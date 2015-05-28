@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.contextFile org.eventb.core.configuration="org.eventb.core.fwd;de.prob.symbolic.ctxBase;de.prob.units.mchBase;org.eventb.codegen.ui.cgConfig;org.animb.valuation.valBase" org.eventb.texttools.text_lastmodified="1407508240176" org.eventb.texttools.text_representation="context Ctx_HM extends Ctx_IPC&#10;&#10;sets&#10;&#9;SYSTEM_ERRORS&#10;&#9;MODULE_RECOVERY_ACTIONS&#10;&#9;PARTITION_RECOVERY_ACTIONS&#10;&#9;ERROR_LEVEL_MP //Error levels for Multi-Partition HM table&#10;&#9;ERROR_LEVEL_P //Error levels for Partition HM table&#10;&#9;MODULE_STATES&#10;&#9;PROC_LEVEL_ERRORS&#10;&#10;constants&#10;&#9;DEADLINE_MISSED APPLICATION_ERROR NUMERIC_ERROR ILLEGAL_REQUEST&#10;&#9;STACK_OVERFLOW MEMORY_VIOLATION HARDWARE_FAULT POWER_FAILURE // Predefined ARINC 653 process level error codes&#10;&#10;&#9;PLA_IGNORE PLA_IDLE PLA_WARM_START  PLA_COLD_START //Error recovery actions to take when partition level errors occur Type&#10;&#10;&#9;MLA_IGNORE MLA_SHUTDOWN MLA_RESET //Recovery action to take when error level is MODULE&#10;&#9;ERROR_LEVEL_MODULE ERROR_LEVEL_PARTITION1  ERROR_LEVEL_PARTITION2 ERROR_LEVEL_PROCESS // types of error level&#10;&#10;&#9;Module_HM_Table&#10;&#9;MultiPart_HM_Table&#10;&#9;Partition_HM_Table&#10;&#10;axioms&#10;&#9;@axm01 finite(SYSTEM_ERRORS) ∧ card(SYSTEM_ERRORS) &gt; 0&#10;&#9;@axm02 partition(ERROR_LEVEL_MP,{ERROR_LEVEL_MODULE},{ERROR_LEVEL_PARTITION1})&#10;&#9;@axm03 partition(ERROR_LEVEL_P,{ERROR_LEVEL_PARTITION2},{ERROR_LEVEL_PROCESS})&#10;&#9;@axm04 partition(MODULE_RECOVERY_ACTIONS,{MLA_IGNORE},{MLA_SHUTDOWN},{MLA_RESET})&#10;&#9;@axm05 partition(PARTITION_RECOVERY_ACTIONS,{PLA_IGNORE},{PLA_IDLE},{PLA_WARM_START},{PLA_COLD_START})&#10;&#9;@axm06 finite(MODULE_STATES) ∧ card(MODULE_STATES) &gt; 0&#10;&#9;@axm10 partition(PROC_LEVEL_ERRORS,{DEADLINE_MISSED},{APPLICATION_ERROR},{NUMERIC_ERROR},{ILLEGAL_REQUEST},{STACK_OVERFLOW},{MEMORY_VIOLATION},{HARDWARE_FAULT},{POWER_FAILURE})&#10;&#9;@axm07 Module_HM_Table∈SYSTEM_ERRORS⇸(MODULE_STATES ×  MODULE_RECOVERY_ACTIONS)&#10;&#9;@axm08 MultiPart_HM_Table∈PARTITIONS→(SYSTEM_ERRORS⇸MODULE_RECOVERY_ACTIONS)&#10;&#9;@axm09 Partition_HM_Table∈PARTITIONS→(SYSTEM_ERRORS⇸(ERROR_LEVEL_P×PARTITION_RECOVERY_ACTIONS⇸PROC_LEVEL_ERRORS))&#10;end&#10;" version="3">
+<org.eventb.core.extendsContext name="'" org.eventb.core.target="Ctx_IPC"/>
+<org.eventb.core.constant name="_-LbncP3TEeOo5_6MhQdZkA" org.eventb.core.identifier="DEADLINE_MISSED"/>
+<org.eventb.core.constant name="_-Lbncf3TEeOo5_6MhQdZkA" org.eventb.core.identifier="APPLICATION_ERROR"/>
+<org.eventb.core.constant name="_-Lbncv3TEeOo5_6MhQdZkA" org.eventb.core.identifier="NUMERIC_ERROR"/>
+<org.eventb.core.constant name="_-Lbnc_3TEeOo5_6MhQdZkA" org.eventb.core.identifier="ILLEGAL_REQUEST"/>
+<org.eventb.core.constant name="_-LbndP3TEeOo5_6MhQdZkA" org.eventb.core.identifier="STACK_OVERFLOW"/>
+<org.eventb.core.constant name="_-Lbndf3TEeOo5_6MhQdZkA" org.eventb.core.identifier="MEMORY_VIOLATION"/>
+<org.eventb.core.constant name="_-Lbndv3TEeOo5_6MhQdZkA" org.eventb.core.identifier="HARDWARE_FAULT"/>
+<org.eventb.core.constant name="_-Lbnd_3TEeOo5_6MhQdZkA" org.eventb.core.comment="Predefined ARINC 653 process level error codes" org.eventb.core.identifier="POWER_FAILURE"/>
+<org.eventb.core.carrierSet name="_Nw_VIP3WEeOo5_6MhQdZkA" org.eventb.core.identifier="SYSTEM_ERRORS"/>
+<org.eventb.core.carrierSet name="_Nw_VIf3WEeOo5_6MhQdZkA" org.eventb.core.identifier="MODULE_RECOVERY_ACTIONS"/>
+<org.eventb.core.constant name="_Nw_VIv3WEeOo5_6MhQdZkA" org.eventb.core.identifier="PLA_IGNORE"/>
+<org.eventb.core.constant name="_Nw_VI_3WEeOo5_6MhQdZkA" org.eventb.core.identifier="PLA_IDLE"/>
+<org.eventb.core.constant name="_Nw_VJP3WEeOo5_6MhQdZkA" org.eventb.core.identifier="PLA_WARM_START"/>
+<org.eventb.core.constant name="_Nw_VJf3WEeOo5_6MhQdZkA" org.eventb.core.comment="Error recovery actions to take when partition level errors occur Type" org.eventb.core.identifier="PLA_COLD_START"/>
+<org.eventb.core.constant name="_Nw_VJv3WEeOo5_6MhQdZkA" org.eventb.core.identifier="MLA_IGNORE"/>
+<org.eventb.core.constant name="_Nw_VJ_3WEeOo5_6MhQdZkA" org.eventb.core.identifier="MLA_SHUTDOWN"/>
+<org.eventb.core.constant name="_Nw_VKP3WEeOo5_6MhQdZkA" org.eventb.core.comment="Recovery action to take when error level is MODULE" org.eventb.core.identifier="MLA_RESET"/>
+<org.eventb.core.constant name="_Nw_VKf3WEeOo5_6MhQdZkA" org.eventb.core.identifier="ERROR_LEVEL_MODULE"/>
+<org.eventb.core.constant name="_Nw_VKv3WEeOo5_6MhQdZkA" org.eventb.core.identifier="ERROR_LEVEL_PARTITION1"/>
+<org.eventb.core.constant name="_BQLRMP3cEeOo5_6MhQdZkA" org.eventb.core.identifier="ERROR_LEVEL_PARTITION2"/>
+<org.eventb.core.constant name="_Nw_VK_3WEeOo5_6MhQdZkA" org.eventb.core.comment="types of error level" org.eventb.core.identifier="ERROR_LEVEL_PROCESS"/>
+<org.eventb.core.carrierSet name="_YY_jsP3YEeOo5_6MhQdZkA" org.eventb.core.identifier="PARTITION_RECOVERY_ACTIONS"/>
+<org.eventb.core.carrierSet name="_N8QpoP3ZEeOo5_6MhQdZkA" org.eventb.core.comment="Error levels for Multi-Partition HM table" org.eventb.core.identifier="ERROR_LEVEL_MP"/>
+<org.eventb.core.carrierSet name="_N8Qpof3ZEeOo5_6MhQdZkA" org.eventb.core.comment="Error levels for Partition HM table" org.eventb.core.identifier="ERROR_LEVEL_P"/>
+<org.eventb.core.axiom name="_N8Qpov3ZEeOo5_6MhQdZkA" org.eventb.core.label="axm01" org.eventb.core.predicate="finite(SYSTEM_ERRORS) ∧ card(SYSTEM_ERRORS) &gt; 0"/>
+<org.eventb.core.axiom name="_N8Qpo_3ZEeOo5_6MhQdZkA" org.eventb.core.label="axm02" org.eventb.core.predicate="partition(ERROR_LEVEL_MP,{ERROR_LEVEL_MODULE},{ERROR_LEVEL_PARTITION1})"/>
+<org.eventb.core.axiom name="_N8QppP3ZEeOo5_6MhQdZkA" org.eventb.core.label="axm03" org.eventb.core.predicate="partition(ERROR_LEVEL_P,{ERROR_LEVEL_PARTITION2},{ERROR_LEVEL_PROCESS})"/>
+<org.eventb.core.axiom name="_N8Qppf3ZEeOo5_6MhQdZkA" org.eventb.core.label="axm04" org.eventb.core.predicate="partition(MODULE_RECOVERY_ACTIONS,{MLA_IGNORE},{MLA_SHUTDOWN},{MLA_RESET})"/>
+<org.eventb.core.axiom name="_N8Qppv3ZEeOo5_6MhQdZkA" org.eventb.core.label="axm05" org.eventb.core.predicate="partition(PARTITION_RECOVERY_ACTIONS,{PLA_IGNORE},{PLA_IDLE},{PLA_WARM_START},{PLA_COLD_START})"/>
+<org.eventb.core.constant name="_eypX8P3ZEeOo5_6MhQdZkA" org.eventb.core.identifier="Module_HM_Table"/>
+<org.eventb.core.constant name="_eypX8f3ZEeOo5_6MhQdZkA" org.eventb.core.identifier="MultiPart_HM_Table"/>
+<org.eventb.core.constant name="_eypX8v3ZEeOo5_6MhQdZkA" org.eventb.core.identifier="Partition_HM_Table"/>
+<org.eventb.core.carrierSet name="_MSZTYP3aEeOo5_6MhQdZkA" org.eventb.core.identifier="MODULE_STATES"/>
+<org.eventb.core.axiom name="_MSZTYf3aEeOo5_6MhQdZkA" org.eventb.core.label="axm06" org.eventb.core.predicate="finite(MODULE_STATES) ∧ card(MODULE_STATES) &gt; 0"/>
+<org.eventb.core.axiom name="_utc84P3bEeOo5_6MhQdZkA" org.eventb.core.label="axm10" org.eventb.core.predicate="partition(PROC_LEVEL_ERRORS,{DEADLINE_MISSED},{APPLICATION_ERROR},{NUMERIC_ERROR},{ILLEGAL_REQUEST},{STACK_OVERFLOW},{MEMORY_VIOLATION},{HARDWARE_FAULT},{POWER_FAILURE})"/>
+<org.eventb.core.axiom name="_MSZTYv3aEeOo5_6MhQdZkA" org.eventb.core.label="axm07" org.eventb.core.predicate="Module_HM_Table∈SYSTEM_ERRORS⇸(MODULE_STATES ×  MODULE_RECOVERY_ACTIONS)"/>
+<org.eventb.core.axiom name="_R8TFsP3bEeOo5_6MhQdZkA" org.eventb.core.label="axm08" org.eventb.core.predicate="MultiPart_HM_Table∈PARTITIONS→(SYSTEM_ERRORS⇸MODULE_RECOVERY_ACTIONS)"/>
+<org.eventb.core.axiom name="_R8TFsf3bEeOo5_6MhQdZkA" org.eventb.core.label="axm09" org.eventb.core.predicate="Partition_HM_Table∈PARTITIONS→(SYSTEM_ERRORS⇸(ERROR_LEVEL_P×PARTITION_RECOVERY_ACTIONS⇸PROC_LEVEL_ERRORS))"/>
+<org.eventb.core.carrierSet name="_utc84f3bEeOo5_6MhQdZkA" org.eventb.core.identifier="PROC_LEVEL_ERRORS"/>
+</org.eventb.core.contextFile>
