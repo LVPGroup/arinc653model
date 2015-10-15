@@ -1,7 +1,7 @@
 # arinc653model
 This is an Event-B model and Proofs of ARINC 653 Part 1 - 3 (2010)
 
-The directory "ARINC653P1-3(2010)_Model2" is the Rodin Project (Rodin 3.2, with Camille Editor plugin), which contains the event-b model files and all proofs. 
+The directory "ARINC653P1-3(2010)_Model2" is the project files in Rodin 3.2 (with Camille Editor plugin), which contains the event-b model files and all proofs. 
 
 For convenience, please see the PDF version of event-b sources using a Rodin Plugin - Camille Text Editor under the "PDF" directory. 
 
