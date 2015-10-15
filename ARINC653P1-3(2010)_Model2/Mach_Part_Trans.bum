@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.machineFile org.eventb.core.configuration="org.eventb.core.fwd;de.prob.units.mchBase;org.eventb.codegen.ui.cgConfig" org.eventb.texttools.text_lastmodified="1444906972388" org.eventb.texttools.text_representation="machine Mach_Part_Trans&#10;&#10; sees Ctx_PartProc_Trans&#10;&#10;variables partition_mode&#10;&#10;&#10;invariants&#10;  @inv_part_mode partition_mode ∈ PARTITIONS → PARTITION_MODES&#10;&#10;events&#10;  event INITIALISATION&#10;    then&#10;      @act01 partition_mode ≔ PARTITIONS × {PM_COLD_START}&#10;   end&#10;&#10;  event partition_mode_transition&#10;    any part newm&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 newm ∈ PARTITION_MODES&#10;      @grd03 partition_mode(part) = PM_COLD_START ⇒ newm =  PM_COLD_START ∨ newm = PM_IDLE ∨  newm = PM_NORMAL&#10;      @grd04 partition_mode(part) = PM_WARM_START ⇒ newm =  PM_WARM_START ∨ newm =  PM_COLD_START ∨ newm = PM_IDLE ∨  newm = PM_NORMAL&#10;      @grd05 partition_mode(part) = PM_IDLE ⇒  newm =  PM_WARM_START ∨ newm =  PM_COLD_START&#10;      @grd06 partition_mode(part) = PM_NORMAL ⇒  newm =  PM_WARM_START ∨ newm =  PM_COLD_START ∨ newm = PM_IDLE&#10;    then&#10;      @act01 partition_mode(part) ≔ newm&#10;  end&#10;end&#10;" version="5">
+<org.eventb.core.seesContext name="_yI8UAM4SEeO_w8hSz1RRkQ" org.eventb.core.target="Ctx_PartProc_Trans"/>
+<org.eventb.core.event name="'" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="INITIALISATION">
+<org.eventb.core.action name="_cLCTgNS7EeO_AqRzFCxhpA" org.eventb.core.assignment="partition_mode ≔ PARTITIONS × {PM_COLD_START}" org.eventb.core.label="act01"/>
+</org.eventb.core.event>
+<org.eventb.core.variable name="_yI8UAc4SEeO_w8hSz1RRkQ" org.eventb.core.identifier="partition_mode"/>
+<org.eventb.core.invariant name="_yI8UAs4SEeO_w8hSz1RRkQ" org.eventb.core.label="inv_part_mode" org.eventb.core.predicate="partition_mode ∈ PARTITIONS → PARTITION_MODES"/>
+<org.eventb.core.event name="_5xVowM4SEeO_w8hSz1RRkQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="partition_mode_transition">
+<org.eventb.core.parameter name="_5xVowc4SEeO_w8hSz1RRkQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_5xVows4SEeO_w8hSz1RRkQ" org.eventb.core.identifier="newm"/>
+<org.eventb.core.guard name="_5xVow84SEeO_w8hSz1RRkQ" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_5xVoxM4SEeO_w8hSz1RRkQ" org.eventb.core.label="grd02" org.eventb.core.predicate="newm ∈ PARTITION_MODES"/>
+<org.eventb.core.guard name="_5xVoxc4SEeO_w8hSz1RRkQ" org.eventb.core.label="grd03" org.eventb.core.predicate="partition_mode(part) = PM_COLD_START ⇒ newm =  PM_COLD_START ∨ newm = PM_IDLE ∨  newm = PM_NORMAL"/>
+<org.eventb.core.guard name="_5xVoxs4SEeO_w8hSz1RRkQ" org.eventb.core.label="grd04" org.eventb.core.predicate="partition_mode(part) = PM_WARM_START ⇒ newm =  PM_WARM_START ∨ newm =  PM_COLD_START ∨ newm = PM_IDLE ∨  newm = PM_NORMAL"/>
+<org.eventb.core.guard name="_5xfZwM4SEeO_w8hSz1RRkQ" org.eventb.core.label="grd05" org.eventb.core.predicate="partition_mode(part) = PM_IDLE ⇒  newm =  PM_WARM_START ∨ newm =  PM_COLD_START"/>
+<org.eventb.core.guard name="_5xfZwc4SEeO_w8hSz1RRkQ" org.eventb.core.label="grd06" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ⇒  newm =  PM_WARM_START ∨ newm =  PM_COLD_START ∨ newm = PM_IDLE"/>
+<org.eventb.core.action name="_5xfZws4SEeO_w8hSz1RRkQ" org.eventb.core.assignment="partition_mode(part) ≔ newm" org.eventb.core.label="act01"/>
+</org.eventb.core.event>
+</org.eventb.core.machineFile>

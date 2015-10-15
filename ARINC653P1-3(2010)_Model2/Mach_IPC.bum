@@ -1,0 +1,1025 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.machineFile org.eventb.core.configuration="org.eventb.core.fwd;de.prob.units.mchBase;org.eventb.codegen.ui.cgConfig" org.eventb.texttools.text_lastmodified="1444908283923" org.eventb.texttools.text_representation="machine Mach_IPC&#10;&#10; refines Mach_IPC_Conds  sees Ctx_IPC&#10;&#10;variables processes processes_of_partition partition_mode process_state periodtype_of_process&#10;          process_wait_type&#10;          locklevel_of_partition&#10;          startcondition_of_partition&#10;          basepriority_of_process&#10;          period_of_process&#10;          timecapacity_of_process&#10;          deadline_of_process&#10;          currentpriority_of_process&#10;          deadlinetime_of_process&#10;          releasepoint_of_process&#10;          delaytime_of_process&#10;          current_partition&#10;          current_process&#10;          current_partition_flag&#10;          current_process_flag&#10;          clock_tick&#10;          need_reschedule&#10;          need_procresch&#10;          preempter_of_partition&#10;          timeout_trigger&#10;          errorhandler_of_partition&#10;          process_call_errorhandler&#10;          queuing_ports&#10;          sampling_ports&#10;          RefreshPeriod_of_SamplingPorts&#10;          msgspace_of_samplingports&#10;          needtrans_of_sourcesamplingport&#10;          queue_of_queueingports quediscipline_of_queueingports&#10;          processes_waitingfor_queuingports&#10;          buffers blackboards semaphores events_ buffers_of_partition blackboards_of_partition semaphores_of_partition events_of_partition MaxMsgNum_of_Buffers queue_of_buffers processes_waitingfor_buffers quediscipline_of_buffers msgspace_of_blackboards emptyindicator_of_blackboards processes_waitingfor_blackboards MaxValue_of_Semaphores value_of_semaphores quediscipline_of_semaphores processes_waitingfor_semaphores state_of_events processes_waitingfor_events used_messages&#10;&#10;invariants&#10;  @inv_refreshprd_of_sampports RefreshPeriod_of_SamplingPorts ∈ sampling_ports → ℕ1&#10;  @inv_flag_sourcesampport needtrans_of_sourcesamplingport ∈ sampling_ports → BOOL&#10;  @inv_flag_means_msg ∀p·(p∈sampling_ports ∧ needtrans_of_sourcesamplingport(p) = TRUE ⇒ p∈dom(msgspace_of_samplingports))&#10;  @inv_quediscipline_of_queueingports quediscipline_of_queueingports∈queuing_ports→QUEUING_DISCIPLINE&#10;  @inv_quediscipline_of_buffers quediscipline_of_buffers∈buffers→QUEUING_DISCIPLINE&#10;  @inv_quediscipline_of_semaphores quediscipline_of_semaphores∈semaphores→QUEUING_DISCIPLINE&#10;&#10;events&#10;  event INITIALISATION extends INITIALISATION&#10;    then&#10;      @act400 RefreshPeriod_of_SamplingPorts ≔ ∅&#10;      @act401 needtrans_of_sourcesamplingport ≔  ∅&#10;      @act402 quediscipline_of_queueingports ≔ ∅&#10;      @act407 quediscipline_of_buffers ≔ ∅&#10;      @act408 quediscipline_of_semaphores ≔ ∅&#10;  end&#10;&#10;  event create_sampling_port refines create_sampling_port&#10;    any port refresh&#10;    where&#10;      @grd01 current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)&#10;      @grd02 port∈PORTS∖(sampling_ports ∪ queuing_ports)&#10;      @grd03 port∈SamplingPorts&#10;      @grd04 Ports_of_Partition(port) = current_partition&#10;      @grd05 refresh∈ℕ1&#10;      @grd06 partition_mode(current_partition)≠PM_NORMAL&#10;    then&#10;      @act01 RefreshPeriod_of_SamplingPorts(port)≔refresh&#10;      @act02 sampling_ports ≔ sampling_ports∪{port}&#10;      @act03 needtrans_of_sourcesamplingport(port) ≔ FALSE&#10;  end&#10;&#10;  event write_sampling_message refines write_sampling_message&#10;    any port msg t&#10;    where&#10;      @grd01 port∈sampling_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;      @grd02 port∈SamplingPorts&#10;      @grd03 Direction_of_Ports(port)=PORT_SOURCE&#10;      @grd04 msg∈MESSAGES∖used_messages&#10;      @grd05 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10;      @act02 msgspace_of_samplingports(port) ≔ msg ↦ t&#10;      @act04 needtrans_of_sourcesamplingport(port) ≔ TRUE&#10;      @act05 used_messages ≔ used_messages  ∪ {msg}&#10;  end&#10;&#10;  event transfer_sampling_msg refines transfer_sampling_msg&#10;    any p m t&#10;    where&#10;      @grd02 p∈sampling_ports&#10;      @grd03 m ∈ MESSAGES ∧ p∈dom(msgspace_of_samplingports) ∧ m↦t=msgspace_of_samplingports(p)&#10;      @grd05 needtrans_of_sourcesamplingport(p) = TRUE&#10;      @grd06 Sampling_Channels∼[{p}] ⊆ sampling_ports&#10;      @grd07 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10;      @act01 needtrans_of_sourcesamplingport(p) ≔ FALSE&#10;      @act02 msgspace_of_samplingports ≔ msgspace_of_samplingports  (Sampling_Channels∼[{p}] × {m↦t})&#10;  end&#10;&#10;  event read_sampling_message refines read_sampling_message&#10;    any port m t&#10;    where&#10;      @grd01 port∈sampling_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;      @grd03 Direction_of_Ports(port)=PORT_DESTINATION&#10;      @grd04 port∈dom(msgspace_of_samplingports) ∧ (m↦t)=msgspace_of_samplingports(port)&#10;      @grd05 t+RefreshPeriod_of_SamplingPorts(port)≥clock_tick ∗ ONE_TICK_TIME&#10;  end&#10;&#10;  event get_sampling_port_id&#10;    any port&#10;    where&#10;      @grd01 port∈sampling_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;  end&#10;&#10;  event get_sampling_port_status&#10;    any port&#10;    where&#10;      @grd01 port∈sampling_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;  end&#10;&#10;  event create_queuing_port refines create_queuing_port&#10;    any port discipline&#10;    where&#10;      @grd02 port∈PORTS∖(sampling_ports ∪ queuing_ports)&#10;      @grd03 port∈QueuingPorts&#10;      @grd01 current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)&#10;      @grd04 Ports_of_Partition(port) = current_partition&#10;      @grd05 discipline∈QUEUING_DISCIPLINE&#10;      @grd06 partition_mode(current_partition)≠PM_NORMAL&#10;    then&#10;      @act01 quediscipline_of_queueingports(port)≔discipline&#10;      @act02 queuing_ports ≔ queuing_ports∪{port}&#10;      @act03 queue_of_queueingports(port) ≔  ∅&#10;      @act04 processes_waitingfor_queuingports(port) ≔ ∅&#10;  end&#10;&#10;  event send_queuing_message refines send_queuing_message&#10;    any port msg t&#10;    where&#10;      @grd01 port∈queuing_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;      @grd03 Direction_of_Ports(port)=PORT_SOURCE&#10;      @grd04 msg∈MESSAGES∖used_messages&#10;      @grd05 card(queue_of_queueingports(port))&lt;MaxMsgNum_of_QueuingPorts(port)&#10;      @grd06 processes_waitingfor_queuingports(port) = ∅&#10;      @grd07 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10;      @act01 queue_of_queueingports(port) ≔ queue_of_queueingports(port)  {msg↦t}&#10;      @act05 used_messages ≔ used_messages ∪ {msg}&#10;  end&#10;&#10;  event send_queuing_message_needwait&#10;  refines send_queuing_message_needwait&#10;    any part proc newstate wt timeout tmout_trig port msg t&#10;    where&#10;      @grd40 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd41 part = current_partition ∧ proc = current_process ∧ newstate = PS_Waiting&#10;      @grd43 wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)&#10;      @grd06 timeout ∈ℕ&#10;      @grd07 current_process = proc&#10;      @grd45 tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)&#10;      @grd46 (timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})&#10;      @grd47 timeout&gt;0 ⇒ wt = PROC_WAIT_TIMEOUT&#10;      @grd48 timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ&#10;      @grd51 port∈queuing_ports&#10;      @grd50 Ports_of_Partition(port) = current_partition&#10;      @grd53 Direction_of_Ports(port)=PORT_SOURCE&#10;      @grd54 msg∈MESSAGES∖used_messages&#10;      @grd55 card(queue_of_queueingports(port))=MaxMsgNum_of_QueuingPorts(port) ∨ processes_waitingfor_queuingports(port) ≠ ∅&#10;      @grd57 locklevel_of_partition(current_partition)=0 ∧ (current_partition∈dom(errorhandler_of_partition) ⇒ current_process≠errorhandler_of_partition(current_partition))&#10;      @grd58 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10;      @act41 need_reschedule ≔ TRUE&#10;      @act42 current_process_flag ≔ FALSE&#10;      @act43 process_wait_type(current_process) ≔ wt&#10;      @act45 timeout_trigger ≔ timeout_trigger   tmout_trig&#10;      @act52 processes_waitingfor_queuingports(port) ≔  processes_waitingfor_queuingports(port)  {proc↦(msg↦t )}&#10;      @act55 used_messages ≔ used_messages ∪ {msg}&#10;      @act56 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event transfer_queuing_msg extends transfer_queuing_msg&#10;    when&#10;      @grd20 (∀m1,t1·(m1↦t1∈queue_of_queueingports(p) ⇒ t≤t1))&#10;&#10;  end&#10;&#10;  event wakeup_waitproc_on_srcqueports&#10;  refines wakeup_waitproc_on_srcqueports&#10;    any part proc newstate resch port msg t&#10;    where&#10;      @grd500 current_partition_flag = TRUE ∧ partition_mode(current_partition)=PM_NORMAL&#10;      @grd509 part = current_partition&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend&#10;      @grd33 process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready&#10;      @grd34 process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend&#10;      @grd40 process_wait_type(proc)= PROC_WAIT_OBJ&#10;      @grd510 resch = TRUE&#10;      @grd502 port ∈ Source_QueuingPorts ∧ port∈queuing_ports&#10;      @grd504 card(queue_of_queueingports(port)) &lt; MaxMsgNum_of_QueuingPorts(port)&#10;      @grd506 (proc↦(msg ↦ t))∈processes_waitingfor_queuingports(port)&#10;      @grd507 quediscipline_of_queueingports(port)=QUEUE_FIFO ⇒ (∀p1,t1,m·((p1↦(m↦t1))∈processes_waitingfor_queuingports(port) ⇒ t≤t1))&#10;      @grd508 quediscipline_of_queueingports(port)=QUEUE_PRIORITY ⇒ (∀p1,t1,m·((p1↦(m↦t1))∈processes_waitingfor_queuingports(port) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))&#10;    then&#10;      @act41 process_wait_type ≔  {proc}⩤process_wait_type&#10;      @act42 timeout_trigger ≔ {proc}⩤timeout_trigger&#10;      @act43 need_reschedule ≔ resch&#10;      @act501 processes_waitingfor_queuingports(port) ≔ {proc} ⩤ processes_waitingfor_queuingports(port)&#10;      @act506 queue_of_queueingports(port) ≔ queue_of_queueingports(port){msg↦t}&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event wakeup_waitproc_on_destqueports&#10;  refines wakeup_waitproc_on_destqueports&#10;    any part proc newstate resch port msg t msg1 t1&#10;    where&#10;      @grd500 current_partition_flag = TRUE ∧ partition_mode(current_partition)=PM_NORMAL&#10;      @grd503 part = current_partition&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend&#10;      @grd33 process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready&#10;      @grd34 process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend&#10;      @grd40 process_wait_type(proc)= PROC_WAIT_OBJ&#10;      @grd501 resch = TRUE&#10;      @grd502 port ∈ Dest_QueuingPorts ∧ port∈queuing_ports&#10;      @grd504 queue_of_queueingports(port)≠ ∅&#10;      @grd506 (proc↦(msg ↦ t))∈processes_waitingfor_queuingports(port)&#10;      @grd507 quediscipline_of_queueingports(port)=QUEUE_FIFO ⇒ (∀p1,tt,m·(p1↦(m↦tt)∈processes_waitingfor_queuingports(port) ⇒ t≤tt))&#10;      @grd508 quediscipline_of_queueingports(port)=QUEUE_PRIORITY ⇒ (∀p1,tt,m·(p1↦(m↦tt)∈processes_waitingfor_queuingports(port) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))&#10;      @grd509 msg1↦t1∈queue_of_queueingports(port)&#10;      @grd510 (∀tt,mm·(mm↦tt∈queue_of_queueingports(port) ⇒t1≤tt))&#10;    then&#10;      @act41 process_wait_type ≔  {proc}⩤process_wait_type&#10;      @act42 timeout_trigger ≔ {proc}⩤timeout_trigger&#10;      @act43 need_reschedule ≔ resch&#10;      @act501 processes_waitingfor_queuingports(port) ≔ {proc} ⩤ processes_waitingfor_queuingports(port)&#10;      @act506 queue_of_queueingports(port) ≔ queue_of_queueingports(port)∖{msg ↦  t}&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event receive_queuing_message refines receive_queuing_message&#10;    any port msg t&#10;    where&#10;      @grd01 port∈queuing_ports&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ Ports_of_Partition(port) = current_partition&#10;      @grd03 Direction_of_Ports(port)=PORT_DESTINATION&#10;      @grd04 msg∈MESSAGES&#10;      @grd06 queue_of_queueingports(port)≠∅&#10;      @grd05 (msg ↦t) ∈ queue_of_queueingports(port)  ∧ (∀m,t1·(m↦t1∈queue_of_queueingports(port) ⇒ t≤t1)) // FIFO queue, read the first msg&#10;    then&#10;      @act01 queue_of_queueingports(port) ≔ queue_of_queueingports(port) ∖ {msg↦t}&#10;  end&#10;&#10;  event receive_queuing_message_needwait&#10;  refines receive_queuing_message_needwait&#10;    any part proc newstate port msg wt timeout tmout_trig t&#10;    where&#10;      @grd40 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd41 part = current_partition ∧ proc = current_process&#10;      @grd42 newstate = PS_Waiting&#10;      @grd43 wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)&#10;      @grd44 timeout ∈ℕ&#10;      @grd45 tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)&#10;      @grd46 (timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})&#10;      @grd47 timeout &gt;0 ⇒ wt = PROC_WAIT_TIMEOUT&#10;      @grd48 timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ&#10;      @grd502 port∈queuing_ports&#10;      @grd503 port∈QueuingPorts&#10;      @grd500 Ports_of_Partition(port) = current_partition&#10;      @grd504 Direction_of_Ports(port)=PORT_DESTINATION&#10;      @grd505 queue_of_queueingports(port)=∅&#10;      @grd506 msg∈MESSAGES&#10;      @grd510 (msg ↦t) ∈ queue_of_queueingports(port)&#10;      @grd507 locklevel_of_partition(current_partition)=0&#10;      @grd508 current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)&#10;    then&#10;      @act41 need_reschedule ≔ TRUE&#10;      @act42 current_process_flag ≔ FALSE&#10;      @act43 process_wait_type(proc) ≔ wt&#10;      @act05 timeout_trigger ≔ timeout_trigger   tmout_trig&#10;      @act52 processes_waitingfor_queuingports(port) ≔  processes_waitingfor_queuingports(port)  {proc↦(msg↦t)}&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event get_queuing_port_id&#10;    any port&#10;    where&#10;      @grd01 port∈QueuingPorts ∧port∈queuing_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;  end&#10;&#10;  event get_queuing_port_status&#10;    any port&#10;    where&#10;      @grd01 port∈QueuingPorts ∧ port ∈queuing_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;  end&#10;&#10;  event clear_queuing_port refines clear_queuing_port&#10;    any port&#10;    where&#10;      @grd01 port∈QueuingPorts ∧ port∈queuing_ports&#10;      @grd00 current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition&#10;      @grd02 Direction_of_Ports(port)=PORT_DESTINATION&#10;    then&#10;      @act01 queue_of_queueingports(port) ≔ ∅&#10;  end&#10;&#10;  event create_buffer refines create_buffer&#10;    any buf max_msg_size quediscip&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)&#10;      @grd01 buf∈BUFFERS∖buffers&#10;      @grd03 max_msg_size∈ℕ1&#10;      @grd04 quediscip∈QUEUING_DISCIPLINE&#10;      @grd06 partition_mode(current_partition)≠PM_NORMAL&#10;    then&#10;      @act01 MaxMsgNum_of_Buffers(buf)≔max_msg_size&#10;      @act02 buffers ≔ buffers∪{buf}&#10;      @act03 quediscipline_of_buffers(buf) ≔ quediscip&#10;      @act04 buffers_of_partition(buf) ≔ current_partition&#10;      @act05 queue_of_buffers(buf) ≔ ∅&#10;      @act06 processes_waitingfor_buffers(buf) ≔ ∅&#10;  end&#10;&#10;  event send_buffer refines send_buffer&#10;    any buf msg t&#10;    where&#10;      @grd01 buf ∈ buffers&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ buffers_of_partition(buf) = current_partition&#10;      @grd02 msg∈MESSAGES∖used_messages&#10;      @grd05 card(queue_of_buffers(buf))&lt;MaxMsgNum_of_Buffers(buf)&#10;      @grd06 processes_waitingfor_buffers(buf) = ∅&#10;      @grd07 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10; @act01 queue_of_buffers(buf) ≔ queue_of_buffers(buf)  {msg↦t}&#10;      @act05 used_messages ≔ used_messages ∪ {msg}&#10;  end&#10;&#10;  event send_buffer_needwakeuprecvproc&#10;  refines send_buffer_needwakeuprecvproc&#10;    any part proc newstate resch buf msg t m&#10;    where&#10;      @grd01 buf ∈ buffers&#10;      @grd02 current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ buffers_of_partition(buf) = current_partition&#10;      @grd03 part = current_partition&#10;      @grd04 proc ∈ processes&#10;      @grd05 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend&#10;      @grd06 process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready&#10;      @grd07 process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend&#10;      @grd08 process_wait_type(proc)= PROC_WAIT_OBJ&#10;      @grd09 resch ∈BOOL&#10;      @grd10 (locklevel_of_partition(current_partition)=0 ⇒ resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒ resch=need_reschedule)&#10;      @grd11 msg∈MESSAGES∖used_messages&#10;      @grd12 t∈ℕ ∧ m∈MESSAGES&#10;      @grd13 card(queue_of_buffers(buf))&lt;MaxMsgNum_of_Buffers(buf)&#10;      @grd14 processes_waitingfor_buffers(buf)≠∅ ∧ (proc↦(m↦WAITING_R ↦t)) ∈processes_waitingfor_buffers(buf)&#10;      @grd15 quediscipline_of_buffers(buf)=QUEUE_FIFO ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ t≤t1))&#10;      @grd16 quediscipline_of_buffers(buf)=QUEUE_PRIORITY ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))&#10;    then&#10;      @act41 process_wait_type ≔  {proc}⩤process_wait_type&#10;      @act42 timeout_trigger ≔ {proc}⩤timeout_trigger&#10;      @act43 need_reschedule ≔ resch&#10;&#9;  @act501 used_messages ≔ used_messages ∪ {msg}&#10;      @act502 processes_waitingfor_buffers(buf) ≔ {proc} ⩤   processes_waitingfor_buffers(buf)&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event send_buffer_withfull&#10;  refines send_buffer_withfull&#10;    any part proc newstate wt timeout tmout_trig buf msg t&#10;    where&#10;      @grd40 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd41 part = current_partition&#10;      @grd42 proc = current_process&#10;      @grd34 newstate = PS_Waiting&#10;      @grd43 wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)&#10;      @grd44 timeout ∈ℕ&#10;      @grd45 tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)&#10;      @grd46 (timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})&#10;      @grd47 timeout&gt;0 ⇒ wt = PROC_WAIT_TIMEOUT&#10;      @grd48 timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ&#10;      @grd503 buf ∈ buffers&#10;      @grd500 buffers_of_partition(buf) = current_partition&#10;      @grd502 msg∈MESSAGES∖used_messages&#10;      @grd504 buffers_of_partition(buf) = current_partition&#10;      @grd505 card(queue_of_buffers(buf))=MaxMsgNum_of_Buffers(buf)&#10;      @grd509 locklevel_of_partition(current_partition) = 0&#10;      @grd510 current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)&#10;      @grd511 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10;      @act41 need_reschedule ≔ TRUE&#10;      @act42 current_process_flag ≔ FALSE&#10;      @act43 process_wait_type(proc) ≔ wt&#10;      @act05 timeout_trigger ≔ timeout_trigger   tmout_trig&#10;      @act501 processes_waitingfor_buffers(buf) ≔  processes_waitingfor_buffers(buf) {proc ↦(msg↦WAITING_W↦t)}&#10;      @act502 used_messages ≔ used_messages ∪ {msg}&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event receive_buffer refines receive_buffer&#10;    any buf msg t&#10;    where&#10;      @grd01 buf ∈ buffers&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ buffers_of_partition(buf) = current_partition&#10;      @grd02 msg∈MESSAGES&#10;      @grd03 queue_of_buffers(buf)≠ ∅&#10;      @grd04 msg↦t∈queue_of_buffers(buf) ∧ (∀m1,t1·(m1↦t1∈queue_of_buffers(buf)⇒t≤t1))&#10;      @grd05 processes_waitingfor_buffers(buf)=∅&#10;&#9;then&#10;      @act01 queue_of_buffers(buf) ≔ queue_of_buffers(buf) ∖ {msg↦t}&#10;  end&#10;&#10;  event receive_buffer_needwakeupsendproc&#10;  refines receive_buffer_needwakeupsendproc&#10;    any part proc newstate resch buf msg t m t_&#10;    where&#10;      @grd500 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd501 part = current_partition&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend&#10;      @grd33 process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready&#10;      @grd34 process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend&#10;      @grd40 process_wait_type(proc)= PROC_WAIT_OBJ&#10;      @grd41 resch∈BOOL&#10;      @grd509 (locklevel_of_partition(current_partition)=0 ⇒ resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒ resch=need_reschedule)&#10;      @grd506 buf ∈ buffers&#10;      @grd05 buffers_of_partition(buf) = current_partition&#10;      @grd502 msg∈MESSAGES&#10;      @grd508 m∈MESSAGES ∧ t∈ℕ ∧ t_∈ℕ&#10;      @grd503 queue_of_buffers(buf)≠∅&#10;      @grd504 msg↦t∈queue_of_buffers(buf) ∧ (∀m1,t1·(m1↦t1∈queue_of_buffers(buf)⇒t≤t1))&#10;      @grd505 processes_waitingfor_buffers(buf)≠∅ ∧ (proc↦(m↦WAITING_W ↦t_)) ∈processes_waitingfor_buffers(buf)&#10;&#9;  @grd510 quediscipline_of_buffers(buf)=QUEUE_FIFO ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ t≤t1))&#10;      @grd507 quediscipline_of_buffers(buf)=QUEUE_PRIORITY ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))&#10;    then&#10;      @act41 process_wait_type ≔  {proc}⩤process_wait_type&#10;      @act42 timeout_trigger ≔ {proc}⩤timeout_trigger&#10;      @act43 need_reschedule ≔ resch&#10;      @act501 queue_of_buffers(buf) ≔ (queue_of_buffers(buf) ∖ {msg↦t})&#10;      @act502 processes_waitingfor_buffers(buf) ≔ {proc} ⩤   processes_waitingfor_buffers(buf)&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event receive_buffer_whenempty&#10;  refines receive_buffer_whenempty&#10;    any part proc newstate wt timeout tmout_trig buf msg t&#10;    where&#10;      @grd40 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd41 part = current_partition&#10;      @grd42 proc = current_process&#10;      @grd34 newstate = PS_Waiting&#10;      @grd43 wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)&#10;      @grd44 timeout ∈ℕ&#10;      @grd45 tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)&#10;      @grd46 (timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})&#10;      @grd47 timeout &gt;0 ⇒ wt = PROC_WAIT_TIMEOUT&#10;      @grd48 timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ&#10;      @grd504 buf ∈ buffers&#10;      @grd500 buffers_of_partition(buf) = current_partition&#10;      @grd502 queue_of_buffers(buf)=∅&#10;      @grd503 msg∈MESSAGES&#10;      @grd509 locklevel_of_partition(current_partition) = 0&#10;      @grd510 current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)&#10;      @grd511 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10;      @act41 need_reschedule ≔ TRUE&#10;      @act42 current_process_flag ≔ FALSE&#10;      @act43 process_wait_type(proc) ≔ wt&#10;      @act05 timeout_trigger ≔ timeout_trigger   tmout_trig&#10;      @act11 process_state(proc) ≔ newstate&#10;      @act501 processes_waitingfor_buffers(buf) ≔ processes_waitingfor_buffers(buf) {proc ↦(msg↦WAITING_R↦t)}&#10;  end&#10;&#10;  event get_buffer_id&#10;    any buf&#10;    where&#10;      @grd01 buf ∈ buffers&#10;      @grd00 current_partition_flag = TRUE ∧ buffers_of_partition(buf) = current_partition&#10;  end&#10;&#10;  event get_buffer_status&#10;    any buf&#10;    where&#10;      @grd01 buf ∈ buffers&#10;      @grd00 current_partition_flag = TRUE ∧ buffers_of_partition(buf) = current_partition&#10;  end&#10;&#10;  event create_blackboard refines create_blackboard&#10;    any bb&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)&#10;      @grd01 bb∈BLACKBOARDS∖blackboards&#10;      @grd06 partition_mode(current_partition)≠PM_NORMAL&#10;    then&#10;      @act02 blackboards ≔ blackboards∪{bb}&#10;      @act03 blackboards_of_partition(bb)≔ current_partition&#10;      @act04 emptyindicator_of_blackboards(bb)≔BB_EMPTY&#10;      @act05 processes_waitingfor_blackboards(bb) ≔ ∅&#10;  end&#10;&#10;  event display_blackboard refines display_blackboard&#10;    any bb msg&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition&#10;      @grd02 msg∈MESSAGES∖used_messages&#10;      @grd03 processes_waitingfor_blackboards(bb) = ∅&#10;    then&#10;      @act01 msgspace_of_blackboards(bb) ≔ msg&#10;      @act02 emptyindicator_of_blackboards(bb) ≔ BB_OCCUPIED&#10;      @act03 used_messages ≔ used_messages ∪ {msg}&#10;  end&#10;&#10;  event display_blackboard_needwakeuprdprocs&#10;  refines display_blackboard_needwakeuprdprocs&#10;    any part procs newstates resch bb msg&#10;    where&#10;      @grd01 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd02 part = current_partition&#10;      @grd13 bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition&#10;      @grd03 procs⊆PROCESSES ∧ procs ⊆ processes_of_partition∼[{part}]&#10;      @grd04 procs = processes_waitingfor_blackboards(bb) ∧ procs⊆ dom(process_wait_type)&#10;      @grd05 ∀proc·(proc∈procs ⇒ process_wait_type(proc)= PROC_WAIT_OBJ)&#10;      @grd06 newstates ∈ procs → PROCESS_STATES&#10;      @grd07 partition_mode(part) = PM_NORMAL&#10;      @grd08 ∀proc·(proc∈procs ⇒ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend)&#10;      @grd09 ∀proc·(proc∈procs ∧ process_state(proc) = PS_Waiting ⇒ newstates(proc) = PS_Ready)&#10;      @grd10 ∀proc·(proc∈procs ∧ process_state(proc) = PS_WaitandSuspend ⇒ newstates(proc) = PS_Suspend)&#10;      @grd11 resch∈BOOL&#10;      @grd12 (locklevel_of_partition(current_partition)=0 ⇒  resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒  resch=need_reschedule)&#10;      @grd14 msg∈MESSAGES∖used_messages&#10;      @grd15 processes_waitingfor_blackboards(bb) ≠ ∅&#10;    then&#10;      @act41 process_wait_type ≔  procs⩤process_wait_type&#10;      @act42 timeout_trigger ≔ procs⩤timeout_trigger&#10;      @act43 need_reschedule ≔ resch&#10;      @act11 process_state ≔ process_state newstates&#10;      @act501 msgspace_of_blackboards(bb) ≔ msg&#10;      @act502 emptyindicator_of_blackboards(bb) ≔ BB_OCCUPIED&#10;      @act503 processes_waitingfor_blackboards(bb) ≔ processes_waitingfor_blackboards(bb)∖procs&#10;      @act504 used_messages ≔ used_messages ∪ {msg}&#10;  end&#10;&#10;  event read_blackboard refines read_blackboard&#10;    any bb msg&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition&#10;      @grd02 msg∈MESSAGES&#10;      @grd03 bb∈dom(msgspace_of_blackboards) ∧ msg = msgspace_of_blackboards(bb)&#10;      @grd04 emptyindicator_of_blackboards(bb) = BB_OCCUPIED&#10;  end&#10;&#10;  event read_blackboard_whenempty&#10;  refines read_blackboard_whenempty&#10;    any part proc newstate wt timeout tmout_trig bb&#10;    where&#10;      @grd40 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd41 part = current_partition&#10;      @grd42 proc = current_process&#10;      @grd43 wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)&#10;      @grd34 newstate = PS_Waiting&#10;      @grd44 timeout ∈ℕ&#10;      @grd45 tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)&#10;      @grd46 (timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})&#10;      @grd47 timeout &gt;0 ⇒ wt = PROC_WAIT_TIMEOUT&#10;      @grd48 timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ&#10;      @grd501 bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition&#10;      @grd503 emptyindicator_of_blackboards(bb) = BB_EMPTY&#10;      @grd504 locklevel_of_partition(current_partition) = 0&#10;      @grd515 current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)&#10;    then&#10;      @act41 need_reschedule ≔ TRUE&#10;      @act42 current_process_flag ≔ FALSE&#10;      @act43 process_wait_type(proc) ≔ wt&#10;      @act05 timeout_trigger ≔ timeout_trigger   tmout_trig&#10;      @act501 processes_waitingfor_blackboards(bb) ≔ processes_waitingfor_blackboards(bb) ∪ {proc}&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event clear_blackboard refines clear_blackboard&#10;    any bb&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition&#10;    then&#10;      @act01 emptyindicator_of_blackboards(bb) ≔ BB_EMPTY&#10;      @act02 msgspace_of_blackboards ≔ {bb} ⩤ msgspace_of_blackboards&#10;  end&#10;&#10;  event get_blackboard_id&#10;    any bb&#10;    where&#10;      @grd01 bb∈blackboards&#10;      @grd00 current_partition_flag = TRUE ∧ blackboards_of_partition(bb) = current_partition&#10;  end&#10;&#10;  event get_blackboard_status&#10;    any bb&#10;    where&#10;      @grd01 bb∈blackboards&#10;      @grd00 current_partition_flag = TRUE ∧ blackboards_of_partition(bb) = current_partition&#10;  end&#10;&#10;  event create_semaphore refines create_semaphore&#10;    any sem maxval currentval quediscip&#10;    where&#10;      @grd01 current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)&#10;      @grd02 sem∈SEMAPHORES∖semaphores&#10;      @grd05 quediscip∈QUEUING_DISCIPLINE&#10;      @grd06 partition_mode(current_partition)≠PM_NORMAL&#10;      @grd07 maxval∈ℕ1&#10;      @grd08 currentval∈ℕ ∧ currentval≤maxval&#10;    then&#10;      @act01 quediscipline_of_semaphores(sem)≔quediscip&#10;      @act02 semaphores ≔ semaphores∪{sem}&#10;      @act03 value_of_semaphores(sem)≔currentval&#10;      @act04 MaxValue_of_Semaphores(sem)≔maxval&#10;      @act05 semaphores_of_partition(sem) ≔current_partition&#10;      @act06 processes_waitingfor_semaphores(sem) ≔ ∅&#10;  end&#10;&#10;  event wait_semaphore refines wait_semaphore&#10;    any sem&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition&#10;      @grd02 value_of_semaphores(sem) &gt; 0&#10;    then&#10;      @act01 value_of_semaphores(sem) ≔ value_of_semaphores(sem) −1&#10;  end&#10;&#10;  event wait_semahpore_whenzero&#10;  refines wait_semahpore_whenzero&#10;    any part proc newstate wt timeout tmout_trig sem t&#10;    where&#10;&#9;  @grd40 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd41 part = current_partition&#10;      @grd42 proc = current_process&#10;      @grd34 newstate = PS_Waiting&#10;      @grd43 wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)&#10;      @grd44 timeout ∈ℕ&#10;      @grd45 tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)&#10;      @grd46 (timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt; 0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})&#10;      @grd47 timeout &gt; 0 ⇒ wt = PROC_WAIT_TIMEOUT&#10;      @grd48 timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ&#10;&#9;  @grd502 sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition&#10;      @grd504 value_of_semaphores(sem) = 0&#10;      @grd505 locklevel_of_partition(current_partition) = 0&#10;      @grd506 current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)&#10;      @grd507 t = clock_tick ∗ ONE_TICK_TIME&#10;    then&#10;      @act41 need_reschedule ≔ TRUE&#10;      @act42 current_process_flag ≔ FALSE&#10;      @act43 process_wait_type(proc) ≔ wt&#10;      @act05 timeout_trigger ≔ timeout_trigger   tmout_trig&#10;      @act501 processes_waitingfor_semaphores(sem) ≔ processes_waitingfor_semaphores(sem)  {proc ↦ t}&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event signal_semaphore refines signal_semaphore&#10;    any sem&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition&#10;      @grd02 value_of_semaphores(sem) ≠ MaxValue_of_Semaphores(sem)&#10;      @grd03 processes_waitingfor_semaphores(sem) = ∅&#10;    then&#10;      @act01 value_of_semaphores(sem) ≔ value_of_semaphores(sem) + 1&#10;  end&#10;&#10;  event signal_semaphore_needwakeupproc&#10;  refines signal_semaphore_needwakeupproc&#10;    any part proc newstate resch sem t&#10;    where&#10;      @grd02 proc ∈ processes&#10;      @grd32 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend&#10;      @grd33 process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready&#10;      @grd34 process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend&#10;      @grd35 proc∈ dom(process_wait_type)&#10;      @grd40 process_wait_type(proc)= PROC_WAIT_OBJ&#10;      @grd41 resch∈BOOL&#10;      @grd42 t∈ℕ&#10;      @grd500 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd501 part = current_partition&#10;      @grd509 (locklevel_of_partition(current_partition)=0 ⇒ resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒ resch=need_reschedule)&#10;      @grd502 sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition&#10;      @grd503 value_of_semaphores(sem) &lt; MaxValue_of_Semaphores(sem)&#10;      @grd506 processes_waitingfor_semaphores(sem)≠∅ ∧ (proc↦t) ∈processes_waitingfor_semaphores(sem)&#10;      @grd507 quediscipline_of_semaphores(sem)=QUEUE_FIFO ⇒ (∀p1,t1·(p1↦t1∈processes_waitingfor_semaphores(sem) ⇒ t≤t1))&#10;      @grd508 quediscipline_of_semaphores(sem)=QUEUE_PRIORITY ⇒ (∀p1,t1·(p1↦t1∈processes_waitingfor_semaphores(sem) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))&#10;    then&#10;      @act41 process_wait_type ≔  {proc}⩤process_wait_type&#10;      @act42 timeout_trigger ≔ {proc}⩤timeout_trigger&#10;      @act43 need_reschedule ≔ resch&#10;      @act501 processes_waitingfor_semaphores(sem) ≔ {proc} ⩤ processes_waitingfor_semaphores(sem)&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event get_semaphore_id&#10;    any sem&#10;    where&#10;      @grd01 sem∈semaphores&#10;      @grd00 current_partition_flag = TRUE ∧ semaphores_of_partition(sem) = current_partition&#10;  end&#10;&#10;  event get_semaphore_status&#10;    any sem&#10;    where&#10;      @grd01 sem∈semaphores&#10;      @grd00 current_partition_flag = TRUE ∧ semaphores_of_partition(sem) = current_partition&#10;  end&#10;&#10;  event create_event refines create_event&#10;    any ev&#10;    where&#10;      @grd01 current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)&#10;      @grd02 ev∈EVENTS∖events_&#10;      @grd06 partition_mode(current_partition)≠PM_NORMAL&#10;    then&#10;      @act01 events_ ≔ events_∪{ev}&#10;      @act02 state_of_events(ev) ≔ EVENT_DOWN&#10;      @act03 events_of_partition(ev) ≔ current_partition&#10;      @act04 processes_waitingfor_events(ev) ≔ ∅&#10;  end&#10;&#10;  event set_event refines set_event&#10;    any ev&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 ev∈events_ ∧ events_of_partition(ev) = current_partition&#10;      @grd03 processes_waitingfor_events(ev) = ∅&#10;    then&#10;      @act01 state_of_events(ev)≔EVENT_UP&#10;  end&#10;&#10;  event set_event_needwakeupprocs&#10;  refines set_event_needwakeupprocs&#10;    any part procs newstates resch ev&#10;    where&#10;      @grd500 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd501 part = current_partition&#10;      @grd502 ev∈events_ ∧ events_of_partition(ev) = current_partition&#10;      @grd02 procs ⊆ processes&#10;      @grd06 procs ⊆ processes_of_partition∼[{part}]&#10;      @grd504 procs = processes_waitingfor_events(ev) ∧ procs⊆ dom(process_wait_type)&#10;      @grd40 ∀proc·(proc∈procs ⇒ process_wait_type(proc)= PROC_WAIT_OBJ)&#10;      @grd03 newstates ∈ procs → PROCESS_STATES&#10;      @grd07 partition_mode(part) = PM_NORMAL&#10;      @grd32 ∀proc·(proc∈procs ⇒ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend)&#10;      @grd33 ∀proc·(proc∈procs ∧ process_state(proc) = PS_Waiting ⇒ newstates(proc) = PS_Ready)&#10;      @grd34 ∀proc·(proc∈procs ∧ process_state(proc) = PS_WaitandSuspend ⇒ newstates(proc) = PS_Suspend)&#10;      @grd41 resch∈BOOL&#10;      @grd507 (locklevel_of_partition(current_partition)=0 ⇒  resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒  resch=need_reschedule)&#10;      @grd503 processes_waitingfor_events(ev) ≠ ∅&#10;    then&#10;      @act41 process_wait_type ≔  procs⩤process_wait_type&#10;      @act42 timeout_trigger ≔ procs⩤timeout_trigger&#10;      @act43 need_reschedule ≔ resch&#10;      @act11 process_state ≔ process_state newstates&#10;      @act501 state_of_events(ev)≔EVENT_UP&#10;      @act503 processes_waitingfor_events(ev) ≔ processes_waitingfor_events(ev)∖procs&#10;  end&#10;&#10;  event reset_event refines reset_event&#10;    any ev&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 ev∈events_ ∧ events_of_partition(ev) = current_partition&#10;    then&#10;      @act01 state_of_events(ev)≔EVENT_DOWN&#10;  end&#10;&#10;  event wait_event refines wait_event&#10;    any ev&#10;    where&#10;      @grd00 current_partition_flag = TRUE ∧ current_process_flag=TRUE&#10;      @grd01 ev∈events_ ∧ events_of_partition(ev) = current_partition&#10;      @grd02 state_of_events(ev)=EVENT_UP&#10;  end&#10;&#10;  event wait_event_whendown&#10;  refines wait_event_whendown&#10;    any part proc newstate wt timeout tmout_trig ev&#10;    where&#10;      @grd40 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd41 part = current_partition&#10;      @grd42 proc = current_process&#10;      @grd34 newstate = PS_Waiting&#10;      @grd43 wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)&#10;      @grd44 timeout ∈ℕ&#10;      @grd45 tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)&#10;      @grd46 (timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})&#10;      @grd47 timeout&gt;0 ⇒ wt = PROC_WAIT_TIMEOUT&#10;      @grd48 timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ&#10;      @grd503 ev∈events_ ∧ events_of_partition(ev) = current_partition&#10;      @grd504 state_of_events(ev)=EVENT_DOWN&#10;      @grd509 locklevel_of_partition(current_partition) = 0&#10;      @grd510 current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)&#10;    then&#10;      @act41 need_reschedule ≔ TRUE&#10;      @act42 current_process_flag ≔ FALSE&#10;      @act43 process_wait_type(proc) ≔ wt&#10;      @act05 timeout_trigger ≔ timeout_trigger   tmout_trig&#10;      @act501 processes_waitingfor_events(ev) ≔ processes_waitingfor_events(ev) ∪ {proc}&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event get_event_id&#10;    any ev&#10;    where&#10;      @grd01 ev∈events_&#10;      @grd00 current_partition_flag = TRUE ∧ events_of_partition(ev) = current_partition&#10;  end&#10;&#10;  event get_event_status&#10;    any ev&#10;    where&#10;      @grd01 ev∈events_&#10;      @grd00 current_partition_flag = TRUE ∧ events_of_partition(ev) = current_partition&#10;  end&#10;&#10;  event ticktock&#10;  extends ticktock&#10;  end&#10;&#10;  event partition_schedule extends partition_schedule&#10;  end&#10;&#10;  event process_schedule&#10;  extends process_schedule&#10;  end&#10;&#10;  event run_errorhandler_preempter&#10;  extends run_errorhandler_preempter&#10;  end&#10;&#10;  event get_partition_status extends get_partition_status&#10;  end&#10;&#10;  event set_partition_mode_to_idle&#10;  extends set_partition_mode_to_idle&#10;    then&#10;      @act601 RefreshPeriod_of_SamplingPorts ≔ Ports_of_Partition∼[{part}] ⩤ RefreshPeriod_of_SamplingPorts&#10;      @act602 needtrans_of_sourcesamplingport ≔  Ports_of_Partition∼[{part}] ⩤ needtrans_of_sourcesamplingport&#10;      @act603 quediscipline_of_queueingports ≔ Ports_of_Partition∼[{part}] ⩤ quediscipline_of_queueingports&#10;      @act604 quediscipline_of_buffers ≔ buffers_of_partition∼[{part}]⩤quediscipline_of_buffers&#10;      @act605 quediscipline_of_semaphores ≔ semaphores_of_partition∼[{part}] ⩤ quediscipline_of_semaphores&#10;  end&#10;&#10;  event set_partition_mode_to_normal extends set_partition_mode_to_normal&#10;  end&#10;&#10;  event set_partition_mode_to_coldstart extends set_partition_mode_to_coldstart&#10;    then&#10;      @act601 RefreshPeriod_of_SamplingPorts ≔ Ports_of_Partition∼[{part}] ⩤ RefreshPeriod_of_SamplingPorts&#10;      @act602 needtrans_of_sourcesamplingport ≔  Ports_of_Partition∼[{part}] ⩤ needtrans_of_sourcesamplingport&#10;      @act603 quediscipline_of_queueingports ≔ Ports_of_Partition∼[{part}] ⩤ quediscipline_of_queueingports&#10;      @act604 quediscipline_of_buffers ≔ buffers_of_partition∼[{part}]⩤quediscipline_of_buffers&#10;      @act605 quediscipline_of_semaphores ≔ semaphores_of_partition∼[{part}] ⩤ quediscipline_of_semaphores&#10;  end&#10;&#10;  event set_partition_mode_to_warmstart extends set_partition_mode_to_warmstart&#10;    then&#10;      @act601 RefreshPeriod_of_SamplingPorts ≔ Ports_of_Partition∼[{part}] ⩤ RefreshPeriod_of_SamplingPorts&#10;      @act602 needtrans_of_sourcesamplingport ≔  Ports_of_Partition∼[{part}] ⩤ needtrans_of_sourcesamplingport&#10;      @act603 quediscipline_of_queueingports ≔ Ports_of_Partition∼[{part}] ⩤ quediscipline_of_queueingports&#10;      @act604 quediscipline_of_buffers ≔ buffers_of_partition∼[{part}]⩤quediscipline_of_buffers&#10;      @act605 quediscipline_of_semaphores ≔ semaphores_of_partition∼[{part}] ⩤ quediscipline_of_semaphores&#10;  end&#10;&#10;  event get_process_id extends get_process_id&#10;  end&#10;&#10;  event get_process_status extends get_process_status&#10;  end&#10;&#10;  event create_process extends create_process&#10;  end&#10;&#10;  event set_priority extends set_priority&#10;  end&#10;&#10;  event suspend_self&#10;  extends suspend_self&#10;  end&#10;&#10;  event suspend&#10;  extends suspend&#10;  end&#10;&#10;  event resume&#10;  extends resume&#10;  end&#10;&#10;  event stop_self extends stop_self&#10;  end&#10;&#10;  event stop extends stop&#10;  end&#10;&#10;  event stop_wf_qport extends stop_wf_qport&#10;  end&#10;&#10;  event stop_wf_buf extends stop_wf_buf&#10;  end&#10;&#10;  event stop_wf_sem extends stop_wf_sem&#10;  end&#10;&#10;  event stop_wf_bb extends stop_wf_bb&#10;  end&#10;&#10;  event stop_wf_evt extends stop_wf_evt&#10;  end&#10;&#10;  event start_aperiodprocess_instart&#10;  extends start_aperiodprocess_instart&#10;  end&#10;&#10;  event start_aperiodprocess_innormal&#10;  extends start_aperiodprocess_innormal&#10;  end&#10;&#10;  event start_periodprocess_instart&#10;  extends start_periodprocess_instart&#10;  end&#10;&#10;  event start_periodprocess_innormal&#10;  extends start_periodprocess_innormal&#10;  end&#10;&#10;  event delaystart_aperiodprocess_instart&#10;  extends delaystart_aperiodprocess_instart&#10;  end&#10;&#10;  event delaystart_aperiodprocess_innormal&#10;  extends delaystart_aperiodprocess_innormal&#10;  end&#10;&#10;  event delaystart_periodprocess_instart&#10;  extends delaystart_periodprocess_instart&#10;  end&#10;&#10;  event delaystart_periodprocess_innormal&#10;  extends delaystart_periodprocess_innormal&#10;  end&#10;&#10;  event lock_preemption extends lock_preemption&#10;  end&#10;&#10;  event unlock_preemption extends unlock_preemption&#10;  end&#10;&#10;  event get_my_id extends get_my_id&#10;  end&#10;&#10;  event timed_wait extends timed_wait&#10;  end&#10;&#10;  event period_wait extends period_wait&#10;  end&#10;&#10;  event get_time extends get_time&#10;  end&#10;&#10;  event replenish extends replenish&#10;  end&#10;&#10;  event aperiodicprocess_finished extends aperiodicprocess_finished&#10;  end&#10;&#10;  event periodicprocess_finished extends periodicprocess_finished&#10;  end&#10;&#10;  event time_out // should refined to support remove process on waiting queue of comm resources&#10;  extends time_out&#10;  end&#10;&#10;&#10;  event time_out_wf_qport extends time_out_wf_qport&#10;  end&#10;&#10;  event time_out_wf_buf extends time_out_wf_buf&#10;  end&#10;&#10;  event time_out_wf_sem extends time_out_wf_sem&#10;  end&#10;&#10;  event time_out_wf_bb extends time_out_wf_bb&#10;  end&#10;&#10;  event time_out_wf_evt extends time_out_wf_evt&#10;  end&#10;&#10;  event periodicproc_reach_releasepoint extends periodicproc_reach_releasepoint&#10;  end&#10;&#10;  event coldstart_partition_fromidle extends coldstart_partition_fromidle&#10;  end&#10;&#10;  event warmstart_partition_fromidle extends warmstart_partition_fromidle&#10;  end&#10;end&#10;" version="5">
+<org.eventb.core.refinesMachine name="'" org.eventb.core.target="Mach_IPC_Conds"/>
+<org.eventb.core.seesContext name="_kB3EcfaqEeO0lIhp9r31mg" org.eventb.core.target="Ctx_IPC"/>
+<org.eventb.core.variable name="_kB9LEPaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes"/>
+<org.eventb.core.variable name="_kB9LEfaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_of_partition"/>
+<org.eventb.core.variable name="_kB9LEvaqEeO0lIhp9r31mg" org.eventb.core.identifier="partition_mode"/>
+<org.eventb.core.variable name="_kB9LE_aqEeO0lIhp9r31mg" org.eventb.core.identifier="process_state"/>
+<org.eventb.core.variable name="_kB9LFPaqEeO0lIhp9r31mg" org.eventb.core.identifier="periodtype_of_process"/>
+<org.eventb.core.variable name="_kB9LFfaqEeO0lIhp9r31mg" org.eventb.core.identifier="process_wait_type"/>
+<org.eventb.core.variable name="_kB9LFvaqEeO0lIhp9r31mg" org.eventb.core.identifier="locklevel_of_partition"/>
+<org.eventb.core.variable name="_kB9LF_aqEeO0lIhp9r31mg" org.eventb.core.identifier="startcondition_of_partition"/>
+<org.eventb.core.variable name="_kB9LGPaqEeO0lIhp9r31mg" org.eventb.core.identifier="basepriority_of_process"/>
+<org.eventb.core.variable name="_kB9LGfaqEeO0lIhp9r31mg" org.eventb.core.identifier="period_of_process"/>
+<org.eventb.core.variable name="_kB9LGvaqEeO0lIhp9r31mg" org.eventb.core.identifier="timecapacity_of_process"/>
+<org.eventb.core.variable name="_kB9LG_aqEeO0lIhp9r31mg" org.eventb.core.identifier="deadline_of_process"/>
+<org.eventb.core.variable name="_kB9LHPaqEeO0lIhp9r31mg" org.eventb.core.identifier="currentpriority_of_process"/>
+<org.eventb.core.variable name="_kB9LHfaqEeO0lIhp9r31mg" org.eventb.core.identifier="deadlinetime_of_process"/>
+<org.eventb.core.variable name="_kB9LHvaqEeO0lIhp9r31mg" org.eventb.core.identifier="releasepoint_of_process"/>
+<org.eventb.core.variable name="_kB9LH_aqEeO0lIhp9r31mg" org.eventb.core.identifier="delaytime_of_process"/>
+<org.eventb.core.variable name="_kB9LIPaqEeO0lIhp9r31mg" org.eventb.core.identifier="current_partition"/>
+<org.eventb.core.variable name="_kB9LIfaqEeO0lIhp9r31mg" org.eventb.core.identifier="current_process"/>
+<org.eventb.core.variable name="_kB9LIvaqEeO0lIhp9r31mg" org.eventb.core.identifier="current_partition_flag"/>
+<org.eventb.core.variable name="_kB9LI_aqEeO0lIhp9r31mg" org.eventb.core.identifier="current_process_flag"/>
+<org.eventb.core.variable name="_kB9LJPaqEeO0lIhp9r31mg" org.eventb.core.identifier="clock_tick"/>
+<org.eventb.core.variable name="_kB9LJfaqEeO0lIhp9r31mg" org.eventb.core.identifier="need_reschedule"/>
+<org.eventb.core.variable name="_9074cDVJEeSxw-wt7-_VGQ" org.eventb.core.identifier="need_procresch"/>
+<org.eventb.core.variable name="_kB9LJvaqEeO0lIhp9r31mg" org.eventb.core.identifier="preempter_of_partition"/>
+<org.eventb.core.variable name="_kB9LJ_aqEeO0lIhp9r31mg" org.eventb.core.identifier="timeout_trigger"/>
+<org.eventb.core.variable name="_kB9LKPaqEeO0lIhp9r31mg" org.eventb.core.identifier="errorhandler_of_partition"/>
+<org.eventb.core.variable name="_kB9LKfaqEeO0lIhp9r31mg" org.eventb.core.identifier="process_call_errorhandler"/>
+<org.eventb.core.variable name="_kB9LKvaqEeO0lIhp9r31mg" org.eventb.core.identifier="queuing_ports"/>
+<org.eventb.core.variable name="_mW8Q8PdkEeOkQpPDjalEqQ" org.eventb.core.identifier="sampling_ports"/>
+<org.eventb.core.variable name="_kB9LLPaqEeO0lIhp9r31mg" org.eventb.core.identifier="RefreshPeriod_of_SamplingPorts"/>
+<org.eventb.core.variable name="_mW8Q8fdkEeOkQpPDjalEqQ" org.eventb.core.identifier="msgspace_of_samplingports"/>
+<org.eventb.core.variable name="_kB9LLvaqEeO0lIhp9r31mg" org.eventb.core.identifier="needtrans_of_sourcesamplingport"/>
+<org.eventb.core.variable name="_mW8Q8vdkEeOkQpPDjalEqQ" org.eventb.core.identifier="queue_of_queueingports"/>
+<org.eventb.core.variable name="_kB9LMPaqEeO0lIhp9r31mg" org.eventb.core.identifier="quediscipline_of_queueingports"/>
+<org.eventb.core.variable name="_kB9LMfaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_waitingfor_queuingports"/>
+<org.eventb.core.variable name="_kB9LMvaqEeO0lIhp9r31mg" org.eventb.core.identifier="buffers"/>
+<org.eventb.core.variable name="_kCDRsPaqEeO0lIhp9r31mg" org.eventb.core.identifier="blackboards"/>
+<org.eventb.core.variable name="_kCDRsfaqEeO0lIhp9r31mg" org.eventb.core.identifier="semaphores"/>
+<org.eventb.core.variable name="_mW8Q8_dkEeOkQpPDjalEqQ" org.eventb.core.identifier="events_"/>
+<org.eventb.core.variable name="_mW8Q9PdkEeOkQpPDjalEqQ" org.eventb.core.identifier="buffers_of_partition"/>
+<org.eventb.core.variable name="_mW8Q9fdkEeOkQpPDjalEqQ" org.eventb.core.identifier="blackboards_of_partition"/>
+<org.eventb.core.variable name="_mW8Q9vdkEeOkQpPDjalEqQ" org.eventb.core.identifier="semaphores_of_partition"/>
+<org.eventb.core.variable name="__thJkPdiEeOkQpPDjalEqQ" org.eventb.core.identifier="events_of_partition"/>
+<org.eventb.core.variable name="_kCDRt_aqEeO0lIhp9r31mg" org.eventb.core.identifier="MaxMsgNum_of_Buffers"/>
+<org.eventb.core.variable name="_kCDRuPaqEeO0lIhp9r31mg" org.eventb.core.identifier="queue_of_buffers"/>
+<org.eventb.core.variable name="_mW8Q9_dkEeOkQpPDjalEqQ" org.eventb.core.identifier="processes_waitingfor_buffers"/>
+<org.eventb.core.variable name="_kCDRuvaqEeO0lIhp9r31mg" org.eventb.core.identifier="quediscipline_of_buffers"/>
+<org.eventb.core.variable name="_kCDRu_aqEeO0lIhp9r31mg" org.eventb.core.identifier="msgspace_of_blackboards"/>
+<org.eventb.core.variable name="_kCDRvPaqEeO0lIhp9r31mg" org.eventb.core.identifier="emptyindicator_of_blackboards"/>
+<org.eventb.core.variable name="__thJkfdiEeOkQpPDjalEqQ" org.eventb.core.identifier="processes_waitingfor_blackboards"/>
+<org.eventb.core.variable name="_kCDRvvaqEeO0lIhp9r31mg" org.eventb.core.identifier="MaxValue_of_Semaphores"/>
+<org.eventb.core.variable name="_mW8Q-PdkEeOkQpPDjalEqQ" org.eventb.core.identifier="value_of_semaphores"/>
+<org.eventb.core.variable name="_kCDRwPaqEeO0lIhp9r31mg" org.eventb.core.identifier="quediscipline_of_semaphores"/>
+<org.eventb.core.variable name="_kCDRwfaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_waitingfor_semaphores"/>
+<org.eventb.core.variable name="_kCDRwvaqEeO0lIhp9r31mg" org.eventb.core.identifier="state_of_events"/>
+<org.eventb.core.variable name="_kCDRw_aqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_waitingfor_events"/>
+<org.eventb.core.invariant name="_mXGB8vdkEeOkQpPDjalEqQ" org.eventb.core.label="inv_refreshprd_of_sampports" org.eventb.core.predicate="RefreshPeriod_of_SamplingPorts ∈ sampling_ports → ℕ1"/>
+<org.eventb.core.invariant name="_mXGB9PdkEeOkQpPDjalEqQ" org.eventb.core.label="inv_flag_sourcesampport" org.eventb.core.predicate="needtrans_of_sourcesamplingport ∈ sampling_ports → BOOL"/>
+<org.eventb.core.invariant name="_mXGB9fdkEeOkQpPDjalEqQ" org.eventb.core.label="inv_flag_means_msg" org.eventb.core.predicate="∀p·(p∈sampling_ports ∧ needtrans_of_sourcesamplingport(p) = TRUE ⇒ p∈dom(msgspace_of_samplingports))"/>
+<org.eventb.core.invariant name="_mXGB9vdkEeOkQpPDjalEqQ" org.eventb.core.label="inv_quediscipline_of_queueingports" org.eventb.core.predicate="quediscipline_of_queueingports∈queuing_ports→QUEUING_DISCIPLINE"/>
+<org.eventb.core.invariant name="_mXGB-fdkEeOkQpPDjalEqQ" org.eventb.core.label="inv_quediscipline_of_buffers" org.eventb.core.predicate="quediscipline_of_buffers∈buffers→QUEUING_DISCIPLINE"/>
+<org.eventb.core.invariant name="_mXGCBvdkEeOkQpPDjalEqQ" org.eventb.core.label="inv_quediscipline_of_semaphores" org.eventb.core.predicate="quediscipline_of_semaphores∈semaphores→QUEUING_DISCIPLINE"/>
+<org.eventb.core.event name="_mXPL5fdkEeOkQpPDjalEqQ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="INITIALISATION">
+<org.eventb.core.action name="_FD-pMPdpEeOBAsNwi9nlig" org.eventb.core.assignment="RefreshPeriod_of_SamplingPorts ≔ ∅" org.eventb.core.label="act400"/>
+<org.eventb.core.action name="_9Tr8sPdoEeOBAsNwi9nlig" org.eventb.core.assignment="needtrans_of_sourcesamplingport ≔  ∅" org.eventb.core.label="act401"/>
+<org.eventb.core.action name="_9Tr8sfdoEeOBAsNwi9nlig" org.eventb.core.assignment="quediscipline_of_queueingports ≔ ∅" org.eventb.core.label="act402"/>
+<org.eventb.core.action name="_9Tr8tvdoEeOBAsNwi9nlig" org.eventb.core.assignment="quediscipline_of_buffers ≔ ∅" org.eventb.core.label="act407"/>
+<org.eventb.core.action name="_9Tr8t_doEeOBAsNwi9nlig" org.eventb.core.assignment="quediscipline_of_semaphores ≔ ∅" org.eventb.core.label="act408"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_IPsXQPdpEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="create_sampling_port">
+<org.eventb.core.refinesEvent name="_IPsXQfdpEeOBAsNwi9nlig" org.eventb.core.target="create_sampling_port"/>
+<org.eventb.core.parameter name="_IPsXQvdpEeOBAsNwi9nlig" org.eventb.core.identifier="port"/>
+<org.eventb.core.parameter name="_IPsXQ_dpEeOBAsNwi9nlig" org.eventb.core.identifier="refresh"/>
+<org.eventb.core.guard name="_IPsXRPdpEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)"/>
+<org.eventb.core.guard name="_IPsXRfdpEeOBAsNwi9nlig" org.eventb.core.label="grd02" org.eventb.core.predicate="port∈PORTS∖(sampling_ports ∪ queuing_ports)"/>
+<org.eventb.core.guard name="_IPsXRvdpEeOBAsNwi9nlig" org.eventb.core.label="grd03" org.eventb.core.predicate="port∈SamplingPorts"/>
+<org.eventb.core.guard name="_IPsXR_dpEeOBAsNwi9nlig" org.eventb.core.label="grd04" org.eventb.core.predicate="Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_IPsXSPdpEeOBAsNwi9nlig" org.eventb.core.label="grd05" org.eventb.core.predicate="refresh∈ℕ1"/>
+<org.eventb.core.guard name="_IPsXSfdpEeOBAsNwi9nlig" org.eventb.core.label="grd06" org.eventb.core.predicate="partition_mode(current_partition)≠PM_NORMAL"/>
+<org.eventb.core.action name="_IPsXSvdpEeOBAsNwi9nlig" org.eventb.core.assignment="RefreshPeriod_of_SamplingPorts(port)≔refresh" org.eventb.core.label="act01"/>
+<org.eventb.core.action name="_IPsXS_dpEeOBAsNwi9nlig" org.eventb.core.assignment="sampling_ports ≔ sampling_ports∪{port}" org.eventb.core.label="act02"/>
+<org.eventb.core.action name="_OY-pufdpEeOBAsNwi9nlig" org.eventb.core.assignment="needtrans_of_sourcesamplingport(port) ≔ FALSE" org.eventb.core.label="act03"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_OY-psPdpEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="write_sampling_message">
+<org.eventb.core.refinesEvent name="_OY-psfdpEeOBAsNwi9nlig" org.eventb.core.target="write_sampling_message"/>
+<org.eventb.core.parameter name="_OY-psvdpEeOBAsNwi9nlig" org.eventb.core.identifier="port"/>
+<org.eventb.core.parameter name="_OY-ps_dpEeOBAsNwi9nlig" org.eventb.core.identifier="msg"/>
+<org.eventb.core.guard name="_OY-ptPdpEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈sampling_ports"/>
+<org.eventb.core.guard name="_OY-ptfdpEeOBAsNwi9nlig" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_OY-ptvdpEeOBAsNwi9nlig" org.eventb.core.label="grd02" org.eventb.core.predicate="port∈SamplingPorts"/>
+<org.eventb.core.guard name="_OY-pt_dpEeOBAsNwi9nlig" org.eventb.core.label="grd03" org.eventb.core.predicate="Direction_of_Ports(port)=PORT_SOURCE"/>
+<org.eventb.core.guard name="_OY-puPdpEeOBAsNwi9nlig" org.eventb.core.label="grd04" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.action name="_OY-puvdpEeOBAsNwi9nlig" org.eventb.core.assignment="msgspace_of_samplingports(port) ≔ msg ↦ t" org.eventb.core.label="act02"/>
+<org.eventb.core.action name="_OY-pu_dpEeOBAsNwi9nlig" org.eventb.core.assignment="needtrans_of_sourcesamplingport(port) ≔ TRUE" org.eventb.core.label="act04"/>
+<org.eventb.core.parameter name="_UAJtkfdpEeOBAsNwi9nlig" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_UAJtlPdpEeOBAsNwi9nlig" org.eventb.core.label="grd05" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+<org.eventb.core.action name="_UAJtmPdpEeOBAsNwi9nlig" org.eventb.core.assignment="used_messages ≔ used_messages  ∪ {msg}" org.eventb.core.label="act05"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UAJtkPdpEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="transfer_sampling_msg">
+<org.eventb.core.refinesEvent name="_h1Nn8HLcEeW87qINZ44y5w" org.eventb.core.target="transfer_sampling_msg"/>
+<org.eventb.core.parameter name="_UAJtkvdpEeOBAsNwi9nlig" org.eventb.core.identifier="p"/>
+<org.eventb.core.parameter name="_UAJtk_dpEeOBAsNwi9nlig" org.eventb.core.identifier="m"/>
+<org.eventb.core.guard name="_UAJtlfdpEeOBAsNwi9nlig" org.eventb.core.label="grd02" org.eventb.core.predicate="p∈sampling_ports"/>
+<org.eventb.core.guard name="_UAJtlvdpEeOBAsNwi9nlig" org.eventb.core.label="grd03" org.eventb.core.predicate="m ∈ MESSAGES ∧ p∈dom(msgspace_of_samplingports) ∧ m↦t=msgspace_of_samplingports(p)"/>
+<org.eventb.core.guard name="_UAJtl_dpEeOBAsNwi9nlig" org.eventb.core.label="grd05" org.eventb.core.predicate="needtrans_of_sourcesamplingport(p) = TRUE"/>
+<org.eventb.core.action name="_UAJtmfdpEeOBAsNwi9nlig" org.eventb.core.assignment="needtrans_of_sourcesamplingport(p) ≔ FALSE" org.eventb.core.label="act01"/>
+<org.eventb.core.parameter name="_UAJtnPdpEeOBAsNwi9nlig" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_UAJtn_dpEeOBAsNwi9nlig" org.eventb.core.label="grd06" org.eventb.core.predicate="Sampling_Channels∼[{p}] ⊆ sampling_ports"/>
+<org.eventb.core.action name="_zUW2uvdxEeOBAsNwi9nlig" org.eventb.core.assignment="msgspace_of_samplingports ≔ msgspace_of_samplingports  (Sampling_Channels∼[{p}] × {m↦t})" org.eventb.core.label="act02"/>
+<org.eventb.core.guard name="_UAJtoPdpEeOBAsNwi9nlig" org.eventb.core.label="grd07" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UAJtmvdpEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="read_sampling_message">
+<org.eventb.core.refinesEvent name="_UAJtm_dpEeOBAsNwi9nlig" org.eventb.core.target="read_sampling_message"/>
+<org.eventb.core.parameter name="_UAJtnfdpEeOBAsNwi9nlig" org.eventb.core.identifier="port"/>
+<org.eventb.core.parameter name="_UAJtnvdpEeOBAsNwi9nlig" org.eventb.core.identifier="m"/>
+<org.eventb.core.guard name="_UAJtofdpEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈sampling_ports"/>
+<org.eventb.core.guard name="_UAJtovdpEeOBAsNwi9nlig" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_UAJto_dpEeOBAsNwi9nlig" org.eventb.core.label="grd03" org.eventb.core.predicate="Direction_of_Ports(port)=PORT_DESTINATION"/>
+<org.eventb.core.guard name="_UAJtpPdpEeOBAsNwi9nlig" org.eventb.core.label="grd04" org.eventb.core.predicate="port∈dom(msgspace_of_samplingports) ∧ (m↦t)=msgspace_of_samplingports(port)"/>
+<org.eventb.core.parameter name="_UAJtpvdpEeOBAsNwi9nlig" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_UAJtp_dpEeOBAsNwi9nlig" org.eventb.core.label="grd05" org.eventb.core.predicate="t+RefreshPeriod_of_SamplingPorts(port)≥clock_tick ∗ ONE_TICK_TIME"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UAJtpfdpEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_sampling_port_id">
+<org.eventb.core.parameter name="_UAJtqvdpEeOBAsNwi9nlig" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_UAJtq_dpEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈sampling_ports"/>
+<org.eventb.core.guard name="_UAJtqPdpEeOBAsNwi9nlig" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UAJtqfdpEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_sampling_port_status">
+<org.eventb.core.parameter name="_zUW2svdxEeOBAsNwi9nlig" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_zUW2tPdxEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈sampling_ports"/>
+<org.eventb.core.guard name="_UAJtrPdpEeOBAsNwi9nlig" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_zUW2sPdxEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="create_queuing_port">
+<org.eventb.core.refinesEvent name="_zUW2sfdxEeOBAsNwi9nlig" org.eventb.core.target="create_queuing_port"/>
+<org.eventb.core.parameter name="_zUW2s_dxEeOBAsNwi9nlig" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_zUW2tvdxEeOBAsNwi9nlig" org.eventb.core.label="grd02" org.eventb.core.predicate="port∈PORTS∖(sampling_ports ∪ queuing_ports)"/>
+<org.eventb.core.guard name="_zUW2t_dxEeOBAsNwi9nlig" org.eventb.core.label="grd03" org.eventb.core.predicate="port∈QueuingPorts"/>
+<org.eventb.core.guard name="_zUW2uPdxEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)"/>
+<org.eventb.core.guard name="_zUW2ufdxEeOBAsNwi9nlig" org.eventb.core.label="grd04" org.eventb.core.predicate="Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.action name="_zUW2u_dxEeOBAsNwi9nlig" org.eventb.core.assignment="quediscipline_of_queueingports(port)≔discipline" org.eventb.core.label="act01"/>
+<org.eventb.core.parameter name="_zUW2vvdxEeOBAsNwi9nlig" org.eventb.core.identifier="discipline"/>
+<org.eventb.core.guard name="_zUW2wPdxEeOBAsNwi9nlig" org.eventb.core.label="grd05" org.eventb.core.predicate="discipline∈QUEUING_DISCIPLINE"/>
+<org.eventb.core.action name="_zUW2x_dxEeOBAsNwi9nlig" org.eventb.core.assignment="queuing_ports ≔ queuing_ports∪{port}" org.eventb.core.label="act02"/>
+<org.eventb.core.guard name="_zUW2tfdxEeOBAsNwi9nlig" org.eventb.core.label="grd06" org.eventb.core.predicate="partition_mode(current_partition)≠PM_NORMAL"/>
+<org.eventb.core.action name="_zUW2yPdxEeOBAsNwi9nlig" org.eventb.core.assignment="queue_of_queueingports(port) ≔  ∅" org.eventb.core.label="act03"/>
+<org.eventb.core.action name="_zUgntvdxEeOBAsNwi9nlig" org.eventb.core.assignment="processes_waitingfor_queuingports(port) ≔ ∅" org.eventb.core.label="act04"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_zUW2vPdxEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="send_queuing_message">
+<org.eventb.core.refinesEvent name="_cbjwwPhzEeOAG5W4v_4uKA" org.eventb.core.target="send_queuing_message"/>
+<org.eventb.core.parameter name="_zUW2v_dxEeOBAsNwi9nlig" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_zUW2wvdxEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈queuing_ports"/>
+<org.eventb.core.guard name="_zUW2w_dxEeOBAsNwi9nlig" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_zUW2xPdxEeOBAsNwi9nlig" org.eventb.core.label="grd03" org.eventb.core.predicate="Direction_of_Ports(port)=PORT_SOURCE"/>
+<org.eventb.core.guard name="_zUW2xfdxEeOBAsNwi9nlig" org.eventb.core.label="grd04" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.guard name="_zUW2xvdxEeOBAsNwi9nlig" org.eventb.core.label="grd05" org.eventb.core.predicate="card(queue_of_queueingports(port))&lt;MaxMsgNum_of_QueuingPorts(port)"/>
+<org.eventb.core.parameter name="_x9f2kPgjEeOdqO0geQOt0A" org.eventb.core.identifier="msg"/>
+<org.eventb.core.guard name="_zUW20PdxEeOBAsNwi9nlig" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_waitingfor_queuingports(port) = ∅"/>
+<org.eventb.core.parameter name="_x9f2kfgjEeOdqO0geQOt0A" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_x9f2k_gjEeOdqO0geQOt0A" org.eventb.core.label="grd07" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+<org.eventb.core.action name="_zUgnt_dxEeOBAsNwi9nlig" org.eventb.core.assignment="queue_of_queueingports(port) ≔ queue_of_queueingports(port)  {msg↦t}" org.eventb.core.label="act01"/>
+<org.eventb.core.action name="_zUgnuPdxEeOBAsNwi9nlig" org.eventb.core.assignment="used_messages ≔ used_messages ∪ {msg}" org.eventb.core.label="act05"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_zUW2yfdxEeOBAsNwi9nlig" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="send_queuing_message_needwait">
+<org.eventb.core.refinesEvent name="_cbjwwfhzEeOAG5W4v_4uKA" org.eventb.core.target="send_queuing_message_needwait"/>
+<org.eventb.core.parameter name="_x9f2kvgjEeOdqO0geQOt0A" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_zUW2y_dxEeOBAsNwi9nlig" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_zUW2zPdxEeOBAsNwi9nlig" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_zUW2zfdxEeOBAsNwi9nlig" org.eventb.core.identifier="wt"/>
+<org.eventb.core.parameter name="_zUW2zvdxEeOBAsNwi9nlig" org.eventb.core.identifier="timeout"/>
+<org.eventb.core.parameter name="_zUW2z_dxEeOBAsNwi9nlig" org.eventb.core.identifier="tmout_trig"/>
+<org.eventb.core.guard name="_zUW21PdxEeOBAsNwi9nlig" org.eventb.core.label="grd40" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_zUW21fdxEeOBAsNwi9nlig" org.eventb.core.label="grd41" org.eventb.core.predicate="part = current_partition ∧ proc = current_process ∧ newstate = PS_Waiting"/>
+<org.eventb.core.guard name="_zUW21vdxEeOBAsNwi9nlig" org.eventb.core.label="grd43" org.eventb.core.predicate="wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)"/>
+<org.eventb.core.guard name="_zUW21_dxEeOBAsNwi9nlig" org.eventb.core.label="grd06" org.eventb.core.predicate="timeout ∈ℕ"/>
+<org.eventb.core.guard name="_zUW22PdxEeOBAsNwi9nlig" org.eventb.core.label="grd07" org.eventb.core.predicate="current_process = proc"/>
+<org.eventb.core.guard name="_zUW22fdxEeOBAsNwi9nlig" org.eventb.core.label="grd45" org.eventb.core.predicate="tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)"/>
+<org.eventb.core.guard name="_zUW22vdxEeOBAsNwi9nlig" org.eventb.core.label="grd46" org.eventb.core.predicate="(timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})"/>
+<org.eventb.core.guard name="_zUgnsPdxEeOBAsNwi9nlig" org.eventb.core.label="grd47" org.eventb.core.predicate="timeout&gt;0 ⇒ wt = PROC_WAIT_TIMEOUT"/>
+<org.eventb.core.guard name="_zUgnsvdxEeOBAsNwi9nlig" org.eventb.core.label="grd48" org.eventb.core.predicate="timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_zUgns_dxEeOBAsNwi9nlig" org.eventb.core.label="grd51" org.eventb.core.predicate="port∈queuing_ports"/>
+<org.eventb.core.guard name="_zUgntPdxEeOBAsNwi9nlig" org.eventb.core.label="grd50" org.eventb.core.predicate="Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_zUgntfdxEeOBAsNwi9nlig" org.eventb.core.label="grd53" org.eventb.core.predicate="Direction_of_Ports(port)=PORT_SOURCE"/>
+<org.eventb.core.action name="_-XFpcPgjEeOdqO0geQOt0A" org.eventb.core.assignment="need_reschedule ≔ TRUE" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_zUgnuvdxEeOBAsNwi9nlig" org.eventb.core.assignment="current_process_flag ≔ FALSE" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_zUgnu_dxEeOBAsNwi9nlig" org.eventb.core.assignment="process_wait_type(current_process) ≔ wt" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_5mutsPezEeOdqO0geQOt0A" org.eventb.core.assignment="timeout_trigger ≔ timeout_trigger   tmout_trig" org.eventb.core.label="act45"/>
+<org.eventb.core.parameter name="_EHDc8fgkEeOdqO0geQOt0A" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_EHDc9PgkEeOdqO0geQOt0A" org.eventb.core.label="grd54" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.parameter name="_EHDc8vgkEeOdqO0geQOt0A" org.eventb.core.identifier="msg"/>
+<org.eventb.core.guard name="_EHDc9fgkEeOdqO0geQOt0A" org.eventb.core.label="grd55" org.eventb.core.predicate="card(queue_of_queueingports(port))=MaxMsgNum_of_QueuingPorts(port) ∨ processes_waitingfor_queuingports(port) ≠ ∅"/>
+<org.eventb.core.parameter name="_EHDc8_gkEeOdqO0geQOt0A" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_EHDc9vgkEeOdqO0geQOt0A" org.eventb.core.label="grd57" org.eventb.core.predicate="locklevel_of_partition(current_partition)=0 ∧ (current_partition∈dom(errorhandler_of_partition) ⇒ current_process≠errorhandler_of_partition(current_partition))"/>
+<org.eventb.core.action name="_EHDc-_gkEeOdqO0geQOt0A" org.eventb.core.assignment="processes_waitingfor_queuingports(port) ≔  processes_waitingfor_queuingports(port)  {proc↦(msg↦t )}" org.eventb.core.label="act52"/>
+<org.eventb.core.action name="_gT5R9fg_EeORWbKhnlgfew" org.eventb.core.assignment="used_messages ≔ used_messages ∪ {msg}" org.eventb.core.label="act55"/>
+<org.eventb.core.action name="_gT5R9vg_EeORWbKhnlgfew" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act56"/>
+<org.eventb.core.guard name="_EHDc-PgkEeOdqO0geQOt0A" org.eventb.core.label="grd58" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_EHDc8PgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="transfer_queuing_msg">
+<org.eventb.core.refinesEvent name="_CmjPsHLgEeW87qINZ44y5w" org.eventb.core.target="transfer_queuing_msg"/>
+<org.eventb.core.guard name="_gT5R6fg_EeORWbKhnlgfew" org.eventb.core.label="grd20" org.eventb.core.predicate="(∀m1,t1·(m1↦t1∈queue_of_queueingports(p) ⇒ t≤t1))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_EHDc_PgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="wakeup_waitproc_on_srcqueports">
+<org.eventb.core.refinesEvent name="_91OzYDVJEeSxw-wt7-_VGQ" org.eventb.core.target="wakeup_waitproc_on_srcqueports"/>
+<org.eventb.core.parameter name="_EHDc_vgkEeOdqO0geQOt0A" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_EHDc__gkEeOdqO0geQOt0A" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_EHDdAPgkEeOdqO0geQOt0A" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_gT5R4fg_EeORWbKhnlgfew" org.eventb.core.identifier="resch"/>
+<org.eventb.core.parameter name="_gT5R4vg_EeORWbKhnlgfew" org.eventb.core.identifier="port"/>
+<org.eventb.core.parameter name="_gT5R4_g_EeORWbKhnlgfew" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_gT5R5Pg_EeORWbKhnlgfew" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_gT5R6vg_EeORWbKhnlgfew" org.eventb.core.label="grd500" org.eventb.core.predicate="current_partition_flag = TRUE ∧ partition_mode(current_partition)=PM_NORMAL"/>
+<org.eventb.core.guard name="_gT5R6_g_EeORWbKhnlgfew" org.eventb.core.label="grd509" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_gT5R7Pg_EeORWbKhnlgfew" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_gT5R7fg_EeORWbKhnlgfew" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_gT5R5fg_EeORWbKhnlgfew" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_EHDdCPgkEeOdqO0geQOt0A" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_EHDdA_gkEeOdqO0geQOt0A" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend"/>
+<org.eventb.core.guard name="_EHDdBPgkEeOdqO0geQOt0A" org.eventb.core.label="grd33" org.eventb.core.predicate="process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready"/>
+<org.eventb.core.guard name="_EHDdBfgkEeOdqO0geQOt0A" org.eventb.core.label="grd34" org.eventb.core.predicate="process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend"/>
+<org.eventb.core.guard name="_EHDdBvgkEeOdqO0geQOt0A" org.eventb.core.label="grd40" org.eventb.core.predicate="process_wait_type(proc)= PROC_WAIT_OBJ"/>
+<org.eventb.core.action name="_EHDdCfgkEeOdqO0geQOt0A" org.eventb.core.assignment="process_wait_type ≔  {proc}⩤process_wait_type" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_gT5R-Pg_EeORWbKhnlgfew" org.eventb.core.assignment="timeout_trigger ≔ {proc}⩤timeout_trigger" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_H1ewZvhBEeORWbKhnlgfew" org.eventb.core.assignment="need_reschedule ≔ resch" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_H1ewZ_hBEeORWbKhnlgfew" org.eventb.core.assignment="processes_waitingfor_queuingports(port) ≔ {proc} ⩤ processes_waitingfor_queuingports(port)" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_gT5R9_g_EeORWbKhnlgfew" org.eventb.core.assignment="queue_of_queueingports(port) ≔ queue_of_queueingports(port){msg↦t}" org.eventb.core.label="act506"/>
+<org.eventb.core.guard name="_EHDc-fgkEeOdqO0geQOt0A" org.eventb.core.label="grd510" org.eventb.core.predicate="resch = TRUE"/>
+<org.eventb.core.guard name="_EHDc-vgkEeOdqO0geQOt0A" org.eventb.core.label="grd502" org.eventb.core.predicate="port ∈ Source_QueuingPorts ∧ port∈queuing_ports"/>
+<org.eventb.core.guard name="_EHDdAfgkEeOdqO0geQOt0A" org.eventb.core.label="grd504" org.eventb.core.predicate="card(queue_of_queueingports(port)) &lt; MaxMsgNum_of_QueuingPorts(port)"/>
+<org.eventb.core.guard name="_EHDdAvgkEeOdqO0geQOt0A" org.eventb.core.label="grd506" org.eventb.core.predicate="(proc↦(msg ↦ t))∈processes_waitingfor_queuingports(port)"/>
+<org.eventb.core.guard name="_gT5R5_g_EeORWbKhnlgfew" org.eventb.core.label="grd507" org.eventb.core.predicate="quediscipline_of_queueingports(port)=QUEUE_FIFO ⇒ (∀p1,t1,m·((p1↦(m↦t1))∈processes_waitingfor_queuingports(port) ⇒ t≤t1))"/>
+<org.eventb.core.action name="_EHMm5_gkEeOdqO0geQOt0A" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_H1ewVPhBEeORWbKhnlgfew" org.eventb.core.label="grd508" org.eventb.core.predicate="quediscipline_of_queueingports(port)=QUEUE_PRIORITY ⇒ (∀p1,t1,m·((p1↦(m↦t1))∈processes_waitingfor_queuingports(port) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_EHDdC_gkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="wakeup_waitproc_on_destqueports">
+<org.eventb.core.refinesEvent name="_91OzYTVJEeSxw-wt7-_VGQ" org.eventb.core.target="wakeup_waitproc_on_destqueports"/>
+<org.eventb.core.parameter name="_EHDdDfgkEeOdqO0geQOt0A" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_EHDdDvgkEeOdqO0geQOt0A" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_EHDdD_gkEeOdqO0geQOt0A" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_H1ewUPhBEeORWbKhnlgfew" org.eventb.core.identifier="resch"/>
+<org.eventb.core.parameter name="_H1ewUfhBEeORWbKhnlgfew" org.eventb.core.identifier="port"/>
+<org.eventb.core.parameter name="_H1VmYfhBEeORWbKhnlgfew" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_H1VmYvhBEeORWbKhnlgfew" org.eventb.core.identifier="t"/>
+<org.eventb.core.parameter name="_H1VmY_hBEeORWbKhnlgfew" org.eventb.core.identifier="msg1"/>
+<org.eventb.core.parameter name="_H1VmZPhBEeORWbKhnlgfew" org.eventb.core.identifier="t1"/>
+<org.eventb.core.guard name="_H1ewVfhBEeORWbKhnlgfew" org.eventb.core.label="grd500" org.eventb.core.predicate="current_partition_flag = TRUE ∧ partition_mode(current_partition)=PM_NORMAL"/>
+<org.eventb.core.guard name="_H1ewVvhBEeORWbKhnlgfew" org.eventb.core.label="grd503" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_H1ewV_hBEeORWbKhnlgfew" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_H1ewWPhBEeORWbKhnlgfew" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_H1ewWfhBEeORWbKhnlgfew" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_ESY74Ph0EeOAG5W4v_4uKA" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_EHMm4fgkEeOdqO0geQOt0A" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend"/>
+<org.eventb.core.guard name="_EHMm4vgkEeOdqO0geQOt0A" org.eventb.core.label="grd33" org.eventb.core.predicate="process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready"/>
+<org.eventb.core.guard name="_EHMm4_gkEeOdqO0geQOt0A" org.eventb.core.label="grd34" org.eventb.core.predicate="process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend"/>
+<org.eventb.core.guard name="_EHMm5PgkEeOdqO0geQOt0A" org.eventb.core.label="grd40" org.eventb.core.predicate="process_wait_type(proc)= PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_EHMm5fgkEeOdqO0geQOt0A" org.eventb.core.label="grd501" org.eventb.core.predicate="resch = TRUE"/>
+<org.eventb.core.guard name="_MY2QAfhQEeOAG5W4v_4uKA" org.eventb.core.label="grd502" org.eventb.core.predicate="port ∈ Dest_QueuingPorts ∧ port∈queuing_ports"/>
+<org.eventb.core.action name="_H1ewafhBEeORWbKhnlgfew" org.eventb.core.assignment="process_wait_type ≔  {proc}⩤process_wait_type" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_H1ewavhBEeORWbKhnlgfew" org.eventb.core.assignment="timeout_trigger ≔ {proc}⩤timeout_trigger" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_EHMm8_gkEeOdqO0geQOt0A" org.eventb.core.assignment="need_reschedule ≔ resch" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_n9acQ_gkEeOdqO0geQOt0A" org.eventb.core.assignment="processes_waitingfor_queuingports(port) ≔ {proc} ⩤ processes_waitingfor_queuingports(port)" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_H1ewaPhBEeORWbKhnlgfew" org.eventb.core.assignment="queue_of_queueingports(port) ≔ queue_of_queueingports(port)∖{msg ↦  t}" org.eventb.core.label="act506"/>
+<org.eventb.core.action name="_n9acRPgkEeOdqO0geQOt0A" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_EHDdB_gkEeOdqO0geQOt0A" org.eventb.core.label="grd504" org.eventb.core.predicate="queue_of_queueingports(port)≠ ∅"/>
+<org.eventb.core.guard name="_EHDdEPgkEeOdqO0geQOt0A" org.eventb.core.label="grd506" org.eventb.core.predicate="(proc↦(msg ↦ t))∈processes_waitingfor_queuingports(port)"/>
+<org.eventb.core.guard name="_EHMm4PgkEeOdqO0geQOt0A" org.eventb.core.label="grd507" org.eventb.core.predicate="quediscipline_of_queueingports(port)=QUEUE_FIFO ⇒ (∀p1,tt,m·(p1↦(m↦tt)∈processes_waitingfor_queuingports(port) ⇒ t≤tt))"/>
+<org.eventb.core.guard name="_H1ewUvhBEeORWbKhnlgfew" org.eventb.core.label="grd508" org.eventb.core.predicate="quediscipline_of_queueingports(port)=QUEUE_PRIORITY ⇒ (∀p1,tt,m·(p1↦(m↦tt)∈processes_waitingfor_queuingports(port) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))"/>
+<org.eventb.core.guard name="_zUW2wfdxEeOBAsNwi9nlig" org.eventb.core.label="grd509" org.eventb.core.predicate="msg1↦t1∈queue_of_queueingports(port)"/>
+<org.eventb.core.guard name="_EHMm8PgkEeOdqO0geQOt0A" org.eventb.core.label="grd510" org.eventb.core.predicate="(∀tt,mm·(mm↦tt∈queue_of_queueingports(port) ⇒t1≤tt))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_EHMm6PgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="receive_queuing_message">
+<org.eventb.core.refinesEvent name="_91YkYDVJEeSxw-wt7-_VGQ" org.eventb.core.target="receive_queuing_message"/>
+<org.eventb.core.guard name="_EHMm8fgkEeOdqO0geQOt0A" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈queuing_ports"/>
+<org.eventb.core.parameter name="_EHMm6fgkEeOdqO0geQOt0A" org.eventb.core.identifier="port"/>
+<org.eventb.core.parameter name="_EHMm6vgkEeOdqO0geQOt0A" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_EHMm6_gkEeOdqO0geQOt0A" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_H1ewYfhBEeORWbKhnlgfew" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_EHMm7PgkEeOdqO0geQOt0A" org.eventb.core.label="grd03" org.eventb.core.predicate="Direction_of_Ports(port)=PORT_DESTINATION"/>
+<org.eventb.core.guard name="_EHMm7fgkEeOdqO0geQOt0A" org.eventb.core.label="grd04" org.eventb.core.predicate="msg∈MESSAGES"/>
+<org.eventb.core.guard name="_EHMm7vgkEeOdqO0geQOt0A" org.eventb.core.label="grd06" org.eventb.core.predicate="queue_of_queueingports(port)≠∅"/>
+<org.eventb.core.action name="_n9acRvgkEeOdqO0geQOt0A" org.eventb.core.assignment="queue_of_queueingports(port) ≔ queue_of_queueingports(port) ∖ {msg↦t}" org.eventb.core.label="act01"/>
+<org.eventb.core.guard name="_n9RSX_gkEeOdqO0geQOt0A" org.eventb.core.comment="FIFO queue, read the first msg" org.eventb.core.label="grd05" org.eventb.core.predicate="(msg ↦t) ∈ queue_of_queueingports(port)  ∧ (∀m,t1·(m↦t1∈queue_of_queueingports(port) ⇒ t≤t1))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_n9RSUfgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="receive_queuing_message_needwait">
+<org.eventb.core.refinesEvent name="_91YkYTVJEeSxw-wt7-_VGQ" org.eventb.core.target="receive_queuing_message_needwait"/>
+<org.eventb.core.parameter name="_n9RSV_gkEeOdqO0geQOt0A" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_n9RSWPgkEeOdqO0geQOt0A" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_n9RSWfgkEeOdqO0geQOt0A" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_n9RSWvgkEeOdqO0geQOt0A" org.eventb.core.identifier="port"/>
+<org.eventb.core.parameter name="_r9cjMfgkEeOdqO0geQOt0A" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_n9RSU_gkEeOdqO0geQOt0A" org.eventb.core.identifier="wt"/>
+<org.eventb.core.parameter name="_n9RSVPgkEeOdqO0geQOt0A" org.eventb.core.identifier="timeout"/>
+<org.eventb.core.parameter name="_n9RSVfgkEeOdqO0geQOt0A" org.eventb.core.identifier="tmout_trig"/>
+<org.eventb.core.parameter name="_n9RSVvgkEeOdqO0geQOt0A" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_n9RSYPgkEeOdqO0geQOt0A" org.eventb.core.label="grd40" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_n9RSYfgkEeOdqO0geQOt0A" org.eventb.core.label="grd41" org.eventb.core.predicate="part = current_partition ∧ proc = current_process"/>
+<org.eventb.core.guard name="_n9RSYvgkEeOdqO0geQOt0A" org.eventb.core.label="grd42" org.eventb.core.predicate="newstate = PS_Waiting"/>
+<org.eventb.core.guard name="_n9RSY_gkEeOdqO0geQOt0A" org.eventb.core.label="grd43" org.eventb.core.predicate="wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)"/>
+<org.eventb.core.guard name="_n9RSZPgkEeOdqO0geQOt0A" org.eventb.core.label="grd44" org.eventb.core.predicate="timeout ∈ℕ"/>
+<org.eventb.core.guard name="_n9RSZfgkEeOdqO0geQOt0A" org.eventb.core.label="grd45" org.eventb.core.predicate="tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)"/>
+<org.eventb.core.guard name="_n9RSZvgkEeOdqO0geQOt0A" org.eventb.core.label="grd46" org.eventb.core.predicate="(timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})"/>
+<org.eventb.core.guard name="_n9RSZ_gkEeOdqO0geQOt0A" org.eventb.core.label="grd47" org.eventb.core.predicate="timeout &gt;0 ⇒ wt = PROC_WAIT_TIMEOUT"/>
+<org.eventb.core.guard name="_n9RSaPgkEeOdqO0geQOt0A" org.eventb.core.label="grd48" org.eventb.core.predicate="timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_n9RSafgkEeOdqO0geQOt0A" org.eventb.core.label="grd502" org.eventb.core.predicate="port∈queuing_ports"/>
+<org.eventb.core.guard name="_n9acQPgkEeOdqO0geQOt0A" org.eventb.core.label="grd503" org.eventb.core.predicate="port∈QueuingPorts"/>
+<org.eventb.core.guard name="_n9acQfgkEeOdqO0geQOt0A" org.eventb.core.label="grd500" org.eventb.core.predicate="Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_n9acQvgkEeOdqO0geQOt0A" org.eventb.core.label="grd504" org.eventb.core.predicate="Direction_of_Ports(port)=PORT_DESTINATION"/>
+<org.eventb.core.action name="_n9acR_gkEeOdqO0geQOt0A" org.eventb.core.assignment="need_reschedule ≔ TRUE" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_n9acSPgkEeOdqO0geQOt0A" org.eventb.core.assignment="current_process_flag ≔ FALSE" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_r9mUNPgkEeOdqO0geQOt0A" org.eventb.core.assignment="process_wait_type(proc) ≔ wt" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_r9mUPvgkEeOdqO0geQOt0A" org.eventb.core.assignment="timeout_trigger ≔ timeout_trigger   tmout_trig" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_n9acRfgkEeOdqO0geQOt0A" org.eventb.core.assignment="processes_waitingfor_queuingports(port) ≔  processes_waitingfor_queuingports(port)  {proc↦(msg↦t)}" org.eventb.core.label="act52"/>
+<org.eventb.core.guard name="_EHMm8vgkEeOdqO0geQOt0A" org.eventb.core.label="grd505" org.eventb.core.predicate="queue_of_queueingports(port)=∅"/>
+<org.eventb.core.guard name="_n9RSW_gkEeOdqO0geQOt0A" org.eventb.core.label="grd506" org.eventb.core.predicate="msg∈MESSAGES"/>
+<org.eventb.core.guard name="_n9RSXPgkEeOdqO0geQOt0A" org.eventb.core.label="grd510" org.eventb.core.predicate="(msg ↦t) ∈ queue_of_queueingports(port)"/>
+<org.eventb.core.guard name="_n9RSXfgkEeOdqO0geQOt0A" org.eventb.core.label="grd507" org.eventb.core.predicate="locklevel_of_partition(current_partition)=0"/>
+<org.eventb.core.guard name="_r9cjMvgkEeOdqO0geQOt0A" org.eventb.core.label="grd508" org.eventb.core.predicate="current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)"/>
+<org.eventb.core.action name="_r9mUP_gkEeOdqO0geQOt0A" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_r9cjMPgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_queuing_port_id">
+<org.eventb.core.parameter name="_r9cjNfgkEeOdqO0geQOt0A" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_zUW20_dxEeOBAsNwi9nlig" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈QueuingPorts ∧port∈queuing_ports"/>
+<org.eventb.core.guard name="_r9cjNvgkEeOdqO0geQOt0A" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_r9cjNPgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_queuing_port_status">
+<org.eventb.core.parameter name="_r9mUMPgkEeOdqO0geQOt0A" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_EHDc9_gkEeOdqO0geQOt0A" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈QueuingPorts ∧ port ∈queuing_ports"/>
+<org.eventb.core.guard name="_gT5R6Pg_EeORWbKhnlgfew" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_r9cjOPgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="clear_queuing_port">
+<org.eventb.core.refinesEvent name="_GssB0HLkEeW87qINZ44y5w" org.eventb.core.target="clear_queuing_port"/>
+<org.eventb.core.parameter name="_r9mUNvgkEeOdqO0geQOt0A" org.eventb.core.identifier="port"/>
+<org.eventb.core.guard name="_r9mUMvgkEeOdqO0geQOt0A" org.eventb.core.label="grd01" org.eventb.core.predicate="port∈QueuingPorts ∧ port∈queuing_ports"/>
+<org.eventb.core.action name="_r9mUQfgkEeOdqO0geQOt0A" org.eventb.core.assignment="queue_of_queueingports(port) ≔ ∅" org.eventb.core.label="act01"/>
+<org.eventb.core.guard name="_r9cjM_gkEeOdqO0geQOt0A" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ Ports_of_Partition(port) = current_partition"/>
+<org.eventb.core.guard name="_r9mUOfgkEeOdqO0geQOt0A" org.eventb.core.label="grd02" org.eventb.core.predicate="Direction_of_Ports(port)=PORT_DESTINATION"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_r9mUNfgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="create_buffer">
+<org.eventb.core.refinesEvent name="_ZcktYPhCEeORWbKhnlgfew" org.eventb.core.target="create_buffer"/>
+<org.eventb.core.action name="_r9mUQvgkEeOdqO0geQOt0A" org.eventb.core.assignment="MaxMsgNum_of_Buffers(buf)≔max_msg_size" org.eventb.core.label="act01"/>
+<org.eventb.core.action name="_r9mUS_gkEeOdqO0geQOt0A" org.eventb.core.assignment="buffers ≔ buffers∪{buf}" org.eventb.core.label="act02"/>
+<org.eventb.core.action name="_r9mUTPgkEeOdqO0geQOt0A" org.eventb.core.assignment="quediscipline_of_buffers(buf) ≔ quediscip" org.eventb.core.label="act03"/>
+<org.eventb.core.action name="_r9mUQPgkEeOdqO0geQOt0A" org.eventb.core.assignment="buffers_of_partition(buf) ≔ current_partition" org.eventb.core.label="act04"/>
+<org.eventb.core.action name="_ZcueafhCEeORWbKhnlgfew" org.eventb.core.assignment="queue_of_buffers(buf) ≔ ∅" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_ZcueaPhCEeORWbKhnlgfew" org.eventb.core.assignment="processes_waitingfor_buffers(buf) ≔ ∅" org.eventb.core.label="act06"/>
+<org.eventb.core.parameter name="_r9mUN_gkEeOdqO0geQOt0A" org.eventb.core.identifier="buf"/>
+<org.eventb.core.parameter name="_r9mUOPgkEeOdqO0geQOt0A" org.eventb.core.identifier="max_msg_size"/>
+<org.eventb.core.parameter name="_r9mURPgkEeOdqO0geQOt0A" org.eventb.core.identifier="quediscip"/>
+<org.eventb.core.guard name="_EHMm7_gkEeOdqO0geQOt0A" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)"/>
+<org.eventb.core.guard name="_r9mUO_gkEeOdqO0geQOt0A" org.eventb.core.label="grd01" org.eventb.core.predicate="buf∈BUFFERS∖buffers"/>
+<org.eventb.core.guard name="_r9mUPPgkEeOdqO0geQOt0A" org.eventb.core.label="grd03" org.eventb.core.predicate="max_msg_size∈ℕ1"/>
+<org.eventb.core.guard name="_r9cjN_gkEeOdqO0geQOt0A" org.eventb.core.label="grd04" org.eventb.core.predicate="quediscip∈QUEUING_DISCIPLINE"/>
+<org.eventb.core.guard name="_r9mUVPgkEeOdqO0geQOt0A" org.eventb.core.label="grd06" org.eventb.core.predicate="partition_mode(current_partition)≠PM_NORMAL"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_r9mUQ_gkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="send_buffer">
+<org.eventb.core.refinesEvent name="_ZcktYfhCEeORWbKhnlgfew" org.eventb.core.target="send_buffer"/>
+<org.eventb.core.parameter name="_r9mURfgkEeOdqO0geQOt0A" org.eventb.core.identifier="buf"/>
+<org.eventb.core.parameter name="_ZcktYvhCEeORWbKhnlgfew" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_ZcktY_hCEeORWbKhnlgfew" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_r9mURvgkEeOdqO0geQOt0A" org.eventb.core.label="grd01" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_r9mUR_gkEeOdqO0geQOt0A" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ buffers_of_partition(buf) = current_partition"/>
+<org.eventb.core.guard name="_r9mUSPgkEeOdqO0geQOt0A" org.eventb.core.label="grd02" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.guard name="_r9mUSfgkEeOdqO0geQOt0A" org.eventb.core.label="grd05" org.eventb.core.predicate="card(queue_of_buffers(buf))&lt;MaxMsgNum_of_Buffers(buf)"/>
+<org.eventb.core.action name="_r9mUXPgkEeOdqO0geQOt0A" org.eventb.core.assignment="queue_of_buffers(buf) ≔ queue_of_buffers(buf)  {msg↦t}" org.eventb.core.label="act01"/>
+<org.eventb.core.action name="_r9mUXfgkEeOdqO0geQOt0A" org.eventb.core.assignment="used_messages ≔ used_messages ∪ {msg}" org.eventb.core.label="act05"/>
+<org.eventb.core.guard name="_H1ewU_hBEeORWbKhnlgfew" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_waitingfor_buffers(buf) = ∅"/>
+<org.eventb.core.guard name="_ZcueYPhCEeORWbKhnlgfew" org.eventb.core.label="grd07" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_r9mUTfgkEeOdqO0geQOt0A" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="send_buffer_needwakeuprecvproc">
+<org.eventb.core.refinesEvent name="__Td8sPgkEeOdqO0geQOt0A" org.eventb.core.target="send_buffer_needwakeuprecvproc"/>
+<org.eventb.core.parameter name="_r9mUUfgkEeOdqO0geQOt0A" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_r9mUUvgkEeOdqO0geQOt0A" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_F-CbovhDEeORWbKhnlgfew" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_F-Cbo_hDEeORWbKhnlgfew" org.eventb.core.identifier="resch"/>
+<org.eventb.core.parameter name="_ZcktZPhCEeORWbKhnlgfew" org.eventb.core.identifier="buf"/>
+<org.eventb.core.parameter name="_ZcktZfhCEeORWbKhnlgfew" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_r9mUT_gkEeOdqO0geQOt0A" org.eventb.core.identifier="t"/>
+<org.eventb.core.parameter name="_r9mUUPgkEeOdqO0geQOt0A" org.eventb.core.identifier="m"/>
+<org.eventb.core.guard name="_ZcueYfhCEeORWbKhnlgfew" org.eventb.core.label="grd01" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_r9mUW_gkEeOdqO0geQOt0A" org.eventb.core.label="grd02" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ buffers_of_partition(buf) = current_partition"/>
+<org.eventb.core.guard name="_r9mUU_gkEeOdqO0geQOt0A" org.eventb.core.label="grd03" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_r9mUVvgkEeOdqO0geQOt0A" org.eventb.core.label="grd04" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_r9mUV_gkEeOdqO0geQOt0A" org.eventb.core.label="grd05" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend"/>
+<org.eventb.core.guard name="_r9mUWPgkEeOdqO0geQOt0A" org.eventb.core.label="grd06" org.eventb.core.predicate="process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready"/>
+<org.eventb.core.guard name="_r9mUWfgkEeOdqO0geQOt0A" org.eventb.core.label="grd07" org.eventb.core.predicate="process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend"/>
+<org.eventb.core.guard name="_r9mUWvgkEeOdqO0geQOt0A" org.eventb.core.label="grd08" org.eventb.core.predicate="process_wait_type(proc)= PROC_WAIT_OBJ"/>
+<org.eventb.core.action name="_Zcuea_hCEeORWbKhnlgfew" org.eventb.core.assignment="process_wait_type ≔  {proc}⩤process_wait_type" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_F-MMqvhDEeORWbKhnlgfew" org.eventb.core.assignment="timeout_trigger ≔ {proc}⩤timeout_trigger" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_F-MMq_hDEeORWbKhnlgfew" org.eventb.core.assignment="need_reschedule ≔ resch" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_ZcueavhCEeORWbKhnlgfew" org.eventb.core.assignment="used_messages ≔ used_messages ∪ {msg}" org.eventb.core.label="act501"/>
+<org.eventb.core.guard name="_F-CbqvhDEeORWbKhnlgfew" org.eventb.core.label="grd09" org.eventb.core.predicate="resch ∈BOOL"/>
+<org.eventb.core.guard name="_r9mUVfgkEeOdqO0geQOt0A" org.eventb.core.label="grd10" org.eventb.core.predicate="(locklevel_of_partition(current_partition)=0 ⇒ resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒ resch=need_reschedule)"/>
+<org.eventb.core.guard name="_ZcktZvhCEeORWbKhnlgfew" org.eventb.core.label="grd11" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.guard name="_ZcktZ_hCEeORWbKhnlgfew" org.eventb.core.label="grd12" org.eventb.core.predicate="t∈ℕ ∧ m∈MESSAGES"/>
+<org.eventb.core.guard name="_ZcktaPhCEeORWbKhnlgfew" org.eventb.core.label="grd13" org.eventb.core.predicate="card(queue_of_buffers(buf))&lt;MaxMsgNum_of_Buffers(buf)"/>
+<org.eventb.core.action name="_F-MMrfhDEeORWbKhnlgfew" org.eventb.core.assignment="processes_waitingfor_buffers(buf) ≔ {proc} ⩤   processes_waitingfor_buffers(buf)" org.eventb.core.label="act502"/>
+<org.eventb.core.guard name="_r9mUMfgkEeOdqO0geQOt0A" org.eventb.core.label="grd14" org.eventb.core.predicate="processes_waitingfor_buffers(buf)≠∅ ∧ (proc↦(m↦WAITING_R ↦t)) ∈processes_waitingfor_buffers(buf)"/>
+<org.eventb.core.action name="_F-MMrvhDEeORWbKhnlgfew" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_n9RSXvgkEeOdqO0geQOt0A" org.eventb.core.label="grd15" org.eventb.core.predicate="quediscipline_of_buffers(buf)=QUEUE_FIFO ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ t≤t1))"/>
+<org.eventb.core.guard name="_F-MMoPhDEeORWbKhnlgfew" org.eventb.core.label="grd16" org.eventb.core.predicate="quediscipline_of_buffers(buf)=QUEUE_PRIORITY ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_F-CboPhDEeORWbKhnlgfew" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="send_buffer_withfull">
+<org.eventb.core.refinesEvent name="_F-CbofhDEeORWbKhnlgfew" org.eventb.core.target="send_buffer_withfull"/>
+<org.eventb.core.parameter name="_F-CbqPhDEeORWbKhnlgfew" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_F-CbqfhDEeORWbKhnlgfew" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_O0WVAvhDEeORWbKhnlgfew" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_O0WVA_hDEeORWbKhnlgfew" org.eventb.core.identifier="wt"/>
+<org.eventb.core.parameter name="_O0WVBPhDEeORWbKhnlgfew" org.eventb.core.identifier="timeout"/>
+<org.eventb.core.parameter name="_F-CbpPhDEeORWbKhnlgfew" org.eventb.core.identifier="tmout_trig"/>
+<org.eventb.core.parameter name="_F-CbpfhDEeORWbKhnlgfew" org.eventb.core.identifier="buf"/>
+<org.eventb.core.parameter name="_F-CbpvhDEeORWbKhnlgfew" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_F-Cbp_hDEeORWbKhnlgfew" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_O0WVBfhDEeORWbKhnlgfew" org.eventb.core.label="grd40" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_O0WVBvhDEeORWbKhnlgfew" org.eventb.core.label="grd41" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_F-Cbq_hDEeORWbKhnlgfew" org.eventb.core.label="grd42" org.eventb.core.predicate="proc = current_process"/>
+<org.eventb.core.guard name="_F-CbrPhDEeORWbKhnlgfew" org.eventb.core.label="grd34" org.eventb.core.predicate="newstate = PS_Waiting"/>
+<org.eventb.core.guard name="_F-CbrfhDEeORWbKhnlgfew" org.eventb.core.label="grd43" org.eventb.core.predicate="wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)"/>
+<org.eventb.core.guard name="_F-CbrvhDEeORWbKhnlgfew" org.eventb.core.label="grd44" org.eventb.core.predicate="timeout ∈ℕ"/>
+<org.eventb.core.guard name="_r9mUM_gkEeOdqO0geQOt0A" org.eventb.core.label="grd45" org.eventb.core.predicate="tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)"/>
+<org.eventb.core.guard name="_F-CbsPhDEeORWbKhnlgfew" org.eventb.core.label="grd46" org.eventb.core.predicate="(timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})"/>
+<org.eventb.core.guard name="_F-MMofhDEeORWbKhnlgfew" org.eventb.core.label="grd47" org.eventb.core.predicate="timeout&gt;0 ⇒ wt = PROC_WAIT_TIMEOUT"/>
+<org.eventb.core.guard name="_F-MMovhDEeORWbKhnlgfew" org.eventb.core.label="grd48" org.eventb.core.predicate="timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_F-MMo_hDEeORWbKhnlgfew" org.eventb.core.label="grd503" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_F-MMpPhDEeORWbKhnlgfew" org.eventb.core.label="grd500" org.eventb.core.predicate="buffers_of_partition(buf) = current_partition"/>
+<org.eventb.core.guard name="_F-MMpfhDEeORWbKhnlgfew" org.eventb.core.label="grd502" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.guard name="_F-MMpvhDEeORWbKhnlgfew" org.eventb.core.label="grd504" org.eventb.core.predicate="buffers_of_partition(buf) = current_partition"/>
+<org.eventb.core.guard name="_F-MMp_hDEeORWbKhnlgfew" org.eventb.core.label="grd505" org.eventb.core.predicate="card(queue_of_buffers(buf))=MaxMsgNum_of_Buffers(buf)"/>
+<org.eventb.core.guard name="_F-MMqPhDEeORWbKhnlgfew" org.eventb.core.label="grd509" org.eventb.core.predicate="locklevel_of_partition(current_partition) = 0"/>
+<org.eventb.core.guard name="_F-MMqfhDEeORWbKhnlgfew" org.eventb.core.label="grd510" org.eventb.core.predicate="current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)"/>
+<org.eventb.core.action name="_F-MMr_hDEeORWbKhnlgfew" org.eventb.core.assignment="need_reschedule ≔ TRUE" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_F-MMsPhDEeORWbKhnlgfew" org.eventb.core.assignment="current_process_flag ≔ FALSE" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_xGpgmPhDEeORWbKhnlgfew" org.eventb.core.assignment="process_wait_type(proc) ≔ wt" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_xGpgmfhDEeORWbKhnlgfew" org.eventb.core.assignment="timeout_trigger ≔ timeout_trigger   tmout_trig" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_F-MMrPhDEeORWbKhnlgfew" org.eventb.core.assignment="processes_waitingfor_buffers(buf) ≔  processes_waitingfor_buffers(buf) {proc ↦(msg↦WAITING_W↦t)}" org.eventb.core.label="act501"/>
+<org.eventb.core.guard name="_O0WVB_hDEeORWbKhnlgfew" org.eventb.core.label="grd511" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+<org.eventb.core.action name="_O0WVHfhDEeORWbKhnlgfew" org.eventb.core.assignment="used_messages ≔ used_messages ∪ {msg}" org.eventb.core.label="act502"/>
+<org.eventb.core.action name="_O0WVHvhDEeORWbKhnlgfew" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_O0WVAPhDEeORWbKhnlgfew" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="receive_buffer">
+<org.eventb.core.refinesEvent name="_O0WVAfhDEeORWbKhnlgfew" org.eventb.core.target="receive_buffer"/>
+<org.eventb.core.guard name="_O0WVCPhDEeORWbKhnlgfew" org.eventb.core.label="grd01" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_O0WVCfhDEeORWbKhnlgfew" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE ∧ buffers_of_partition(buf) = current_partition"/>
+<org.eventb.core.guard name="_O0WVCvhDEeORWbKhnlgfew" org.eventb.core.label="grd02" org.eventb.core.predicate="msg∈MESSAGES"/>
+<org.eventb.core.guard name="_r9mUOvgkEeOdqO0geQOt0A" org.eventb.core.label="grd03" org.eventb.core.predicate="queue_of_buffers(buf)≠ ∅"/>
+<org.eventb.core.guard name="_O0WVFfhDEeORWbKhnlgfew" org.eventb.core.label="grd04" org.eventb.core.predicate="msg↦t∈queue_of_buffers(buf) ∧ (∀m1,t1·(m1↦t1∈queue_of_buffers(buf)⇒t≤t1))"/>
+<org.eventb.core.parameter name="_xGfvkPhDEeORWbKhnlgfew" org.eventb.core.identifier="buf"/>
+<org.eventb.core.parameter name="_xGfvkfhDEeORWbKhnlgfew" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_xGfvkvhDEeORWbKhnlgfew" org.eventb.core.identifier="t"/>
+<org.eventb.core.action name="_xGpgm_hDEeORWbKhnlgfew" org.eventb.core.assignment="queue_of_buffers(buf) ≔ queue_of_buffers(buf) ∖ {msg↦t}" org.eventb.core.label="act01"/>
+<org.eventb.core.guard name="_xGfvmvhDEeORWbKhnlgfew" org.eventb.core.label="grd05" org.eventb.core.predicate="processes_waitingfor_buffers(buf)=∅"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_O0WVDPhDEeORWbKhnlgfew" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="receive_buffer_needwakeupsendproc">
+<org.eventb.core.refinesEvent name="_O0WVDfhDEeORWbKhnlgfew" org.eventb.core.target="receive_buffer_needwakeupsendproc"/>
+<org.eventb.core.parameter name="_O0WVEfhDEeORWbKhnlgfew" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_O0WVEvhDEeORWbKhnlgfew" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_MZS78vhQEeOAG5W4v_4uKA" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_MZS78_hQEeOAG5W4v_4uKA" org.eventb.core.identifier="resch"/>
+<org.eventb.core.parameter name="_MZS79PhQEeOAG5W4v_4uKA" org.eventb.core.identifier="buf"/>
+<org.eventb.core.parameter name="_xGfvk_hDEeORWbKhnlgfew" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_O0WVDvhDEeORWbKhnlgfew" org.eventb.core.identifier="t"/>
+<org.eventb.core.parameter name="_O0WVD_hDEeORWbKhnlgfew" org.eventb.core.identifier="m"/>
+<org.eventb.core.parameter name="_O0WVEPhDEeORWbKhnlgfew" org.eventb.core.identifier="t_"/>
+<org.eventb.core.guard name="_MZS7-_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd500" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_xGfvlPhDEeORWbKhnlgfew" org.eventb.core.label="grd501" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_xGfvlfhDEeORWbKhnlgfew" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_xGfvlvhDEeORWbKhnlgfew" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_xGfvl_hDEeORWbKhnlgfew" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_r9mUPfgkEeOdqO0geQOt0A" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_MZcs8_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend"/>
+<org.eventb.core.guard name="_xGfvmfhDEeORWbKhnlgfew" org.eventb.core.label="grd33" org.eventb.core.predicate="process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready"/>
+<org.eventb.core.guard name="_xGfvm_hDEeORWbKhnlgfew" org.eventb.core.label="grd34" org.eventb.core.predicate="process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend"/>
+<org.eventb.core.guard name="_xGfvnPhDEeORWbKhnlgfew" org.eventb.core.label="grd40" org.eventb.core.predicate="process_wait_type(proc)= PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_O0WVHPhDEeORWbKhnlgfew" org.eventb.core.label="grd41" org.eventb.core.predicate="resch∈BOOL"/>
+<org.eventb.core.guard name="_O0WVE_hDEeORWbKhnlgfew" org.eventb.core.label="grd509" org.eventb.core.predicate="(locklevel_of_partition(current_partition)=0 ⇒ resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒ resch=need_reschedule)"/>
+<org.eventb.core.guard name="_YXwIcPhEEeORWbKhnlgfew" org.eventb.core.label="grd506" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_O0WVFvhDEeORWbKhnlgfew" org.eventb.core.label="grd05" org.eventb.core.predicate="buffers_of_partition(buf) = current_partition"/>
+<org.eventb.core.guard name="_O0WVF_hDEeORWbKhnlgfew" org.eventb.core.label="grd502" org.eventb.core.predicate="msg∈MESSAGES"/>
+<org.eventb.core.guard name="_O0WVGPhDEeORWbKhnlgfew" org.eventb.core.label="grd508" org.eventb.core.predicate="m∈MESSAGES ∧ t∈ℕ ∧ t_∈ℕ"/>
+<org.eventb.core.guard name="_O0WVGfhDEeORWbKhnlgfew" org.eventb.core.label="grd503" org.eventb.core.predicate="queue_of_buffers(buf)≠∅"/>
+<org.eventb.core.guard name="_O0WVGvhDEeORWbKhnlgfew" org.eventb.core.label="grd504" org.eventb.core.predicate="msg↦t∈queue_of_buffers(buf) ∧ (∀m1,t1·(m1↦t1∈queue_of_buffers(buf)⇒t≤t1))"/>
+<org.eventb.core.guard name="_O0WVG_hDEeORWbKhnlgfew" org.eventb.core.label="grd505" org.eventb.core.predicate="processes_waitingfor_buffers(buf)≠∅ ∧ (proc↦(m↦WAITING_W ↦t_)) ∈processes_waitingfor_buffers(buf)"/>
+<org.eventb.core.action name="_MZcs_PhQEeOAG5W4v_4uKA" org.eventb.core.assignment="process_wait_type ≔  {proc}⩤process_wait_type" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_MZcs_fhQEeOAG5W4v_4uKA" org.eventb.core.assignment="timeout_trigger ≔ {proc}⩤timeout_trigger" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_xGpgmvhDEeORWbKhnlgfew" org.eventb.core.assignment="need_reschedule ≔ resch" org.eventb.core.label="act43"/>
+<org.eventb.core.guard name="_MZS7-vhQEeOAG5W4v_4uKA" org.eventb.core.label="grd510" org.eventb.core.predicate="quediscipline_of_buffers(buf)=QUEUE_FIFO ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ t≤t1))"/>
+<org.eventb.core.action name="_MZcs__hQEeOAG5W4v_4uKA" org.eventb.core.assignment="queue_of_buffers(buf) ≔ (queue_of_buffers(buf) ∖ {msg↦t})" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_MZctAPhQEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_buffers(buf) ≔ {proc} ⩤   processes_waitingfor_buffers(buf)" org.eventb.core.label="act502"/>
+<org.eventb.core.action name="_MZctAfhQEeOAG5W4v_4uKA" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_MZcs9fhQEeOAG5W4v_4uKA" org.eventb.core.label="grd507" org.eventb.core.predicate="quediscipline_of_buffers(buf)=QUEUE_PRIORITY ⇒ (∀p1,m1,t1·(p1↦(m1↦WAITING_R↦t1)∈processes_waitingfor_buffers(buf) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_MZS78PhQEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="receive_buffer_whenempty">
+<org.eventb.core.refinesEvent name="_MZS78fhQEeOAG5W4v_4uKA" org.eventb.core.target="receive_buffer_whenempty"/>
+<org.eventb.core.parameter name="_MZS7-fhQEeOAG5W4v_4uKA" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_UPNvUfhQEeOAG5W4v_4uKA" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_UPNvVfhQEeOAG5W4v_4uKA" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_UPNvWvhQEeOAG5W4v_4uKA" org.eventb.core.identifier="wt"/>
+<org.eventb.core.parameter name="_UPNvY_hQEeOAG5W4v_4uKA" org.eventb.core.identifier="timeout"/>
+<org.eventb.core.parameter name="_MZS79fhQEeOAG5W4v_4uKA" org.eventb.core.identifier="tmout_trig"/>
+<org.eventb.core.parameter name="_MZS79vhQEeOAG5W4v_4uKA" org.eventb.core.identifier="buf"/>
+<org.eventb.core.parameter name="_MZS79_hQEeOAG5W4v_4uKA" org.eventb.core.identifier="msg"/>
+<org.eventb.core.parameter name="_MZS7-PhQEeOAG5W4v_4uKA" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_UPNvVvhQEeOAG5W4v_4uKA" org.eventb.core.label="grd40" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_MZS7_PhQEeOAG5W4v_4uKA" org.eventb.core.label="grd41" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_MZS7_fhQEeOAG5W4v_4uKA" org.eventb.core.label="grd42" org.eventb.core.predicate="proc = current_process"/>
+<org.eventb.core.guard name="_MZcs8PhQEeOAG5W4v_4uKA" org.eventb.core.label="grd34" org.eventb.core.predicate="newstate = PS_Waiting"/>
+<org.eventb.core.guard name="_MZcs8fhQEeOAG5W4v_4uKA" org.eventb.core.label="grd43" org.eventb.core.predicate="wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)"/>
+<org.eventb.core.guard name="_r9mUSvgkEeOdqO0geQOt0A" org.eventb.core.label="grd44" org.eventb.core.predicate="timeout ∈ℕ"/>
+<org.eventb.core.guard name="_UPNvV_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd45" org.eventb.core.predicate="tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)"/>
+<org.eventb.core.guard name="_MZcs9PhQEeOAG5W4v_4uKA" org.eventb.core.label="grd46" org.eventb.core.predicate="(timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})"/>
+<org.eventb.core.guard name="_MZcs9vhQEeOAG5W4v_4uKA" org.eventb.core.label="grd47" org.eventb.core.predicate="timeout &gt;0 ⇒ wt = PROC_WAIT_TIMEOUT"/>
+<org.eventb.core.guard name="_MZcs9_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd48" org.eventb.core.predicate="timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_MZcs-PhQEeOAG5W4v_4uKA" org.eventb.core.label="grd504" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_MZcs-fhQEeOAG5W4v_4uKA" org.eventb.core.label="grd500" org.eventb.core.predicate="buffers_of_partition(buf) = current_partition"/>
+<org.eventb.core.guard name="_MZcs-vhQEeOAG5W4v_4uKA" org.eventb.core.label="grd502" org.eventb.core.predicate="queue_of_buffers(buf)=∅"/>
+<org.eventb.core.guard name="_MZcs-_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd503" org.eventb.core.predicate="msg∈MESSAGES"/>
+<org.eventb.core.action name="_UPNvXvhQEeOAG5W4v_4uKA" org.eventb.core.assignment="need_reschedule ≔ TRUE" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_UPNvX_hQEeOAG5W4v_4uKA" org.eventb.core.assignment="current_process_flag ≔ FALSE" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_MZcs_vhQEeOAG5W4v_4uKA" org.eventb.core.assignment="process_wait_type(proc) ≔ wt" org.eventb.core.label="act43"/>
+<org.eventb.core.guard name="_UPNvUvhQEeOAG5W4v_4uKA" org.eventb.core.label="grd509" org.eventb.core.predicate="locklevel_of_partition(current_partition) = 0"/>
+<org.eventb.core.guard name="_UPNvU_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd510" org.eventb.core.predicate="current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)"/>
+<org.eventb.core.guard name="_UPNvXPhQEeOAG5W4v_4uKA" org.eventb.core.label="grd511" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+<org.eventb.core.action name="_UPNvafhQEeOAG5W4v_4uKA" org.eventb.core.assignment="timeout_trigger ≔ timeout_trigger   tmout_trig" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_UPNvavhQEeOAG5W4v_4uKA" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.action name="_UPNvYPhQEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_buffers(buf) ≔ processes_waitingfor_buffers(buf) {proc ↦(msg↦WAITING_R↦t)}" org.eventb.core.label="act501"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UPNvUPhQEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_buffer_id">
+<org.eventb.core.parameter name="_UPNvZPhQEeOAG5W4v_4uKA" org.eventb.core.identifier="buf"/>
+<org.eventb.core.guard name="_ZcktafhCEeORWbKhnlgfew" org.eventb.core.label="grd01" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_F-Cbr_hDEeORWbKhnlgfew" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ buffers_of_partition(buf) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UPNvVPhQEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_buffer_status">
+<org.eventb.core.parameter name="_bc5MEvhSEeOAG5W4v_4uKA" org.eventb.core.identifier="buf"/>
+<org.eventb.core.guard name="_UPNvW_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="buf ∈ buffers"/>
+<org.eventb.core.guard name="_UPNvXfhQEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ buffers_of_partition(buf) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UPNvWPhQEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="create_blackboard">
+<org.eventb.core.refinesEvent name="_UPNvWfhQEeOAG5W4v_4uKA" org.eventb.core.target="create_blackboard"/>
+<org.eventb.core.guard name="_UPNvaPhQEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)"/>
+<org.eventb.core.guard name="_UPNvZvhQEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="bb∈BLACKBOARDS∖blackboards"/>
+<org.eventb.core.guard name="_bc5MGfhSEeOAG5W4v_4uKA" org.eventb.core.label="grd06" org.eventb.core.predicate="partition_mode(current_partition)≠PM_NORMAL"/>
+<org.eventb.core.action name="_bc5MJ_hSEeOAG5W4v_4uKA" org.eventb.core.assignment="blackboards ≔ blackboards∪{bb}" org.eventb.core.label="act02"/>
+<org.eventb.core.action name="_bc5MKPhSEeOAG5W4v_4uKA" org.eventb.core.assignment="blackboards_of_partition(bb)≔ current_partition" org.eventb.core.label="act03"/>
+<org.eventb.core.action name="_UPNva_hQEeOAG5W4v_4uKA" org.eventb.core.assignment="emptyindicator_of_blackboards(bb)≔BB_EMPTY" org.eventb.core.label="act04"/>
+<org.eventb.core.parameter name="_bc5ME_hSEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.action name="_bc5MKvhSEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_blackboards(bb) ≔ ∅" org.eventb.core.label="act05"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_UPNvYfhQEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="display_blackboard">
+<org.eventb.core.refinesEvent name="_UPNvYvhQEeOAG5W4v_4uKA" org.eventb.core.target="display_blackboard"/>
+<org.eventb.core.parameter name="_bc5MFPhSEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.parameter name="_bc5MFfhSEeOAG5W4v_4uKA" org.eventb.core.identifier="msg"/>
+<org.eventb.core.guard name="_O0WVFPhDEeORWbKhnlgfew" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_bc5MIPhSEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition"/>
+<org.eventb.core.guard name="_xGfvmPhDEeORWbKhnlgfew" org.eventb.core.label="grd02" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.action name="_bc5MK_hSEeOAG5W4v_4uKA" org.eventb.core.assignment="msgspace_of_blackboards(bb) ≔ msg" org.eventb.core.label="act01"/>
+<org.eventb.core.action name="_bc5MLPhSEeOAG5W4v_4uKA" org.eventb.core.assignment="emptyindicator_of_blackboards(bb) ≔ BB_OCCUPIED" org.eventb.core.label="act02"/>
+<org.eventb.core.action name="_bc5MLfhSEeOAG5W4v_4uKA" org.eventb.core.assignment="used_messages ≔ used_messages ∪ {msg}" org.eventb.core.label="act03"/>
+<org.eventb.core.guard name="_bc5MIvhSEeOAG5W4v_4uKA" org.eventb.core.label="grd03" org.eventb.core.predicate="processes_waitingfor_blackboards(bb) = ∅"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_bc5MEPhSEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="display_blackboard_needwakeuprdprocs">
+<org.eventb.core.refinesEvent name="_bc5MEfhSEeOAG5W4v_4uKA" org.eventb.core.target="display_blackboard_needwakeuprdprocs"/>
+<org.eventb.core.guard name="_KxY6RvhhEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_MZcs8vhQEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_bc5MHPhSEeOAG5W4v_4uKA" org.eventb.core.label="grd13" org.eventb.core.predicate="bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition"/>
+<org.eventb.core.guard name="_bc5MHfhSEeOAG5W4v_4uKA" org.eventb.core.label="grd03" org.eventb.core.predicate="procs⊆PROCESSES ∧ procs ⊆ processes_of_partition∼[{part}]"/>
+<org.eventb.core.guard name="_bc5MHvhSEeOAG5W4v_4uKA" org.eventb.core.label="grd04" org.eventb.core.predicate="procs = processes_waitingfor_blackboards(bb) ∧ procs⊆ dom(process_wait_type)"/>
+<org.eventb.core.guard name="_bc5MGvhSEeOAG5W4v_4uKA" org.eventb.core.label="grd05" org.eventb.core.predicate="∀proc·(proc∈procs ⇒ process_wait_type(proc)= PROC_WAIT_OBJ)"/>
+<org.eventb.core.guard name="_KxY6R_hhEeOAG5W4v_4uKA" org.eventb.core.label="grd06" org.eventb.core.predicate="newstates ∈ procs → PROCESS_STATES"/>
+<org.eventb.core.guard name="_bc5MIfhSEeOAG5W4v_4uKA" org.eventb.core.label="grd07" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_bc5MI_hSEeOAG5W4v_4uKA" org.eventb.core.label="grd08" org.eventb.core.predicate="∀proc·(proc∈procs ⇒ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend)"/>
+<org.eventb.core.guard name="_bc5MJPhSEeOAG5W4v_4uKA" org.eventb.core.label="grd09" org.eventb.core.predicate="∀proc·(proc∈procs ∧ process_state(proc) = PS_Waiting ⇒ newstates(proc) = PS_Ready)"/>
+<org.eventb.core.guard name="_bc5MJfhSEeOAG5W4v_4uKA" org.eventb.core.label="grd10" org.eventb.core.predicate="∀proc·(proc∈procs ∧ process_state(proc) = PS_WaitandSuspend ⇒ newstates(proc) = PS_Suspend)"/>
+<org.eventb.core.guard name="_bc5MJvhSEeOAG5W4v_4uKA" org.eventb.core.label="grd11" org.eventb.core.predicate="resch∈BOOL"/>
+<org.eventb.core.action name="_bc5MLvhSEeOAG5W4v_4uKA" org.eventb.core.assignment="process_wait_type ≔  procs⩤process_wait_type" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_KxiEO_hhEeOAG5W4v_4uKA" org.eventb.core.assignment="timeout_trigger ≔ procs⩤timeout_trigger" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_KxiEPPhhEeOAG5W4v_4uKA" org.eventb.core.assignment="need_reschedule ≔ resch" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_bc5MKfhSEeOAG5W4v_4uKA" org.eventb.core.assignment="process_state ≔ process_state newstates" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_KxY6RPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd12" org.eventb.core.predicate="(locklevel_of_partition(current_partition)=0 ⇒  resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒  resch=need_reschedule)"/>
+<org.eventb.core.parameter name="_KxY6S_hhEeOAG5W4v_4uKA" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_KxY6TPhhEeOAG5W4v_4uKA" org.eventb.core.identifier="procs"/>
+<org.eventb.core.parameter name="_bc5MFvhSEeOAG5W4v_4uKA" org.eventb.core.identifier="newstates"/>
+<org.eventb.core.parameter name="_bc5MF_hSEeOAG5W4v_4uKA" org.eventb.core.identifier="resch"/>
+<org.eventb.core.parameter name="_KxY6QvhhEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.parameter name="_KxY6Q_hhEeOAG5W4v_4uKA" org.eventb.core.identifier="msg"/>
+<org.eventb.core.guard name="_KxY6RfhhEeOAG5W4v_4uKA" org.eventb.core.label="grd14" org.eventb.core.predicate="msg∈MESSAGES∖used_messages"/>
+<org.eventb.core.guard name="_KxY6UvhhEeOAG5W4v_4uKA" org.eventb.core.label="grd15" org.eventb.core.predicate="processes_waitingfor_blackboards(bb) ≠ ∅"/>
+<org.eventb.core.action name="_KxiEPvhhEeOAG5W4v_4uKA" org.eventb.core.assignment="msgspace_of_blackboards(bb) ≔ msg" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_KxiEP_hhEeOAG5W4v_4uKA" org.eventb.core.assignment="emptyindicator_of_blackboards(bb) ≔ BB_OCCUPIED" org.eventb.core.label="act502"/>
+<org.eventb.core.action name="_KxiEQPhhEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_blackboards(bb) ≔ processes_waitingfor_blackboards(bb)∖procs" org.eventb.core.label="act503"/>
+<org.eventb.core.action name="_asS3xfhhEeOAG5W4v_4uKA" org.eventb.core.assignment="used_messages ≔ used_messages ∪ {msg}" org.eventb.core.label="act504"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_KxY6QPhhEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="read_blackboard">
+<org.eventb.core.refinesEvent name="_KxY6QfhhEeOAG5W4v_4uKA" org.eventb.core.target="read_blackboard"/>
+<org.eventb.core.parameter name="_KxY6TfhhEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.parameter name="_KxY6TvhhEeOAG5W4v_4uKA" org.eventb.core.identifier="msg"/>
+<org.eventb.core.guard name="_KxY6U_hhEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_UPNvZfhQEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition"/>
+<org.eventb.core.guard name="_KxiENfhhEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="msg∈MESSAGES"/>
+<org.eventb.core.guard name="_KxY6SPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd03" org.eventb.core.predicate="bb∈dom(msgspace_of_blackboards) ∧ msg = msgspace_of_blackboards(bb)"/>
+<org.eventb.core.guard name="_KxiEN_hhEeOAG5W4v_4uKA" org.eventb.core.label="grd04" org.eventb.core.predicate="emptyindicator_of_blackboards(bb) = BB_OCCUPIED"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_KxY6SfhhEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="read_blackboard_whenempty">
+<org.eventb.core.refinesEvent name="_KxY6SvhhEeOAG5W4v_4uKA" org.eventb.core.target="read_blackboard_whenempty"/>
+<org.eventb.core.guard name="_asS3yPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd40" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_KxiEMPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd41" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_KxiEMfhhEeOAG5W4v_4uKA" org.eventb.core.label="grd42" org.eventb.core.predicate="proc = current_process"/>
+<org.eventb.core.guard name="_KxiEMvhhEeOAG5W4v_4uKA" org.eventb.core.label="grd43" org.eventb.core.predicate="wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)"/>
+<org.eventb.core.guard name="_KxiEM_hhEeOAG5W4v_4uKA" org.eventb.core.label="grd34" org.eventb.core.predicate="newstate = PS_Waiting"/>
+<org.eventb.core.guard name="_UPNvZ_hQEeOAG5W4v_4uKA" org.eventb.core.label="grd44" org.eventb.core.predicate="timeout ∈ℕ"/>
+<org.eventb.core.guard name="_asS3yfhhEeOAG5W4v_4uKA" org.eventb.core.label="grd45" org.eventb.core.predicate="tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)"/>
+<org.eventb.core.guard name="_KxiENvhhEeOAG5W4v_4uKA" org.eventb.core.label="grd46" org.eventb.core.predicate="(timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})"/>
+<org.eventb.core.guard name="_KxiEOPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd47" org.eventb.core.predicate="timeout &gt;0 ⇒ wt = PROC_WAIT_TIMEOUT"/>
+<org.eventb.core.guard name="_KxiEOfhhEeOAG5W4v_4uKA" org.eventb.core.label="grd48" org.eventb.core.predicate="timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_KxiEOvhhEeOAG5W4v_4uKA" org.eventb.core.label="grd501" org.eventb.core.predicate="bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition"/>
+<org.eventb.core.action name="_asS32_hhEeOAG5W4v_4uKA" org.eventb.core.assignment="need_reschedule ≔ TRUE" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_KxiEPfhhEeOAG5W4v_4uKA" org.eventb.core.assignment="current_process_flag ≔ FALSE" org.eventb.core.label="act42"/>
+<org.eventb.core.parameter name="_asS3x_hhEeOAG5W4v_4uKA" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_asS3y_hhEeOAG5W4v_4uKA" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_asS30PhhEeOAG5W4v_4uKA" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_KxY6T_hhEeOAG5W4v_4uKA" org.eventb.core.identifier="wt"/>
+<org.eventb.core.parameter name="_KxY6UPhhEeOAG5W4v_4uKA" org.eventb.core.identifier="timeout"/>
+<org.eventb.core.parameter name="_KxY6UfhhEeOAG5W4v_4uKA" org.eventb.core.identifier="tmout_trig"/>
+<org.eventb.core.parameter name="_asS3wvhhEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.guard name="_asS3w_hhEeOAG5W4v_4uKA" org.eventb.core.label="grd503" org.eventb.core.predicate="emptyindicator_of_blackboards(bb) = BB_EMPTY"/>
+<org.eventb.core.guard name="_asS3xPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd504" org.eventb.core.predicate="locklevel_of_partition(current_partition) = 0"/>
+<org.eventb.core.guard name="_asS3zfhhEeOAG5W4v_4uKA" org.eventb.core.label="grd515" org.eventb.core.predicate="current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)"/>
+<org.eventb.core.action name="_asS33PhhEeOAG5W4v_4uKA" org.eventb.core.assignment="process_wait_type(proc) ≔ wt" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_asS33vhhEeOAG5W4v_4uKA" org.eventb.core.assignment="timeout_trigger ≔ timeout_trigger   tmout_trig" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_asS33_hhEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_blackboards(bb) ≔ processes_waitingfor_blackboards(bb) ∪ {proc}" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_asS35vhhEeOAG5W4v_4uKA" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_asS3wPhhEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="clear_blackboard">
+<org.eventb.core.refinesEvent name="_asS3wfhhEeOAG5W4v_4uKA" org.eventb.core.target="clear_blackboard"/>
+<org.eventb.core.action name="_vqjkB_htEeOAG5W4v_4uKA" org.eventb.core.assignment="emptyindicator_of_blackboards(bb) ≔ BB_EMPTY" org.eventb.core.label="act01"/>
+<org.eventb.core.action name="_asS33fhhEeOAG5W4v_4uKA" org.eventb.core.assignment="msgspace_of_blackboards ≔ {bb} ⩤ msgspace_of_blackboards" org.eventb.core.label="act02"/>
+<org.eventb.core.parameter name="_asS30fhhEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.guard name="_bc5MGPhSEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_bc5MG_hSEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="bb∈blackboards ∧ blackboards_of_partition(bb) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_asS3xvhhEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_blackboard_id">
+<org.eventb.core.parameter name="_asS30vhhEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.guard name="_asS3zPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="bb∈blackboards"/>
+<org.eventb.core.guard name="_asS35PhhEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ blackboards_of_partition(bb) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_asS3yvhhEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_blackboard_status">
+<org.eventb.core.parameter name="_asS30_hhEeOAG5W4v_4uKA" org.eventb.core.identifier="bb"/>
+<org.eventb.core.guard name="_asS31PhhEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="bb∈blackboards"/>
+<org.eventb.core.guard name="_bc5MH_hSEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ blackboards_of_partition(bb) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_asS3zvhhEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="create_semaphore">
+<org.eventb.core.refinesEvent name="_asS3z_hhEeOAG5W4v_4uKA" org.eventb.core.target="create_semaphore"/>
+<org.eventb.core.parameter name="_asS34vhhEeOAG5W4v_4uKA" org.eventb.core.identifier="sem"/>
+<org.eventb.core.parameter name="_vqjj8vhtEeOAG5W4v_4uKA" org.eventb.core.identifier="maxval"/>
+<org.eventb.core.parameter name="_vqjj8_htEeOAG5W4v_4uKA" org.eventb.core.identifier="currentval"/>
+<org.eventb.core.parameter name="_vqjj9PhtEeOAG5W4v_4uKA" org.eventb.core.identifier="quediscip"/>
+<org.eventb.core.guard name="_asS32PhhEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)"/>
+<org.eventb.core.guard name="_KxY6VPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="sem∈SEMAPHORES∖semaphores"/>
+<org.eventb.core.guard name="_asS32vhhEeOAG5W4v_4uKA" org.eventb.core.label="grd05" org.eventb.core.predicate="quediscip∈QUEUING_DISCIPLINE"/>
+<org.eventb.core.guard name="_asS31vhhEeOAG5W4v_4uKA" org.eventb.core.label="grd06" org.eventb.core.predicate="partition_mode(current_partition)≠PM_NORMAL"/>
+<org.eventb.core.guard name="_asS35fhhEeOAG5W4v_4uKA" org.eventb.core.label="grd07" org.eventb.core.predicate="maxval∈ℕ1"/>
+<org.eventb.core.action name="_vqjkCPhtEeOAG5W4v_4uKA" org.eventb.core.assignment="quediscipline_of_semaphores(sem)≔quediscip" org.eventb.core.label="act01"/>
+<org.eventb.core.guard name="_KxiENPhhEeOAG5W4v_4uKA" org.eventb.core.label="grd08" org.eventb.core.predicate="currentval∈ℕ ∧ currentval≤maxval"/>
+<org.eventb.core.action name="_vqjkCvhtEeOAG5W4v_4uKA" org.eventb.core.assignment="semaphores ≔ semaphores∪{sem}" org.eventb.core.label="act02"/>
+<org.eventb.core.action name="_vqjkC_htEeOAG5W4v_4uKA" org.eventb.core.assignment="value_of_semaphores(sem)≔currentval" org.eventb.core.label="act03"/>
+<org.eventb.core.action name="_vqjkDPhtEeOAG5W4v_4uKA" org.eventb.core.assignment="MaxValue_of_Semaphores(sem)≔maxval" org.eventb.core.label="act04"/>
+<org.eventb.core.action name="_LHVpN_huEeOAG5W4v_4uKA" org.eventb.core.assignment="semaphores_of_partition(sem) ≔current_partition" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_LHezLPhuEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_semaphores(sem) ≔ ∅" org.eventb.core.label="act06"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_asS34PhhEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="wait_semaphore">
+<org.eventb.core.refinesEvent name="_asS34fhhEeOAG5W4v_4uKA" org.eventb.core.target="wait_semaphore"/>
+<org.eventb.core.action name="_vqjkCfhtEeOAG5W4v_4uKA" org.eventb.core.assignment="value_of_semaphores(sem) ≔ value_of_semaphores(sem) −1" org.eventb.core.label="act01"/>
+<org.eventb.core.parameter name="_vqjj9fhtEeOAG5W4v_4uKA" org.eventb.core.identifier="sem"/>
+<org.eventb.core.guard name="_vqjkAfhtEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_vqjj-fhtEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition"/>
+<org.eventb.core.guard name="_vqjkBPhtEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="value_of_semaphores(sem) &gt; 0"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_vqjj8PhtEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="wait_semahpore_whenzero">
+<org.eventb.core.refinesEvent name="_vqjj8fhtEeOAG5W4v_4uKA" org.eventb.core.target="wait_semahpore_whenzero"/>
+<org.eventb.core.guard name="_vqjkBfhtEeOAG5W4v_4uKA" org.eventb.core.label="grd40" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_vqjkBvhtEeOAG5W4v_4uKA" org.eventb.core.label="grd41" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_LHVpM_huEeOAG5W4v_4uKA" org.eventb.core.label="grd42" org.eventb.core.predicate="proc = current_process"/>
+<org.eventb.core.guard name="_LHVpNPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd34" org.eventb.core.predicate="newstate = PS_Waiting"/>
+<org.eventb.core.guard name="_LHVpNfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd43" org.eventb.core.predicate="wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)"/>
+<org.eventb.core.guard name="_LHVpNvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd44" org.eventb.core.predicate="timeout ∈ℕ"/>
+<org.eventb.core.guard name="_vqjj_PhtEeOAG5W4v_4uKA" org.eventb.core.label="grd45" org.eventb.core.predicate="tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)"/>
+<org.eventb.core.guard name="_asS31fhhEeOAG5W4v_4uKA" org.eventb.core.label="grd46" org.eventb.core.predicate="(timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt; 0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})"/>
+<org.eventb.core.guard name="_vqjj_vhtEeOAG5W4v_4uKA" org.eventb.core.label="grd47" org.eventb.core.predicate="timeout &gt; 0 ⇒ wt = PROC_WAIT_TIMEOUT"/>
+<org.eventb.core.guard name="_vqjj__htEeOAG5W4v_4uKA" org.eventb.core.label="grd48" org.eventb.core.predicate="timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_vqjj-_htEeOAG5W4v_4uKA" org.eventb.core.label="grd502" org.eventb.core.predicate="sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition"/>
+<org.eventb.core.guard name="_LHezIPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd504" org.eventb.core.predicate="value_of_semaphores(sem) = 0"/>
+<org.eventb.core.guard name="_vqjkAvhtEeOAG5W4v_4uKA" org.eventb.core.label="grd505" org.eventb.core.predicate="locklevel_of_partition(current_partition) = 0"/>
+<org.eventb.core.parameter name="_LHVpOvhuEeOAG5W4v_4uKA" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_LHVpO_huEeOAG5W4v_4uKA" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_LHVpPPhuEeOAG5W4v_4uKA" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_LHVpPfhuEeOAG5W4v_4uKA" org.eventb.core.identifier="wt"/>
+<org.eventb.core.parameter name="_vqjj9vhtEeOAG5W4v_4uKA" org.eventb.core.identifier="timeout"/>
+<org.eventb.core.parameter name="_vqjj9_htEeOAG5W4v_4uKA" org.eventb.core.identifier="tmout_trig"/>
+<org.eventb.core.parameter name="_vqjj-PhtEeOAG5W4v_4uKA" org.eventb.core.identifier="sem"/>
+<org.eventb.core.parameter name="_LHVpMvhuEeOAG5W4v_4uKA" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_vqjj-vhtEeOAG5W4v_4uKA" org.eventb.core.label="grd506" org.eventb.core.predicate="current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)"/>
+<org.eventb.core.guard name="_LHezKfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd507" org.eventb.core.predicate="t = clock_tick ∗ ONE_TICK_TIME"/>
+<org.eventb.core.action name="_LHezLfhuEeOAG5W4v_4uKA" org.eventb.core.assignment="need_reschedule ≔ TRUE" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_LHezL_huEeOAG5W4v_4uKA" org.eventb.core.assignment="current_process_flag ≔ FALSE" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_LHezMPhuEeOAG5W4v_4uKA" org.eventb.core.assignment="process_wait_type(proc) ≔ wt" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_2KSyH_huEeOAG5W4v_4uKA" org.eventb.core.assignment="timeout_trigger ≔ timeout_trigger   tmout_trig" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_2KSyIPhuEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_semaphores(sem) ≔ processes_waitingfor_semaphores(sem)  {proc ↦ t}" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_LHezLvhuEeOAG5W4v_4uKA" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_LHVpMPhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="signal_semaphore">
+<org.eventb.core.refinesEvent name="_LHVpMfhuEeOAG5W4v_4uKA" org.eventb.core.target="signal_semaphore"/>
+<org.eventb.core.guard name="_LHezIfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_LHezIvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition"/>
+<org.eventb.core.guard name="_vqjkA_htEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="value_of_semaphores(sem) ≠ MaxValue_of_Semaphores(sem)"/>
+<org.eventb.core.guard name="_LHezJvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd03" org.eventb.core.predicate="processes_waitingfor_semaphores(sem) = ∅"/>
+<org.eventb.core.parameter name="_LHVpPvhuEeOAG5W4v_4uKA" org.eventb.core.identifier="sem"/>
+<org.eventb.core.action name="_2Kb8APhuEeOAG5W4v_4uKA" org.eventb.core.assignment="value_of_semaphores(sem) ≔ value_of_semaphores(sem) + 1" org.eventb.core.label="act01"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_LHVpOPhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="signal_semaphore_needwakeupproc">
+<org.eventb.core.refinesEvent name="_LHVpOfhuEeOAG5W4v_4uKA" org.eventb.core.target="signal_semaphore_needwakeupproc"/>
+<org.eventb.core.guard name="_LHezJ_huEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_LHezI_huEeOAG5W4v_4uKA" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend"/>
+<org.eventb.core.guard name="_2KSyG_huEeOAG5W4v_4uKA" org.eventb.core.label="grd33" org.eventb.core.predicate="process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready"/>
+<org.eventb.core.guard name="_LHezKvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd34" org.eventb.core.predicate="process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend"/>
+<org.eventb.core.guard name="_LHezK_huEeOAG5W4v_4uKA" org.eventb.core.label="grd35" org.eventb.core.predicate="proc∈ dom(process_wait_type)"/>
+<org.eventb.core.guard name="_2KSyEvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd40" org.eventb.core.predicate="process_wait_type(proc)= PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_2KSyE_huEeOAG5W4v_4uKA" org.eventb.core.label="grd41" org.eventb.core.predicate="resch∈BOOL"/>
+<org.eventb.core.guard name="_2KSyFvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd42" org.eventb.core.predicate="t∈ℕ"/>
+<org.eventb.core.guard name="_2KSyF_huEeOAG5W4v_4uKA" org.eventb.core.label="grd500" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_asS32fhhEeOAG5W4v_4uKA" org.eventb.core.label="grd501" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_LHezJfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd509" org.eventb.core.predicate="(locklevel_of_partition(current_partition)=0 ⇒ resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒ resch=need_reschedule)"/>
+<org.eventb.core.parameter name="_2KSyJPhuEeOAG5W4v_4uKA" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2Kb8A_huEeOAG5W4v_4uKA" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_LHVpP_huEeOAG5W4v_4uKA" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_2KSyEfhuEeOAG5W4v_4uKA" org.eventb.core.identifier="resch"/>
+<org.eventb.core.parameter name="_2KSyFfhuEeOAG5W4v_4uKA" org.eventb.core.identifier="sem"/>
+<org.eventb.core.parameter name="_2KSyGvhuEeOAG5W4v_4uKA" org.eventb.core.identifier="t"/>
+<org.eventb.core.guard name="_2KSyHfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd502" org.eventb.core.predicate="sem∈semaphores ∧ semaphores_of_partition(sem) = current_partition"/>
+<org.eventb.core.guard name="_asS34_hhEeOAG5W4v_4uKA" org.eventb.core.label="grd503" org.eventb.core.predicate="value_of_semaphores(sem) &lt; MaxValue_of_Semaphores(sem)"/>
+<org.eventb.core.guard name="_vqjj_fhtEeOAG5W4v_4uKA" org.eventb.core.label="grd506" org.eventb.core.predicate="processes_waitingfor_semaphores(sem)≠∅ ∧ (proc↦t) ∈processes_waitingfor_semaphores(sem)"/>
+<org.eventb.core.action name="_2Kb8FvhuEeOAG5W4v_4uKA" org.eventb.core.assignment="process_wait_type ≔  {proc}⩤process_wait_type" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_2KSyIfhuEeOAG5W4v_4uKA" org.eventb.core.assignment="timeout_trigger ≔ {proc}⩤timeout_trigger" org.eventb.core.label="act42"/>
+<org.eventb.core.guard name="_asS31_hhEeOAG5W4v_4uKA" org.eventb.core.label="grd507" org.eventb.core.predicate="quediscipline_of_semaphores(sem)=QUEUE_FIFO ⇒ (∀p1,t1·(p1↦t1∈processes_waitingfor_semaphores(sem) ⇒ t≤t1))"/>
+<org.eventb.core.guard name="_LHezJPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd508" org.eventb.core.predicate="quediscipline_of_semaphores(sem)=QUEUE_PRIORITY ⇒ (∀p1,t1·(p1↦t1∈processes_waitingfor_semaphores(sem) ⇒ currentpriority_of_process(proc)≥currentpriority_of_process(p1)))"/>
+<org.eventb.core.action name="_2Kb8F_huEeOAG5W4v_4uKA" org.eventb.core.assignment="need_reschedule ≔ resch" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_2Kb8GfhuEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_semaphores(sem) ≔ {proc} ⩤ processes_waitingfor_semaphores(sem)" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_2Kb8GvhuEeOAG5W4v_4uKA" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2KSyEPhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_semaphore_id">
+<org.eventb.core.guard name="_2KSyHPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="sem∈semaphores"/>
+<org.eventb.core.guard name="_vqjkAPhtEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ semaphores_of_partition(sem) = current_partition"/>
+<org.eventb.core.parameter name="_2Kb8BPhuEeOAG5W4v_4uKA" org.eventb.core.identifier="sem"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2KSyFPhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_semaphore_status">
+<org.eventb.core.parameter name="_2Kb8BfhuEeOAG5W4v_4uKA" org.eventb.core.identifier="sem"/>
+<org.eventb.core.guard name="_2KSyJvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="sem∈semaphores"/>
+<org.eventb.core.guard name="_2Kb8CvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ semaphores_of_partition(sem) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2KSyGPhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="create_event">
+<org.eventb.core.refinesEvent name="_2KSyGfhuEeOAG5W4v_4uKA" org.eventb.core.target="create_event"/>
+<org.eventb.core.guard name="_2Kb8CPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="current_partition_flag = TRUE ∧ (partition_mode(current_partition)=PM_COLD_START ∨ partition_mode(current_partition)=PM_WARM_START)"/>
+<org.eventb.core.guard name="_2KSyHvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="ev∈EVENTS∖events_"/>
+<org.eventb.core.guard name="_LHezKPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd06" org.eventb.core.predicate="partition_mode(current_partition)≠PM_NORMAL"/>
+<org.eventb.core.parameter name="_2Kb8BvhuEeOAG5W4v_4uKA" org.eventb.core.identifier="ev"/>
+<org.eventb.core.action name="_2Kb8G_huEeOAG5W4v_4uKA" org.eventb.core.assignment="events_ ≔ events_∪{ev}" org.eventb.core.label="act01"/>
+<org.eventb.core.action name="_2Kb8IfhuEeOAG5W4v_4uKA" org.eventb.core.assignment="state_of_events(ev) ≔ EVENT_DOWN" org.eventb.core.label="act02"/>
+<org.eventb.core.action name="_WQpGt_hzEeOAG5W4v_4uKA" org.eventb.core.assignment="events_of_partition(ev) ≔ current_partition" org.eventb.core.label="act03"/>
+<org.eventb.core.action name="_2Kb8GPhuEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_events(ev) ≔ ∅" org.eventb.core.label="act04"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2KSyIvhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="set_event">
+<org.eventb.core.refinesEvent name="_2KSyI_huEeOAG5W4v_4uKA" org.eventb.core.target="set_event"/>
+<org.eventb.core.guard name="_2Kb8DvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.parameter name="_2Kb8B_huEeOAG5W4v_4uKA" org.eventb.core.identifier="ev"/>
+<org.eventb.core.guard name="_2Kb8EfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="ev∈events_ ∧ events_of_partition(ev) = current_partition"/>
+<org.eventb.core.guard name="_2Kb8C_huEeOAG5W4v_4uKA" org.eventb.core.label="grd03" org.eventb.core.predicate="processes_waitingfor_events(ev) = ∅"/>
+<org.eventb.core.action name="_WQpGuPhzEeOAG5W4v_4uKA" org.eventb.core.assignment="state_of_events(ev)≔EVENT_UP" org.eventb.core.label="act01"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2Kb8AfhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="set_event_needwakeupprocs">
+<org.eventb.core.refinesEvent name="_2Kb8AvhuEeOAG5W4v_4uKA" org.eventb.core.target="set_event_needwakeupprocs"/>
+<org.eventb.core.guard name="_2Kb8H_huEeOAG5W4v_4uKA" org.eventb.core.label="grd500" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_2Kb8IPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd501" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_2Kb8JfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd502" org.eventb.core.predicate="ev∈events_ ∧ events_of_partition(ev) = current_partition"/>
+<org.eventb.core.guard name="_2Kb8JvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="procs ⊆ processes"/>
+<org.eventb.core.guard name="_WQpGqvhzEeOAG5W4v_4uKA" org.eventb.core.label="grd06" org.eventb.core.predicate="procs ⊆ processes_of_partition∼[{part}]"/>
+<org.eventb.core.guard name="_2KSyJfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd504" org.eventb.core.predicate="procs = processes_waitingfor_events(ev) ∧ procs⊆ dom(process_wait_type)"/>
+<org.eventb.core.guard name="_WQpGq_hzEeOAG5W4v_4uKA" org.eventb.core.label="grd40" org.eventb.core.predicate="∀proc·(proc∈procs ⇒ process_wait_type(proc)= PROC_WAIT_OBJ)"/>
+<org.eventb.core.guard name="_2Kb8DPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd03" org.eventb.core.predicate="newstates ∈ procs → PROCESS_STATES"/>
+<org.eventb.core.guard name="_2Kb8E_huEeOAG5W4v_4uKA" org.eventb.core.label="grd07" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_2Kb8FPhuEeOAG5W4v_4uKA" org.eventb.core.label="grd32" org.eventb.core.predicate="∀proc·(proc∈procs ⇒ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend)"/>
+<org.eventb.core.guard name="_2Kb8FfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd33" org.eventb.core.predicate="∀proc·(proc∈procs ∧ process_state(proc) = PS_Waiting ⇒ newstates(proc) = PS_Ready)"/>
+<org.eventb.core.guard name="_2Kb8J_huEeOAG5W4v_4uKA" org.eventb.core.label="grd34" org.eventb.core.predicate="∀proc·(proc∈procs ∧ process_state(proc) = PS_WaitandSuspend ⇒ newstates(proc) = PS_Suspend)"/>
+<org.eventb.core.guard name="_2Kb8EvhuEeOAG5W4v_4uKA" org.eventb.core.label="grd41" org.eventb.core.predicate="resch∈BOOL"/>
+<org.eventb.core.parameter name="_WQpGpPhzEeOAG5W4v_4uKA" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2Kb8HvhuEeOAG5W4v_4uKA" org.eventb.core.identifier="procs"/>
+<org.eventb.core.parameter name="_2Kb8JPhuEeOAG5W4v_4uKA" org.eventb.core.identifier="newstates"/>
+<org.eventb.core.parameter name="_WQpGovhzEeOAG5W4v_4uKA" org.eventb.core.identifier="resch"/>
+<org.eventb.core.parameter name="_WQpGo_hzEeOAG5W4v_4uKA" org.eventb.core.identifier="ev"/>
+<org.eventb.core.action name="_WQpGu_hzEeOAG5W4v_4uKA" org.eventb.core.assignment="process_wait_type ≔  procs⩤process_wait_type" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_WQpGvPhzEeOAG5W4v_4uKA" org.eventb.core.assignment="timeout_trigger ≔ procs⩤timeout_trigger" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_7oDVwPnjEeOsF7H-KIoPcA" org.eventb.core.assignment="need_reschedule ≔ resch" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_7oDVwfnjEeOsF7H-KIoPcA" org.eventb.core.assignment="process_state ≔ process_state newstates" org.eventb.core.label="act11"/>
+<org.eventb.core.action name="_WQpGufhzEeOAG5W4v_4uKA" org.eventb.core.assignment="state_of_events(ev)≔EVENT_UP" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_WQpGuvhzEeOAG5W4v_4uKA" org.eventb.core.assignment="processes_waitingfor_events(ev) ≔ processes_waitingfor_events(ev)∖procs" org.eventb.core.label="act503"/>
+<org.eventb.core.guard name="_WQpGsvhzEeOAG5W4v_4uKA" org.eventb.core.label="grd507" org.eventb.core.predicate="(locklevel_of_partition(current_partition)=0 ⇒  resch=TRUE) ∧ (locklevel_of_partition(current_partition)&gt;0 ⇒  resch=need_reschedule)"/>
+<org.eventb.core.guard name="_2Kb8D_huEeOAG5W4v_4uKA" org.eventb.core.label="grd503" org.eventb.core.predicate="processes_waitingfor_events(ev) ≠ ∅"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2Kb8HPhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="reset_event">
+<org.eventb.core.refinesEvent name="_2Kb8HfhuEeOAG5W4v_4uKA" org.eventb.core.target="reset_event"/>
+<org.eventb.core.guard name="_2Kb8CfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.parameter name="_WQpGpfhzEeOAG5W4v_4uKA" org.eventb.core.identifier="ev"/>
+<org.eventb.core.action name="_7oDVw_njEeOsF7H-KIoPcA" org.eventb.core.assignment="state_of_events(ev)≔EVENT_DOWN" org.eventb.core.label="act01"/>
+<org.eventb.core.guard name="_WQpGr_hzEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="ev∈events_ ∧ events_of_partition(ev) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2Kb8IvhuEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="wait_event">
+<org.eventb.core.refinesEvent name="_2Kb8I_huEeOAG5W4v_4uKA" org.eventb.core.target="wait_event"/>
+<org.eventb.core.parameter name="_WQpGpvhzEeOAG5W4v_4uKA" org.eventb.core.identifier="ev"/>
+<org.eventb.core.guard name="_WQpGqfhzEeOAG5W4v_4uKA" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag=TRUE"/>
+<org.eventb.core.guard name="_2KSyJ_huEeOAG5W4v_4uKA" org.eventb.core.label="grd01" org.eventb.core.predicate="ev∈events_ ∧ events_of_partition(ev) = current_partition"/>
+<org.eventb.core.guard name="_WQpGv_hzEeOAG5W4v_4uKA" org.eventb.core.label="grd02" org.eventb.core.predicate="state_of_events(ev)=EVENT_UP"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_WQpGoPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="wait_event_whendown">
+<org.eventb.core.refinesEvent name="_WQpGofhzEeOAG5W4v_4uKA" org.eventb.core.target="wait_event_whendown"/>
+<org.eventb.core.guard name="_WQpGwPhzEeOAG5W4v_4uKA" org.eventb.core.label="grd40" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_WQpGw_hzEeOAG5W4v_4uKA" org.eventb.core.label="grd41" org.eventb.core.predicate="part = current_partition"/>
+<org.eventb.core.guard name="_WQpGxPhzEeOAG5W4v_4uKA" org.eventb.core.label="grd42" org.eventb.core.predicate="proc = current_process"/>
+<org.eventb.core.guard name="_qFuVgHLwEeW87qINZ44y5w" org.eventb.core.label="grd34" org.eventb.core.predicate="newstate = PS_Waiting"/>
+<org.eventb.core.guard name="_paEswVRtEeWGc6cgcUjOIg" org.eventb.core.label="grd43" org.eventb.core.predicate="wt∈PROCESS_WAIT_TYPES ∧ (wt= PROC_WAIT_OBJ ∨ wt=PROC_WAIT_TIMEOUT)"/>
+<org.eventb.core.guard name="_2Kb8DfhuEeOAG5W4v_4uKA" org.eventb.core.label="grd44" org.eventb.core.predicate="timeout ∈ℕ"/>
+<org.eventb.core.guard name="_WQpGrfhzEeOAG5W4v_4uKA" org.eventb.core.label="grd45" org.eventb.core.predicate="tmout_trig ∈ processes ⇸ (PROCESS_STATES × ℕ1)"/>
+<org.eventb.core.guard name="_WQpGtPhzEeOAG5W4v_4uKA" org.eventb.core.label="grd46" org.eventb.core.predicate="(timeout = INFINITE_TIME_VALUE ⇒  tmout_trig = ∅)&#10;             ∧ (timeout &gt;0 ⇒ tmout_trig = {proc↦(PS_Ready↦ (timeout +clock_tick ∗ ONE_TICK_TIME))})"/>
+<org.eventb.core.guard name="_WQpGtfhzEeOAG5W4v_4uKA" org.eventb.core.label="grd47" org.eventb.core.predicate="timeout&gt;0 ⇒ wt = PROC_WAIT_TIMEOUT"/>
+<org.eventb.core.guard name="_WQpGtvhzEeOAG5W4v_4uKA" org.eventb.core.label="grd48" org.eventb.core.predicate="timeout =  INFINITE_TIME_VALUE ⇒ wt = PROC_WAIT_OBJ"/>
+<org.eventb.core.guard name="_h7YtoVRtEeWGc6cgcUjOIg" org.eventb.core.label="grd503" org.eventb.core.predicate="ev∈events_ ∧ events_of_partition(ev) = current_partition"/>
+<org.eventb.core.guard name="_WQpGs_hzEeOAG5W4v_4uKA" org.eventb.core.label="grd504" org.eventb.core.predicate="state_of_events(ev)=EVENT_DOWN"/>
+<org.eventb.core.parameter name="_NoK2oFRuEeWGc6cgcUjOIg" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_h7YtoFRtEeWGc6cgcUjOIg" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_paEswFRtEeWGc6cgcUjOIg" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.parameter name="_WQpGp_hzEeOAG5W4v_4uKA" org.eventb.core.identifier="wt"/>
+<org.eventb.core.parameter name="_WQpGqPhzEeOAG5W4v_4uKA" org.eventb.core.identifier="timeout"/>
+<org.eventb.core.parameter name="_WQpGvvhzEeOAG5W4v_4uKA" org.eventb.core.identifier="tmout_trig"/>
+<org.eventb.core.parameter name="_WQpGwvhzEeOAG5W4v_4uKA" org.eventb.core.identifier="ev"/>
+<org.eventb.core.action name="_7oDVxfnjEeOsF7H-KIoPcA" org.eventb.core.assignment="need_reschedule ≔ TRUE" org.eventb.core.label="act41"/>
+<org.eventb.core.action name="_7oDVxvnjEeOsF7H-KIoPcA" org.eventb.core.assignment="current_process_flag ≔ FALSE" org.eventb.core.label="act42"/>
+<org.eventb.core.action name="_7oDVwvnjEeOsF7H-KIoPcA" org.eventb.core.assignment="process_wait_type(proc) ≔ wt" org.eventb.core.label="act43"/>
+<org.eventb.core.action name="_7oDVyPnjEeOsF7H-KIoPcA" org.eventb.core.assignment="timeout_trigger ≔ timeout_trigger   tmout_trig" org.eventb.core.label="act05"/>
+<org.eventb.core.action name="_7oDVyfnjEeOsF7H-KIoPcA" org.eventb.core.assignment="processes_waitingfor_events(ev) ≔ processes_waitingfor_events(ev) ∪ {proc}" org.eventb.core.label="act501"/>
+<org.eventb.core.action name="_7oDVxPnjEeOsF7H-KIoPcA" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_7dc8sHL4EeW87qINZ44y5w" org.eventb.core.label="grd509" org.eventb.core.predicate="locklevel_of_partition(current_partition) = 0"/>
+<org.eventb.core.guard name="_WQpGsPhzEeOAG5W4v_4uKA" org.eventb.core.label="grd510" org.eventb.core.predicate="current_partition∈dom(errorhandler_of_partition) ⇒ current_process ≠ errorhandler_of_partition(current_partition)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_WQpGvfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_event_id">
+<org.eventb.core.parameter name="_NoK2oVRuEeWGc6cgcUjOIg" org.eventb.core.identifier="ev"/>
+<org.eventb.core.guard name="_21LUkHL5EeW87qINZ44y5w" org.eventb.core.label="grd01" org.eventb.core.predicate="ev∈events_"/>
+<org.eventb.core.guard name="_ENWKMHLnEeW87qINZ44y5w" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ events_of_partition(ev) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_WQpGwfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_event_status">
+<org.eventb.core.parameter name="_NoK2o1RuEeWGc6cgcUjOIg" org.eventb.core.identifier="ev"/>
+<org.eventb.core.guard name="_Q6wEYHL8EeW87qINZ44y5w" org.eventb.core.label="grd01" org.eventb.core.predicate="ev∈events_"/>
+<org.eventb.core.guard name="_BW14UHMBEeWvprsQA3-vtw" org.eventb.core.label="grd00" org.eventb.core.predicate="current_partition_flag = TRUE ∧ events_of_partition(ev) = current_partition"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cc50kPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="ticktock">
+<org.eventb.core.refinesEvent name="_cc50kfhzEeOAG5W4v_4uKA" org.eventb.core.target="ticktock"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cc50kvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="partition_schedule">
+<org.eventb.core.refinesEvent name="_cc50k_hzEeOAG5W4v_4uKA" org.eventb.core.target="partition_schedule"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cc50lPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="process_schedule">
+<org.eventb.core.refinesEvent name="_cc50lfhzEeOAG5W4v_4uKA" org.eventb.core.target="process_schedule"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cc50lvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="run_errorhandler_preempter">
+<org.eventb.core.refinesEvent name="_cc50l_hzEeOAG5W4v_4uKA" org.eventb.core.target="run_errorhandler_preempter"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cc50mPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_partition_status">
+<org.eventb.core.refinesEvent name="_cc50mfhzEeOAG5W4v_4uKA" org.eventb.core.target="get_partition_status"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cc50mvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_idle">
+<org.eventb.core.refinesEvent name="_cc50m_hzEeOAG5W4v_4uKA" org.eventb.core.target="set_partition_mode_to_idle"/>
+<org.eventb.core.action name="_7oDVy_njEeOsF7H-KIoPcA" org.eventb.core.assignment="RefreshPeriod_of_SamplingPorts ≔ Ports_of_Partition∼[{part}] ⩤ RefreshPeriod_of_SamplingPorts" org.eventb.core.label="act601"/>
+<org.eventb.core.action name="_7oDVx_njEeOsF7H-KIoPcA" org.eventb.core.assignment="needtrans_of_sourcesamplingport ≔  Ports_of_Partition∼[{part}] ⩤ needtrans_of_sourcesamplingport" org.eventb.core.label="act602"/>
+<org.eventb.core.action name="_7oDVzfnjEeOsF7H-KIoPcA" org.eventb.core.assignment="quediscipline_of_queueingports ≔ Ports_of_Partition∼[{part}] ⩤ quediscipline_of_queueingports" org.eventb.core.label="act603"/>
+<org.eventb.core.action name="_7oDVzvnjEeOsF7H-KIoPcA" org.eventb.core.assignment="quediscipline_of_buffers ≔ buffers_of_partition∼[{part}]⩤quediscipline_of_buffers" org.eventb.core.label="act604"/>
+<org.eventb.core.action name="_7oDVyvnjEeOsF7H-KIoPcA" org.eventb.core.assignment="quediscipline_of_semaphores ≔ semaphores_of_partition∼[{part}] ⩤ quediscipline_of_semaphores" org.eventb.core.label="act605"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdC-hfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_normal">
+<org.eventb.core.refinesEvent name="_cdC-hvhzEeOAG5W4v_4uKA" org.eventb.core.target="set_partition_mode_to_normal"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdC-h_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_coldstart">
+<org.eventb.core.refinesEvent name="_cdC-iPhzEeOAG5W4v_4uKA" org.eventb.core.target="set_partition_mode_to_coldstart"/>
+<org.eventb.core.action name="_EkxXQHLdEeW87qINZ44y5w" org.eventb.core.assignment="RefreshPeriod_of_SamplingPorts ≔ Ports_of_Partition∼[{part}] ⩤ RefreshPeriod_of_SamplingPorts" org.eventb.core.label="act601"/>
+<org.eventb.core.action name="_7oDVzPnjEeOsF7H-KIoPcA" org.eventb.core.assignment="needtrans_of_sourcesamplingport ≔  Ports_of_Partition∼[{part}] ⩤ needtrans_of_sourcesamplingport" org.eventb.core.label="act602"/>
+<org.eventb.core.action name="_Fq9mcHLhEeW87qINZ44y5w" org.eventb.core.assignment="quediscipline_of_queueingports ≔ Ports_of_Partition∼[{part}] ⩤ quediscipline_of_queueingports" org.eventb.core.label="act603"/>
+<org.eventb.core.action name="_UKcncHLkEeW87qINZ44y5w" org.eventb.core.assignment="quediscipline_of_buffers ≔ buffers_of_partition∼[{part}]⩤quediscipline_of_buffers" org.eventb.core.label="act604"/>
+<org.eventb.core.action name="_vtOHwHJnEeWa_9Uew2Y1Aw" org.eventb.core.assignment="quediscipline_of_semaphores ≔ semaphores_of_partition∼[{part}] ⩤ quediscipline_of_semaphores" org.eventb.core.label="act605"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdC-pfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_warmstart">
+<org.eventb.core.refinesEvent name="_cdC-pvhzEeOAG5W4v_4uKA" org.eventb.core.target="set_partition_mode_to_warmstart"/>
+<org.eventb.core.action name="_DaWNsHLsEeW87qINZ44y5w" org.eventb.core.assignment="RefreshPeriod_of_SamplingPorts ≔ Ports_of_Partition∼[{part}] ⩤ RefreshPeriod_of_SamplingPorts" org.eventb.core.label="act601"/>
+<org.eventb.core.action name="_B2mboHLvEeW87qINZ44y5w" org.eventb.core.assignment="needtrans_of_sourcesamplingport ≔  Ports_of_Partition∼[{part}] ⩤ needtrans_of_sourcesamplingport" org.eventb.core.label="act602"/>
+<org.eventb.core.action name="_KjZzsHLvEeW87qINZ44y5w" org.eventb.core.assignment="quediscipline_of_queueingports ≔ Ports_of_Partition∼[{part}] ⩤ quediscipline_of_queueingports" org.eventb.core.label="act603"/>
+<org.eventb.core.action name="_OJ8bkHL6EeW87qINZ44y5w" org.eventb.core.assignment="quediscipline_of_buffers ≔ buffers_of_partition∼[{part}]⩤quediscipline_of_buffers" org.eventb.core.label="act604"/>
+<org.eventb.core.action name="_UG_uAHLoEeW87qINZ44y5w" org.eventb.core.assignment="quediscipline_of_semaphores ≔ semaphores_of_partition∼[{part}] ⩤ quediscipline_of_semaphores" org.eventb.core.label="act605"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdC-w_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_process_id">
+<org.eventb.core.refinesEvent name="_cdC-xPhzEeOAG5W4v_4uKA" org.eventb.core.target="get_process_id"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdC-xfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_process_status">
+<org.eventb.core.refinesEvent name="_cdC-xvhzEeOAG5W4v_4uKA" org.eventb.core.target="get_process_status"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdC-x_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_process">
+<org.eventb.core.refinesEvent name="_cdMvgPhzEeOAG5W4v_4uKA" org.eventb.core.target="create_process"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvgfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_priority">
+<org.eventb.core.refinesEvent name="_cdMvgvhzEeOAG5W4v_4uKA" org.eventb.core.target="set_priority"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvg_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="suspend_self">
+<org.eventb.core.refinesEvent name="_cdMvhPhzEeOAG5W4v_4uKA" org.eventb.core.target="suspend_self"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvhfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="suspend">
+<org.eventb.core.refinesEvent name="_cdMvhvhzEeOAG5W4v_4uKA" org.eventb.core.target="suspend"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvh_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="resume">
+<org.eventb.core.refinesEvent name="_cdMviPhzEeOAG5W4v_4uKA" org.eventb.core.target="resume"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvifhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_self">
+<org.eventb.core.refinesEvent name="_cdMvivhzEeOAG5W4v_4uKA" org.eventb.core.target="stop_self"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvi_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop">
+<org.eventb.core.refinesEvent name="_cdMvjPhzEeOAG5W4v_4uKA" org.eventb.core.target="stop"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvkvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_qport">
+<org.eventb.core.refinesEvent name="_ExaaYHMEEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_qport"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvlPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_buf">
+<org.eventb.core.refinesEvent name="_ExaaYXMEEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_buf"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvlvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_sem">
+<org.eventb.core.refinesEvent name="_ExbBcHMEEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_sem"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvmPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_bb">
+<org.eventb.core.refinesEvent name="_ExbogHMEEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_bb"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvmvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_evt">
+<org.eventb.core.refinesEvent name="_ExcPkHMEEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_evt"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvnPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_aperiodprocess_instart">
+<org.eventb.core.refinesEvent name="_fsn5EHMDEeWvprsQA3-vtw" org.eventb.core.target="start_aperiodprocess_instart"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvnvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_aperiodprocess_innormal">
+<org.eventb.core.refinesEvent name="_fsn5EXMDEeWvprsQA3-vtw" org.eventb.core.target="start_aperiodprocess_innormal"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvoPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_periodprocess_instart">
+<org.eventb.core.refinesEvent name="_fsogIHMDEeWvprsQA3-vtw" org.eventb.core.target="start_periodprocess_instart"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvovhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_periodprocess_innormal">
+<org.eventb.core.refinesEvent name="_fspHMHMDEeWvprsQA3-vtw" org.eventb.core.target="start_periodprocess_innormal"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvpPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_aperiodprocess_instart">
+<org.eventb.core.refinesEvent name="_fspHMXMDEeWvprsQA3-vtw" org.eventb.core.target="delaystart_aperiodprocess_instart"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvpvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_aperiodprocess_innormal">
+<org.eventb.core.refinesEvent name="_fspuQHMDEeWvprsQA3-vtw" org.eventb.core.target="delaystart_aperiodprocess_innormal"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvqPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_periodprocess_instart">
+<org.eventb.core.refinesEvent name="_fspuQXMDEeWvprsQA3-vtw" org.eventb.core.target="delaystart_periodprocess_instart"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvqvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_periodprocess_innormal">
+<org.eventb.core.refinesEvent name="_fsqVUHMDEeWvprsQA3-vtw" org.eventb.core.target="delaystart_periodprocess_innormal"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdMvrPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="lock_preemption">
+<org.eventb.core.refinesEvent name="_fsq8YHMDEeWvprsQA3-vtw" org.eventb.core.target="lock_preemption"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdWggfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="unlock_preemption">
+<org.eventb.core.refinesEvent name="_fsq8YXMDEeWvprsQA3-vtw" org.eventb.core.target="unlock_preemption"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdWgg_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_my_id">
+<org.eventb.core.refinesEvent name="_fsrjcHMDEeWvprsQA3-vtw" org.eventb.core.target="get_my_id"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdWghfhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="timed_wait">
+<org.eventb.core.refinesEvent name="_fsrjcXMDEeWvprsQA3-vtw" org.eventb.core.target="timed_wait"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdWgh_hzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="period_wait">
+<org.eventb.core.refinesEvent name="_fssKgHMDEeWvprsQA3-vtw" org.eventb.core.target="period_wait"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdWgjvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_time">
+<org.eventb.core.refinesEvent name="_fssKgXMDEeWvprsQA3-vtw" org.eventb.core.target="get_time"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdWgkPhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="replenish">
+<org.eventb.core.refinesEvent name="_fssxkHMDEeWvprsQA3-vtw" org.eventb.core.target="replenish"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cdWgkvhzEeOAG5W4v_4uKA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="aperiodicprocess_finished">
+<org.eventb.core.refinesEvent name="_fssxkXMDEeWvprsQA3-vtw" org.eventb.core.target="aperiodicprocess_finished"/>
+</org.eventb.core.event>
+<org.eventb.core.variable name="_3dFlMHJhEeWa_9Uew2Y1Aw" org.eventb.core.identifier="used_messages"/>
+<org.eventb.core.event name="_fstYoHMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="periodicprocess_finished">
+<org.eventb.core.refinesEvent name="_fstYoXMDEeWvprsQA3-vtw" org.eventb.core.target="periodicprocess_finished"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_fstYonMDEeWvprsQA3-vtw" org.eventb.core.comment="should refined to support remove process on waiting queue of comm resources" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out">
+<org.eventb.core.refinesEvent name="_fst_sHMDEeWvprsQA3-vtw" org.eventb.core.target="time_out"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_fst_sXMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_qport">
+<org.eventb.core.refinesEvent name="_Exn1wHMEEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_qport"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_fsumwXMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_buf">
+<org.eventb.core.refinesEvent name="_Exoc0HMEEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_buf"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_fsumw3MDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_sem">
+<org.eventb.core.refinesEvent name="_Expq8HMEEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_sem"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_oKtfsnMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_bb">
+<org.eventb.core.refinesEvent name="_ExqSAHMEEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_bb"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_oKuGwXMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_evt">
+<org.eventb.core.refinesEvent name="_Exq5EHMEEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_evt"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_oKut0HMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="periodicproc_reach_releasepoint">
+<org.eventb.core.refinesEvent name="_oKut0XMDEeWvprsQA3-vtw" org.eventb.core.target="periodicproc_reach_releasepoint"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_oKut0nMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="coldstart_partition_fromidle">
+<org.eventb.core.refinesEvent name="_oKvU4HMDEeWvprsQA3-vtw" org.eventb.core.target="coldstart_partition_fromidle"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_oKvU4XMDEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="warmstart_partition_fromidle">
+<org.eventb.core.refinesEvent name="_oKvU4nMDEeWvprsQA3-vtw" org.eventb.core.target="warmstart_partition_fromidle"/>
+</org.eventb.core.event>
+</org.eventb.core.machineFile>

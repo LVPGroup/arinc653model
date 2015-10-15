@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.contextFile org.eventb.core.configuration="org.eventb.core.fwd;de.prob.symbolic.ctxBase;de.prob.units.mchBase;org.eventb.codegen.ui.cgConfig;org.animb.valuation.valBase" org.eventb.texttools.text_lastmodified="1444906793947" org.eventb.texttools.text_representation="context Ctx_PartProc_Trans&#10;&#10;sets PARTITIONS PROCESSES PARTITION_MODES PROCESS_STATES&#10;&#10;constants PM_IDLE PM_NORMAL PM_WARM_START&#10;          PM_COLD_START&#10;          PS_Dormant PS_Ready PS_Waiting PS_Suspend PS_WaitandSuspend&#10;          PS_Running&#10;&#10;&#10;&#10;axioms&#10;  @axm_part_finite finite(PARTITIONS)&#10;  @axm_processes_finite finite(PROCESSES)&#10;  @axm_partition_partitionmodes partition(PARTITION_MODES,{PM_IDLE}, {PM_NORMAL},{PM_COLD_START},{PM_WARM_START})&#10;  @axm_partition_procstates partition(PROCESS_STATES,{PS_Dormant}, {PS_Ready}, {PS_Waiting}, {PS_Suspend}, {PS_WaitandSuspend}, {PS_Running})&#10;  @axm_partition_nums card(PARTITIONS) &gt;0 ∧ card(PARTITIONS) &lt; 256&#10;end&#10;" version="3">
+<org.eventb.core.carrierSet name="_fazUIM21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PARTITIONS"/>
+<org.eventb.core.carrierSet name="_fazUIc21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PROCESSES"/>
+<org.eventb.core.carrierSet name="_fazUIs21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PARTITION_MODES"/>
+<org.eventb.core.carrierSet name="_fazUI821EeO_w8hSz1RRkQ" org.eventb.core.identifier="PROCESS_STATES"/>
+<org.eventb.core.constant name="_fazUJM21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PM_IDLE"/>
+<org.eventb.core.constant name="_fazUJc21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PM_NORMAL"/>
+<org.eventb.core.constant name="_fazUJs21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PM_WARM_START"/>
+<org.eventb.core.constant name="_fazUJ821EeO_w8hSz1RRkQ" org.eventb.core.identifier="PM_COLD_START"/>
+<org.eventb.core.constant name="_fazUKM21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PS_Dormant"/>
+<org.eventb.core.constant name="_fazUKc21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PS_Ready"/>
+<org.eventb.core.constant name="_fazUKs21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PS_Waiting"/>
+<org.eventb.core.constant name="_fazUK821EeO_w8hSz1RRkQ" org.eventb.core.identifier="PS_Suspend"/>
+<org.eventb.core.constant name="_fazULM21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PS_WaitandSuspend"/>
+<org.eventb.core.constant name="_fazULc21EeO_w8hSz1RRkQ" org.eventb.core.identifier="PS_Running"/>
+<org.eventb.core.axiom name="_fazULs21EeO_w8hSz1RRkQ" org.eventb.core.label="axm_part_finite" org.eventb.core.predicate="finite(PARTITIONS)"/>
+<org.eventb.core.axiom name="_fazUL821EeO_w8hSz1RRkQ" org.eventb.core.label="axm_processes_finite" org.eventb.core.predicate="finite(PROCESSES)"/>
+<org.eventb.core.axiom name="_fazUMc21EeO_w8hSz1RRkQ" org.eventb.core.label="axm_partition_partitionmodes" org.eventb.core.predicate="partition(PARTITION_MODES,{PM_IDLE}, {PM_NORMAL},{PM_COLD_START},{PM_WARM_START})"/>
+<org.eventb.core.axiom name="_fazUMs21EeO_w8hSz1RRkQ" org.eventb.core.label="axm_partition_procstates" org.eventb.core.predicate="partition(PROCESS_STATES,{PS_Dormant}, {PS_Ready}, {PS_Waiting}, {PS_Suspend}, {PS_WaitandSuspend}, {PS_Running})"/>
+<org.eventb.core.axiom name="_fa9FIM21EeO_w8hSz1RRkQ" org.eventb.core.label="axm_partition_nums" org.eventb.core.predicate="card(PARTITIONS) &gt;0 ∧ card(PARTITIONS) &lt; 256"/>
+</org.eventb.core.contextFile>

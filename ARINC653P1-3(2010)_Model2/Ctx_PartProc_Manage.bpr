@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.prFile version="1">
+<org.eventb.core.prProof name="axm_perprocstart_with_partwin/WD" org.eventb.core.confidence="1000" org.eventb.core.prFresh="b,p,y,x" org.eventb.core.prGoal="p0" org.eventb.core.prHyps="p1,p2,p3,p4,p5,p6,p7,p8,p9,p10" org.eventb.core.prSets="PARTITIONS">
+<org.eventb.core.lang name="L"/>
+<org.eventb.core.prRule name="r0" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="Partition rewrites in hyp (partition(PARTITION_MODES,{PM_IDLE},{PM_NORMAL},{PM_COLD_START},{PM_WARM_START}))" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p11" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p12,p13,p14,p15,p16,p17,p18"/>
+<org.eventb.core.prHypAction name="SELECT1" org.eventb.core.prHyps="p12,p13,p14,p15,p16,p17,p18"/>
+<org.eventb.core.prRule name="r0" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="Partition rewrites in hyp (partition(PROCESS_STATES,{PS_Dormant},{PS_Ready},{PS_Waiting},{PS_Suspend},{PS_WaitandSuspend},{PS_Running}))" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p19" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35"/>
+<org.eventb.core.prHypAction name="SELECT1" org.eventb.core.prHyps="p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35"/>
+<org.eventb.core.prRule name="r0" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="Partition rewrites in hyp (partition(PROC_PERIOD_TYPE,{PERIOD_PROC},{APERIOD_PROC}))" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p36" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p37,p38"/>
+<org.eventb.core.prHypAction name="SELECT1" org.eventb.core.prHyps="p37,p38"/>
+<org.eventb.core.prRule name="r0" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="Partition rewrites in hyp (partition(DEADLINE_TYPE,{DEADLINE_HARD},{DEADLINE_SOFT}))" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p39" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p40,p41"/>
+<org.eventb.core.prHypAction name="SELECT1" org.eventb.core.prHyps="p40,p41"/>
+<org.eventb.core.prRule name="r0" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="Partition rewrites in hyp (partition(PARTITION_STARTCONDITIONS,{NORMAL_START},{PARTITION_RESTART},{HM_MODULE_RESTART},{HM_PARTITION_RESTART}))" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p42" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p43,p44,p45,p46,p47,p48,p49"/>
+<org.eventb.core.prHypAction name="SELECT1" org.eventb.core.prHyps="p43,p44,p45,p46,p47,p48,p49"/>
+<org.eventb.core.prRule name="r0" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="Partition rewrites in hyp (partition(PROCESS_WAIT_TYPES,{PROC_WAIT_DELAY},{PROC_WAIT_TIMEOUT},{PROC_WAIT_PERIOD},{PROC_WAIT_OBJ},{PROC_WAIT_PARTITIONNORMAL}))" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p50" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61"/>
+<org.eventb.core.prHypAction name="SELECT1" org.eventb.core.prHyps="p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61"/>
+<org.eventb.core.prRule name="r1" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="simplification rewrites" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p10" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p62,p63"/>
+<org.eventb.core.prHypAction name="REWRITE1" org.eventb.core.prHidden="p64" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p65,p66"/>
+<org.eventb.core.prHypAction name="REWRITE2" org.eventb.core.prHidden="p1" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p67"/>
+<org.eventb.core.prRule name="r2" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="type rewrites" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p4" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p68"/>
+<org.eventb.core.prHypAction name="REWRITE1" org.eventb.core.prHidden="p62" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p69"/>
+<org.eventb.core.prRule name="r1" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="simplification rewrites" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="REWRITE0" org.eventb.core.prHidden="p68" org.eventb.core.prHyps="" org.eventb.core.prInfHyps="p70"/>
+<org.eventb.core.prHypAction name="HIDE1" org.eventb.core.prHyps="p69"/>
+<org.eventb.core.prRule name="r3" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="∀ goal (frees x,y,b,p)" org.eventb.core.prGoal="p0" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'" org.eventb.core.prGoal="p71">
+<org.eventb.core.prIdent name="x" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="y" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="b" org.eventb.core.type="BOOL"/>
+<org.eventb.core.prIdent name="p" org.eventb.core.type="PARTITIONS"/>
+<org.eventb.core.prRule name="r4" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="⇒ goal" org.eventb.core.prGoal="p71" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'" org.eventb.core.prGoal="p74" org.eventb.core.prHyps="p72,p73">
+<org.eventb.core.prRule name="r5" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="∧ goal" org.eventb.core.prGoal="p74" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'" org.eventb.core.prGoal="p75">
+<org.eventb.core.prRule name="r6" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="eh with b=TRUE" org.eventb.core.prGoal="p75" org.eventb.core.prHyps="p73">
+<org.eventb.core.prAnte name="'" org.eventb.core.prGoal="p77">
+<org.eventb.core.prHypAction name="FORWARD_INF0" org.eventb.core.prHyps="p72" org.eventb.core.prInfHyps="p76"/>
+<org.eventb.core.prHypAction name="DESELECT1" org.eventb.core.prHyps="p72"/>
+<org.eventb.core.prRule name="r7" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="sl/ds" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="DESELECT0" org.eventb.core.prHyps="p78,p79,p12,p13,p14,p15,p16,p17,p18,p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35,p37,p38,p40,p41,p43,p44,p45,p46,p47,p48,p49,p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61,p65,p66"/>
+<org.eventb.core.prRule name="r7" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="sl/ds" org.eventb.core.prHyps="">
+<org.eventb.core.prAnte name="'">
+<org.eventb.core.prHypAction name="SELECT0" org.eventb.core.prHyps="p63,p72,p6"/>
+<org.eventb.core.prRule name="r8" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="PP" org.eventb.core.prGoal="p77" org.eventb.core.prHyps="p3,p9,p8,p2,p5,p7,p67,p70,p73,p76,p63,p72,p6">
+<org.eventb.core.prString name=".arg" org.eventb.core.prSValue="R3000"/>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+<org.eventb.core.prAnte name="(" org.eventb.core.prGoal="p80">
+<org.eventb.core.prRule name="r9" org.eventb.core.confidence="1000" org.eventb.core.prDisplay="functional goal" org.eventb.core.prGoal="p80" org.eventb.core.prHyps="p5"/>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+<org.eventb.core.prString name=".pos" org.eventb.core.prSValue=""/>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+<org.eventb.core.prString name=".pos" org.eventb.core.prSValue=""/>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+<org.eventb.core.prString name=".pos" org.eventb.core.prSValue=""/>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+<org.eventb.core.prString name=".pos" org.eventb.core.prSValue=""/>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+<org.eventb.core.prString name=".pos" org.eventb.core.prSValue=""/>
+</org.eventb.core.prRule>
+</org.eventb.core.prAnte>
+<org.eventb.core.prString name=".pos" org.eventb.core.prSValue=""/>
+</org.eventb.core.prRule>
+<org.eventb.core.prIdent name="Duration_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×ℤ)"/>
+<org.eventb.core.prIdent name="Period_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×ℤ)"/>
+<org.eventb.core.prIdent name="SystemPartFlag_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×BOOL)"/>
+<org.eventb.core.prIdent name="partitionTimeWindows" org.eventb.core.type="ℙ(ℤ×ℤ×BOOL)"/>
+<org.eventb.core.prIdent name="periodicprocstart_timeWindow_of_Partition" org.eventb.core.type="ℙ(ℤ×ℤ×BOOL×PARTITIONS)"/>
+<org.eventb.core.prIdent name="timeWindowsofPartition" org.eventb.core.type="ℙ(ℤ×ℤ×BOOL×PARTITIONS)"/>
+<org.eventb.core.prPred name="p71" org.eventb.core.predicate="x ↦ y ↦ b ↦ p∈periodicprocstart_timeWindow_of_Partition∧b=TRUE⇒x ↦ y ↦ b∈dom(timeWindowsofPartition)∧timeWindowsofPartition∈ℤ × ℤ × BOOL ⇸ PARTITIONS">
+<org.eventb.core.prIdent name="b" org.eventb.core.type="BOOL"/>
+<org.eventb.core.prIdent name="p" org.eventb.core.type="PARTITIONS"/>
+<org.eventb.core.prIdent name="x" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="y" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p63" org.eventb.core.predicate="card(PARTITIONS)&lt;256"/>
+<org.eventb.core.prPred name="p26" org.eventb.core.predicate="¬PS_Ready=PS_Waiting">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p39" org.eventb.core.predicate="partition(DEADLINE_TYPE,{DEADLINE_HARD},{DEADLINE_SOFT})">
+<org.eventb.core.prIdent name="DEADLINE_HARD" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.prIdent name="DEADLINE_SOFT" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.prIdent name="DEADLINE_TYPE" org.eventb.core.type="ℙ(DEADLINE_TYPE)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p64" org.eventb.core.predicate="(∃x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows)⇒x+y=majorFrame)∧(∀x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows)⇒x+y≤majorFrame)">
+<org.eventb.core.prIdent name="majorFrame" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p22" org.eventb.core.predicate="¬PS_Dormant=PS_Waiting">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p55" org.eventb.core.predicate="¬PROC_WAIT_DELAY=PROC_WAIT_PARTITIONNORMAL">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_DELAY" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PARTITIONNORMAL" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p16" org.eventb.core.predicate="¬PM_NORMAL=PM_COLD_START">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p45" org.eventb.core.predicate="¬NORMAL_START=HM_MODULE_RESTART">
+<org.eventb.core.prIdent name="HM_MODULE_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="NORMAL_START" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p12" org.eventb.core.predicate="PARTITION_MODES={PM_IDLE,PM_NORMAL,PM_COLD_START,PM_WARM_START}">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p68" org.eventb.core.predicate="∀p⦂PARTITIONS·⊤⇒(∃x⦂ℤ,y⦂ℤ·x ↦ y ↦ TRUE∈timeWindowsofPartition∼[{p}])"/>
+<org.eventb.core.prPred name="p52" org.eventb.core.predicate="¬PROC_WAIT_DELAY=PROC_WAIT_TIMEOUT">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_DELAY" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_TIMEOUT" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p48" org.eventb.core.predicate="¬PARTITION_RESTART=HM_PARTITION_RESTART">
+<org.eventb.core.prIdent name="HM_PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p20" org.eventb.core.predicate="PROCESS_STATES={PS_Dormant,PS_Ready,PS_Waiting,PS_Suspend,PS_WaitandSuspend,PS_Running}">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p14" org.eventb.core.predicate="¬PM_IDLE=PM_COLD_START">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p53" org.eventb.core.predicate="¬PROC_WAIT_DELAY=PROC_WAIT_PERIOD">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_DELAY" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PERIOD" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p1" org.eventb.core.predicate="∃x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows)⇒x=0"/>
+<org.eventb.core.prPred name="p66" org.eventb.core.predicate="∀x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows)⇒x+y≤majorFrame">
+<org.eventb.core.prIdent name="majorFrame" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p17" org.eventb.core.predicate="¬PM_NORMAL=PM_WARM_START">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p29" org.eventb.core.predicate="¬PS_Ready=PS_Running">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p54" org.eventb.core.predicate="¬PROC_WAIT_DELAY=PROC_WAIT_OBJ">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_DELAY" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_OBJ" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p6" org.eventb.core.predicate="finite(PARTITIONS)"/>
+<org.eventb.core.prPred name="p57" org.eventb.core.predicate="¬PROC_WAIT_TIMEOUT=PROC_WAIT_OBJ">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_OBJ" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_TIMEOUT" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p8" org.eventb.core.predicate="SystemPartFlag_of_Partition∈PARTITIONS → BOOL"/>
+<org.eventb.core.prPred name="p59" org.eventb.core.predicate="¬PROC_WAIT_PERIOD=PROC_WAIT_OBJ">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_OBJ" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PERIOD" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p2" org.eventb.core.predicate="partitionTimeWindows∈ℕ × ℕ ⇸ BOOL"/>
+<org.eventb.core.prPred name="p70" org.eventb.core.predicate="∀p⦂PARTITIONS·∃x⦂ℤ,y⦂ℤ·x ↦ y ↦ TRUE∈timeWindowsofPartition∼[{p}]"/>
+<org.eventb.core.prPred name="p27" org.eventb.core.predicate="¬PS_Ready=PS_Suspend">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p43" org.eventb.core.predicate="PARTITION_STARTCONDITIONS={NORMAL_START,PARTITION_RESTART,HM_MODULE_RESTART,HM_PARTITION_RESTART}">
+<org.eventb.core.prIdent name="HM_MODULE_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="HM_PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="NORMAL_START" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p46" org.eventb.core.predicate="¬NORMAL_START=HM_PARTITION_RESTART">
+<org.eventb.core.prIdent name="HM_PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="NORMAL_START" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p78" org.eventb.core.predicate="majorFrame∈ℕ1">
+<org.eventb.core.prIdent name="majorFrame" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p5" org.eventb.core.predicate="timeWindowsofPartition∈partitionTimeWindows ↠ PARTITIONS"/>
+<org.eventb.core.prPred name="p0" org.eventb.core.predicate="∀x⦂ℤ,y⦂ℤ,b⦂BOOL,p⦂PARTITIONS·x ↦ y ↦ b ↦ p∈periodicprocstart_timeWindow_of_Partition∧b=TRUE⇒x ↦ y ↦ b∈dom(timeWindowsofPartition)∧timeWindowsofPartition∈ℤ × ℤ × BOOL ⇸ PARTITIONS"/>
+<org.eventb.core.prPred name="p50" org.eventb.core.predicate="partition(PROCESS_WAIT_TYPES,{PROC_WAIT_DELAY},{PROC_WAIT_TIMEOUT},{PROC_WAIT_PERIOD},{PROC_WAIT_OBJ},{PROC_WAIT_PARTITIONNORMAL})">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_DELAY" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_OBJ" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PARTITIONNORMAL" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PERIOD" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_TIMEOUT" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p65" org.eventb.core.predicate="(∀x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows))⇒(∃x⦂ℤ,y⦂ℤ·x+y=majorFrame)">
+<org.eventb.core.prIdent name="majorFrame" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p56" org.eventb.core.predicate="¬PROC_WAIT_TIMEOUT=PROC_WAIT_PERIOD">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PERIOD" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_TIMEOUT" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p13" org.eventb.core.predicate="¬PM_IDLE=PM_NORMAL">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p44" org.eventb.core.predicate="¬NORMAL_START=PARTITION_RESTART">
+<org.eventb.core.prIdent name="NORMAL_START" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p69" org.eventb.core.predicate="¬⊥"/>
+<org.eventb.core.prPred name="p24" org.eventb.core.predicate="¬PS_Dormant=PS_WaitandSuspend">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p32" org.eventb.core.predicate="¬PS_Waiting=PS_Running">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p18" org.eventb.core.predicate="¬PM_COLD_START=PM_WARM_START">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p42" org.eventb.core.predicate="partition(PARTITION_STARTCONDITIONS,{NORMAL_START},{PARTITION_RESTART},{HM_MODULE_RESTART},{HM_PARTITION_RESTART})">
+<org.eventb.core.prIdent name="HM_MODULE_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="HM_PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="NORMAL_START" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p60" org.eventb.core.predicate="¬PROC_WAIT_PERIOD=PROC_WAIT_PARTITIONNORMAL">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PARTITIONNORMAL" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PERIOD" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p23" org.eventb.core.predicate="¬PS_Dormant=PS_Suspend">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p72" org.eventb.core.predicate="x ↦ y ↦ b ↦ p∈periodicprocstart_timeWindow_of_Partition">
+<org.eventb.core.prIdent name="b" org.eventb.core.type="BOOL"/>
+<org.eventb.core.prIdent name="p" org.eventb.core.type="PARTITIONS"/>
+<org.eventb.core.prIdent name="x" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="y" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p11" org.eventb.core.predicate="partition(PARTITION_MODES,{PM_IDLE},{PM_NORMAL},{PM_COLD_START},{PM_WARM_START})">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p41" org.eventb.core.predicate="¬DEADLINE_HARD=DEADLINE_SOFT">
+<org.eventb.core.prIdent name="DEADLINE_HARD" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.prIdent name="DEADLINE_SOFT" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.prIdent name="DEADLINE_TYPE" org.eventb.core.type="ℙ(DEADLINE_TYPE)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p38" org.eventb.core.predicate="¬PERIOD_PROC=APERIOD_PROC">
+<org.eventb.core.prIdent name="APERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.prIdent name="PERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.prIdent name="PROC_PERIOD_TYPE" org.eventb.core.type="ℙ(PROC_PERIOD_TYPE)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p31" org.eventb.core.predicate="¬PS_Waiting=PS_WaitandSuspend">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p34" org.eventb.core.predicate="¬PS_Suspend=PS_Running">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p75" org.eventb.core.predicate="x ↦ y ↦ b∈dom(timeWindowsofPartition)">
+<org.eventb.core.prIdent name="b" org.eventb.core.type="BOOL"/>
+<org.eventb.core.prIdent name="x" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="y" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p25" org.eventb.core.predicate="¬PS_Dormant=PS_Running">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p61" org.eventb.core.predicate="¬PROC_WAIT_OBJ=PROC_WAIT_PARTITIONNORMAL">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_OBJ" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PARTITIONNORMAL" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p33" org.eventb.core.predicate="¬PS_Suspend=PS_WaitandSuspend">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p49" org.eventb.core.predicate="¬HM_MODULE_RESTART=HM_PARTITION_RESTART">
+<org.eventb.core.prIdent name="HM_MODULE_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="HM_PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p74" org.eventb.core.predicate="x ↦ y ↦ b∈dom(timeWindowsofPartition)∧timeWindowsofPartition∈ℤ × ℤ × BOOL ⇸ PARTITIONS">
+<org.eventb.core.prIdent name="b" org.eventb.core.type="BOOL"/>
+<org.eventb.core.prIdent name="x" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="y" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p58" org.eventb.core.predicate="¬PROC_WAIT_TIMEOUT=PROC_WAIT_PARTITIONNORMAL">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PARTITIONNORMAL" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_TIMEOUT" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p51" org.eventb.core.predicate="PROCESS_WAIT_TYPES={PROC_WAIT_DELAY,PROC_WAIT_TIMEOUT,PROC_WAIT_PERIOD,PROC_WAIT_OBJ,PROC_WAIT_PARTITIONNORMAL}">
+<org.eventb.core.prIdent name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.prIdent name="PROC_WAIT_DELAY" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_OBJ" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PARTITIONNORMAL" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_PERIOD" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.prIdent name="PROC_WAIT_TIMEOUT" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p47" org.eventb.core.predicate="¬PARTITION_RESTART=HM_MODULE_RESTART">
+<org.eventb.core.prIdent name="HM_MODULE_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.prIdent name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p36" org.eventb.core.predicate="partition(PROC_PERIOD_TYPE,{PERIOD_PROC},{APERIOD_PROC})">
+<org.eventb.core.prIdent name="APERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.prIdent name="PERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.prIdent name="PROC_PERIOD_TYPE" org.eventb.core.type="ℙ(PROC_PERIOD_TYPE)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p10" org.eventb.core.predicate="card(PARTITIONS)&gt;0∧card(PARTITIONS)&lt;256"/>
+<org.eventb.core.prPred name="p62" org.eventb.core.predicate="¬PARTITIONS=(∅ ⦂ ℙ(PARTITIONS))"/>
+<org.eventb.core.prPred name="p15" org.eventb.core.predicate="¬PM_IDLE=PM_WARM_START">
+<org.eventb.core.prIdent name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.prIdent name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.prIdent name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p28" org.eventb.core.predicate="¬PS_Ready=PS_WaitandSuspend">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p73" org.eventb.core.predicate="b=TRUE">
+<org.eventb.core.prIdent name="b" org.eventb.core.type="BOOL"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p30" org.eventb.core.predicate="¬PS_Waiting=PS_Suspend">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p76" org.eventb.core.predicate="x ↦ y ↦ TRUE ↦ p∈periodicprocstart_timeWindow_of_Partition">
+<org.eventb.core.prIdent name="p" org.eventb.core.type="PARTITIONS"/>
+<org.eventb.core.prIdent name="x" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="y" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p4" org.eventb.core.predicate="∀p⦂PARTITIONS·p∈PARTITIONS⇒(∃x⦂ℤ,y⦂ℤ·x ↦ y ↦ TRUE∈timeWindowsofPartition∼[{p}])"/>
+<org.eventb.core.prPred name="p21" org.eventb.core.predicate="¬PS_Dormant=PS_Ready">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p7" org.eventb.core.predicate="periodicprocstart_timeWindow_of_Partition∈partitionTimeWindows ⤀ PARTITIONS"/>
+<org.eventb.core.prPred name="p77" org.eventb.core.predicate="x ↦ y ↦ TRUE∈dom(timeWindowsofPartition)">
+<org.eventb.core.prIdent name="x" org.eventb.core.type="ℤ"/>
+<org.eventb.core.prIdent name="y" org.eventb.core.type="ℤ"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p9" org.eventb.core.predicate="Duration_of_Partition∈PARTITIONS → ℕ"/>
+<org.eventb.core.prPred name="p19" org.eventb.core.predicate="partition(PROCESS_STATES,{PS_Dormant},{PS_Ready},{PS_Waiting},{PS_Suspend},{PS_WaitandSuspend},{PS_Running})">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p37" org.eventb.core.predicate="PROC_PERIOD_TYPE={PERIOD_PROC,APERIOD_PROC}">
+<org.eventb.core.prIdent name="APERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.prIdent name="PERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.prIdent name="PROC_PERIOD_TYPE" org.eventb.core.type="ℙ(PROC_PERIOD_TYPE)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p79" org.eventb.core.predicate="firstperiodicprocstart_timeWindow_of_Partition∈PARTITIONS ↣ partitionTimeWindows">
+<org.eventb.core.prIdent name="firstperiodicprocstart_timeWindow_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×(ℤ×ℤ×BOOL))"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p35" org.eventb.core.predicate="¬PS_WaitandSuspend=PS_Running">
+<org.eventb.core.prIdent name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.prIdent name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.prIdent name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p40" org.eventb.core.predicate="DEADLINE_TYPE={DEADLINE_HARD,DEADLINE_SOFT}">
+<org.eventb.core.prIdent name="DEADLINE_HARD" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.prIdent name="DEADLINE_SOFT" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.prIdent name="DEADLINE_TYPE" org.eventb.core.type="ℙ(DEADLINE_TYPE)"/>
+</org.eventb.core.prPred>
+<org.eventb.core.prPred name="p3" org.eventb.core.predicate="Period_of_Partition∈PARTITIONS → ℕ"/>
+<org.eventb.core.prPred name="p67" org.eventb.core.predicate="(∀x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows))⇒(∃x⦂ℤ·x=0)"/>
+<org.eventb.core.prPred name="p80" org.eventb.core.predicate="timeWindowsofPartition∈ℤ × ℤ × BOOL ⇸ PARTITIONS"/>
+<org.eventb.core.prReas name="r1" org.eventb.core.prRID="org.eventb.core.seqprover.autoRewritesL4:0"/>
+<org.eventb.core.prReas name="r9" org.eventb.core.prRID="org.eventb.core.seqprover.isFunGoal"/>
+<org.eventb.core.prReas name="r5" org.eventb.core.prRID="org.eventb.core.seqprover.conj:0"/>
+<org.eventb.core.prReas name="r8" org.eventb.core.prRID="com.clearsy.atelierb.provers.core.externalPP:1"/>
+<org.eventb.core.prReas name="r0" org.eventb.core.prRID="org.eventb.core.seqprover.partitionRewrites"/>
+<org.eventb.core.prReas name="r2" org.eventb.core.prRID="org.eventb.core.seqprover.typeRewrites:1"/>
+<org.eventb.core.prReas name="r3" org.eventb.core.prRID="org.eventb.core.seqprover.allI"/>
+<org.eventb.core.prReas name="r7" org.eventb.core.prRID="org.eventb.core.seqprover.mngHyp"/>
+<org.eventb.core.prReas name="r4" org.eventb.core.prRID="org.eventb.core.seqprover.impI"/>
+<org.eventb.core.prReas name="r6" org.eventb.core.prRID="org.eventb.core.seqprover.eq:1"/>
+</org.eventb.core.prProof>
+</org.eventb.core.prFile>

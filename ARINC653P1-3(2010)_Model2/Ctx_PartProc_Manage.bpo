@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.poFile org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="ABSHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poIdentifier name="PARTITIONS" org.eventb.core.type="ℙ(PARTITIONS)"/>
+<org.eventb.core.poIdentifier name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.poIdentifier name="PROCESSES" org.eventb.core.type="ℙ(PROCESSES)"/>
+<org.eventb.core.poIdentifier name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.poIdentifier name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspene" org.eventb.core.predicate="finite(PARTITIONS)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazULs21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspenf" org.eventb.core.predicate="finite(PROCESSES)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUL821EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspeng" org.eventb.core.predicate="partition(PARTITION_MODES,{PM_IDLE},{PM_NORMAL},{PM_COLD_START},{PM_WARM_START})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUMc21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspenh" org.eventb.core.predicate="partition(PROCESS_STATES,{PS_Dormant},{PS_Ready},{PS_Waiting},{PS_Suspend},{PS_WaitandSuspend},{PS_Running})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUMs21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspeni" org.eventb.core.predicate="card(PARTITIONS)&gt;0∧card(PARTITIONS)&lt;256" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fa9FIM21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poIdentifier name="PROC_PERIOD_TYPE" org.eventb.core.type="ℙ(PROC_PERIOD_TYPE)"/>
+<org.eventb.core.poIdentifier name="APERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.poIdentifier name="PERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspenj" org.eventb.core.predicate="partition(PROC_PERIOD_TYPE,{PERIOD_PROC},{APERIOD_PROC})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_with_Events.buc|org.eventb.core.contextFile#Ctx_PartProc_with_Events|org.eventb.core.axiom#_IKNTw9UOEeOE_q1ibjWlpA"/>
+<org.eventb.core.poIdentifier name="CRITILITY_LEVELS" org.eventb.core.type="ℙ(CRITILITY_LEVELS)"/>
+<org.eventb.core.poIdentifier name="DEADLINE_TYPE" org.eventb.core.type="ℙ(DEADLINE_TYPE)"/>
+<org.eventb.core.poIdentifier name="PARTITION_STARTCONDITIONS" org.eventb.core.type="ℙ(PARTITION_STARTCONDITIONS)"/>
+<org.eventb.core.poIdentifier name="PROCESS_WAIT_TYPES" org.eventb.core.type="ℙ(PROCESS_WAIT_TYPES)"/>
+<org.eventb.core.poIdentifier name="DEADLINE_HARD" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.poIdentifier name="DEADLINE_SOFT" org.eventb.core.type="DEADLINE_TYPE"/>
+<org.eventb.core.poIdentifier name="Duration_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×ℤ)"/>
+<org.eventb.core.poIdentifier name="HM_MODULE_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.poIdentifier name="HM_PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.poIdentifier name="INFINITE_TIME_VALUE" org.eventb.core.type="ℤ"/>
+<org.eventb.core.poIdentifier name="MAX_LOCK_LEVEL" org.eventb.core.type="ℤ"/>
+<org.eventb.core.poIdentifier name="MAX_PRIORITY_VALUE" org.eventb.core.type="ℤ"/>
+<org.eventb.core.poIdentifier name="MIN_PRIORITY_VALUE" org.eventb.core.type="ℤ"/>
+<org.eventb.core.poIdentifier name="NORMAL_START" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.poIdentifier name="ONE_TICK_TIME" org.eventb.core.type="ℤ"/>
+<org.eventb.core.poIdentifier name="PARTITION_RESTART" org.eventb.core.type="PARTITION_STARTCONDITIONS"/>
+<org.eventb.core.poIdentifier name="PROC_WAIT_DELAY" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.poIdentifier name="PROC_WAIT_OBJ" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.poIdentifier name="PROC_WAIT_PARTITIONNORMAL" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.poIdentifier name="PROC_WAIT_PERIOD" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.poIdentifier name="PROC_WAIT_TIMEOUT" org.eventb.core.type="PROCESS_WAIT_TYPES"/>
+<org.eventb.core.poIdentifier name="Period_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×ℤ)"/>
+<org.eventb.core.poIdentifier name="SystemPartFlag_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×BOOL)"/>
+<org.eventb.core.poIdentifier name="firstperiodicprocstart_timeWindow_of_Partition" org.eventb.core.type="ℙ(PARTITIONS×(ℤ×ℤ×BOOL))"/>
+<org.eventb.core.poIdentifier name="majorFrame" org.eventb.core.type="ℤ"/>
+<org.eventb.core.poIdentifier name="partitionTimeWindows" org.eventb.core.type="ℙ(ℤ×ℤ×BOOL)"/>
+<org.eventb.core.poIdentifier name="periodicprocstart_timeWindow_of_Partition" org.eventb.core.type="ℙ(ℤ×ℤ×BOOL×PARTITIONS)"/>
+<org.eventb.core.poIdentifier name="timeWindowsofPartition" org.eventb.core.type="ℙ(ℤ×ℤ×BOOL×PARTITIONS)"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poSequent name="axm_perprocstart_with_partwin/WD" org.eventb.core.accurate="true" org.eventb.core.poDesc="Well-definedness of Axiom" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="SEQHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.bpo|org.eventb.core.poFile#Ctx_PartProc_Manage|org.eventb.core.poPredicateSet#HYPCtx_PartProc_with_Evenu)"/>
+<org.eventb.core.poPredicate name="SEQHYQ" org.eventb.core.predicate="∀x⦂ℤ,y⦂ℤ,b⦂BOOL,p⦂PARTITIONS·x ↦ y ↦ b ↦ p∈periodicprocstart_timeWindow_of_Partition∧b=TRUE⇒x ↦ y ↦ b∈dom(timeWindowsofPartition)∧timeWindowsofPartition∈ℤ × ℤ × BOOL ⇸ PARTITIONS" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bN04s2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYR" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bN04s2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSelHint name="SEQHYS" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.bpo|org.eventb.core.poFile#Ctx_PartProc_Manage|org.eventb.core.poPredicateSet#ABSHYP" org.eventb.core.poSelHintSnd="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.bpo|org.eventb.core.poFile#Ctx_PartProc_Manage|org.eventb.core.poPredicateSet#HYPCtx_PartProc_with_Evenu)"/>
+</org.eventb.core.poSequent>
+<org.eventb.core.poPredicateSet name="HYPCtx_PartProc_with_Evenu)" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.bpo|org.eventb.core.poFile#Ctx_PartProc_Manage|org.eventb.core.poPredicateSet#ABSHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD0" org.eventb.core.predicate="Period_of_Partition∈PARTITIONS → ℕ" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bED-c2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD1" org.eventb.core.predicate="Duration_of_Partition∈PARTITIONS → ℕ" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bED-s2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD2" org.eventb.core.predicate="SystemPartFlag_of_Partition∈PARTITIONS → BOOL" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_cxrv4NJiEeOIk6vzYQGQiQ"/>
+<org.eventb.core.poPredicate name="PRD3" org.eventb.core.predicate="partition(DEADLINE_TYPE,{DEADLINE_HARD},{DEADLINE_SOFT})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bED_c2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD4" org.eventb.core.predicate="partition(PARTITION_STARTCONDITIONS,{NORMAL_START},{PARTITION_RESTART},{HM_MODULE_RESTART},{HM_PARTITION_RESTART})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bED_s2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD5" org.eventb.core.predicate="partition(PROCESS_WAIT_TYPES,{PROC_WAIT_DELAY},{PROC_WAIT_TIMEOUT},{PROC_WAIT_PERIOD},{PROC_WAIT_OBJ},{PROC_WAIT_PARTITIONNORMAL})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_1RgIANJSEeOIk6vzYQGQiQ"/>
+<org.eventb.core.poPredicate name="PRD6" org.eventb.core.predicate="partitionTimeWindows∈ℕ × ℕ ⇸ BOOL" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_gwvjQNJeEeOIk6vzYQGQiQ"/>
+<org.eventb.core.poPredicate name="PRD7" org.eventb.core.predicate="timeWindowsofPartition∈partitionTimeWindows ↠ PARTITIONS" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_gwwKUNJeEeOIk6vzYQGQiQ"/>
+<org.eventb.core.poPredicate name="PRD8" org.eventb.core.predicate="majorFrame∈ℕ1" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bEEBM2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD9" org.eventb.core.predicate="periodicprocstart_timeWindow_of_Partition∈partitionTimeWindows ⤀ PARTITIONS" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_vupioNKCEeOIk6vzYQGQiQ"/>
+<org.eventb.core.poPredicate name="PRD10" org.eventb.core.predicate="firstperiodicprocstart_timeWindow_of_Partition∈PARTITIONS ↣ partitionTimeWindows" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_WmSFgNLOEeOIk6vzYQGQiQ"/>
+<org.eventb.core.poPredicate name="PRD11" org.eventb.core.predicate="(∃x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows)⇒x+y=majorFrame)∧(∀x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows)⇒x+y≤majorFrame)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bEEB82fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD12" org.eventb.core.predicate="∃x⦂ℤ,y⦂ℤ·x ↦ y∈dom(partitionTimeWindows)⇒x=0" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bN04M2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD13" org.eventb.core.predicate="∀p⦂PARTITIONS·p∈PARTITIONS⇒(∃x⦂ℤ,y⦂ℤ·x ↦ y ↦ TRUE∈timeWindowsofPartition∼[{p}])" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bN04c2fEeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="ALLHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.bpo|org.eventb.core.poFile#Ctx_PartProc_Manage|org.eventb.core.poPredicateSet#HYPCtx_PartProc_with_Evenu)" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD14" org.eventb.core.predicate="(∀x⦂ℤ,y⦂ℤ,b⦂BOOL,p⦂PARTITIONS·x ↦ y ↦ b ↦ p∈periodicprocstart_timeWindow_of_Partition⇒b=TRUE∧timeWindowsofPartition(x ↦ y ↦ b)=p)∧(∀x⦂ℤ,y⦂ℤ,b⦂BOOL,p⦂PARTITIONS·x ↦ y ↦ b ↦ p∈timeWindowsofPartition∧b=TRUE⇒x ↦ y ↦ b ↦ p∈periodicprocstart_timeWindow_of_Partition)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_0bN04s2fEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD15" org.eventb.core.predicate="∀x⦂ℤ,y⦂ℤ,b⦂BOOL,p⦂PARTITIONS·p ↦ (x ↦ y ↦ b)∈firstperiodicprocstart_timeWindow_of_Partition⇒x ↦ y ↦ b ↦ p∈periodicprocstart_timeWindow_of_Partition" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_oAnYYdJgEeOIk6vzYQGQiQ"/>
+<org.eventb.core.poPredicate name="PRD16" org.eventb.core.predicate="∀x⦂ℤ,y⦂ℤ,b⦂BOOL,p⦂PARTITIONS·p ↦ (x ↦ y ↦ b)∈firstperiodicprocstart_timeWindow_of_Partition⇒¬(∃x1⦂ℤ,y1⦂ℤ,b1⦂BOOL,p1⦂PARTITIONS·x1 ↦ y1 ↦ b1 ↦ p1∈periodicprocstart_timeWindow_of_Partition∧p=p1∧x1&lt;x)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_8ORD4HCuEeWiNI6EAC4YOQ"/>
+<org.eventb.core.poPredicate name="PRD17" org.eventb.core.predicate="∀x⦂ℤ·x∈ran(Period_of_Partition)⇒(∃y⦂ℤ·y∈ℕ1∧x∗y=majorFrame)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_8ORD4XCuEeWiNI6EAC4YOQ"/>
+<org.eventb.core.poPredicate name="PRD18" org.eventb.core.predicate="MAX_LOCK_LEVEL=32" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_8ORD4nCuEeWiNI6EAC4YOQ"/>
+<org.eventb.core.poPredicate name="PRD19" org.eventb.core.predicate="MIN_PRIORITY_VALUE=0" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_8ORD43CuEeWiNI6EAC4YOQ"/>
+<org.eventb.core.poPredicate name="PRD20" org.eventb.core.predicate="MAX_PRIORITY_VALUE=249" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_8ORD5HCuEeWiNI6EAC4YOQ"/>
+<org.eventb.core.poPredicate name="PRD21" org.eventb.core.predicate="INFINITE_TIME_VALUE=0" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_8ORD5XCuEeWiNI6EAC4YOQ"/>
+<org.eventb.core.poPredicate name="PRD22" org.eventb.core.predicate="ONE_TICK_TIME=20" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Manage.buc|org.eventb.core.contextFile#Ctx_PartProc_Manage|org.eventb.core.axiom#_8ORD5nCuEeWiNI6EAC4YOQ"/>
+</org.eventb.core.poPredicateSet>
+</org.eventb.core.poFile>

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.machineFile org.eventb.core.configuration="org.eventb.core.fwd;de.prob.units.mchBase;org.eventb.codegen.ui.cgConfig" org.eventb.texttools.text_lastmodified="1444907104043" org.eventb.texttools.text_representation="machine Mach_PartProc_Trans_with_Events&#10;&#10; refines Mach_PartProc_Trans  sees Ctx_PartProc_with_Events&#10;&#10;variables processes&#10;          processes_of_partition&#10;          partition_mode process_state periodtype_of_process&#10;&#10;invariants&#10;  @inv_pertype_of_proc periodtype_of_process ∈ processes → PROC_PERIOD_TYPE&#10;  @inv_onlyone_runproc ∀p1,p2·(p1∈processes ∧ p2∈processes ∧ process_state(p1)=PS_Running ∧ process_state(p2)=PS_Running ⇒ p1=p2) // card(process_state∼[{PS_Running}]) ≤ 1 // at most one RUNNING proc in a single processor system&#10;&#10;events&#10;  event INITIALISATION extends INITIALISATION&#10;    then&#10;      @act11 periodtype_of_process ≔ ∅&#10;  end&#10;&#10;  event partition_schedule&#10;    any part&#10;    where&#10;      @grd01 part∈PARTITIONS&#10;      @grd02 partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START&#10;  end&#10;&#10;  event process_schedule extends process_schedule&#10;  end&#10;&#10;  event create_process extends create_process&#10;    any ptype&#10;    where&#10;      @grd11 ptype∈PROC_PERIOD_TYPE&#10;    then&#10;      @act11 periodtype_of_process(proc) ≔ ptype&#10;  end&#10;&#10;  event set_partition_mode_to_idle extends partition_modetransition_to_idle&#10;    then&#10;      @act31 periodtype_of_process ≔ procs ⩤ periodtype_of_process&#10;  end&#10;&#10;  event set_partition_mode_to_normal extends partition_modetransition_to_normal&#10;  end&#10;&#10;  event set_partition_mode_to_coldstart extends partition_modetransition_to_coldstart&#10;    then&#10;      @act31 periodtype_of_process ≔ procs ⩤ periodtype_of_process&#10;  end&#10;&#10;  event set_partition_mode_to_warmstart extends partition_modetransition_to_warmstart&#10;    then&#10;      @act31 periodtype_of_process ≔ procs ⩤ periodtype_of_process&#10;  end&#10;&#10;  event coldstart_partition_fromidle&#10;  extends partition_modetransition_idle_to_coldstart&#10;  end&#10;&#10;  event warmstart_partition_fromidle&#10;  extends partition_modetransition_idle_to_warmstart&#10;  end&#10;&#10;  event suspend_self refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Running&#10;      @grd33 newstate = PS_Suspend&#10;      @grd34 periodtype_of_process(proc) = APERIOD_PROC&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event suspend refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd07 partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START&#10;      @grd31 partition_mode(part) = PM_NORMAL ⇒  (process_state(proc) = PS_Ready ∧ newstate = PS_Suspend)∨  (process_state(proc) = PS_Waiting ∧ newstate = PS_WaitandSuspend)&#10;      @grd32 (partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_Waiting ∧ newstate = PS_WaitandSuspend)&#10;      @grd34 periodtype_of_process(proc) = APERIOD_PROC&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event resume refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd07 partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START&#10;      @grd31 partition_mode(part) = PM_NORMAL ⇒ ((process_state(proc) = PS_Suspend ∧ newstate = PS_Ready) ∨  (process_state(proc) = PS_WaitandSuspend ∧ newstate = PS_Waiting))&#10;      @grd32 (partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_WaitandSuspend ∧ newstate = PS_Waiting)&#10;      @grd34 periodtype_of_process(proc) = APERIOD_PROC&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event stop_self refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd30 partition_mode(part) = PM_NORMAL&#10;      @grd31 process_state(proc) = PS_Running ∧ newstate = PS_Dormant&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event stop refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd07 partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START&#10;      @grd31 partition_mode(part) = PM_NORMAL ⇒  ((process_state(proc) = PS_Ready ∨ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_Suspend ∨ process_state(proc) = PS_WaitandSuspend) ∧ newstate = PS_Dormant)&#10;      @grd32 (partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  ((process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend) ∧ newstate = PS_Dormant)&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event start refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd07 partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START&#10;      @grd31 partition_mode(part) = PM_NORMAL ⇒  (process_state(proc) = PS_Dormant ∧&#10;             ((periodtype_of_process(proc) = APERIOD_PROC ⇒ newstate = PS_Ready) ∧ (periodtype_of_process(proc) = PERIOD_PROC ⇒ newstate = PS_Waiting)))&#10;      @grd32 (partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_Dormant ∧ newstate = PS_Waiting)&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event delayed_start refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd07 partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START&#10;      @grd31 partition_mode(part) = PM_NORMAL ⇒  (process_state(proc) = PS_Dormant ∧ newstate = PS_Waiting)&#10;      @grd32 (partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_Dormant ∧ newstate = PS_Waiting)&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event timed_wait refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Running ∧ (newstate = PS_Ready ∨ newstate = PS_Waiting)&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event period_wait refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Running ∧ newstate = PS_Waiting&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event process_finished refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Running ∧ (newstate = PS_Dormant ∨ newstate = PS_Waiting)&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event time_out refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_Suspend ∨ process_state(proc) = PS_WaitandSuspend&#10;      @grd33 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_Suspend ⇒ newstate = PS_Ready&#10;      @grd34 process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event req_busy_resource refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Running&#10;      @grd34 newstate = PS_Waiting&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event resource_become_available refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd06 processes_of_partition(proc) = part&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend&#10;      @grd33 process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready&#10;      @grd34 process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend&#10;    then&#10;      @act11 process_state(proc) ≔ newstate&#10;  end&#10;&#10;  event resource_become_available2 refines process_state_transition2&#10;    any part procs newstates&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 procs ⊆ processes&#10;      @grd03 newstates ∈ procs → PROCESS_STATES&#10;      @grd06 procs ⊆ processes_of_partition∼[{part}]&#10;      @grd31 partition_mode(part) = PM_NORMAL&#10;      @grd32 ∀proc·(proc∈procs ⇒ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend)&#10;      @grd33 ∀proc·(proc∈procs ∧ process_state(proc) = PS_Waiting ⇒ newstates(proc) = PS_Ready)&#10;      @grd34 ∀proc·(proc∈procs ∧ process_state(proc) = PS_WaitandSuspend ⇒ newstates(proc) = PS_Suspend)&#10;    then&#10;      @act11 process_state ≔ process_state newstates&#10;  end&#10;&#10;  event periodicproc_reach_releasepoint&#10;  refines process_state_transition&#10;    any part proc newstate&#10;    where&#10;      @grd01 part ∈ PARTITIONS&#10;      @grd02 proc ∈ processes&#10;      @grd03 newstate ∈ PROCESS_STATES&#10;      @grd04 processes_of_partition(proc) = part&#10;      @grd05 partition_mode(part) = PM_NORMAL&#10;      @grd06 periodtype_of_process(proc) = APERIOD_PROC&#10;      @grd07 process_state(proc) = PS_Waiting&#10;      @grd08 newstate = PS_Ready&#10;    then&#10;      @act01 process_state(proc) ≔ newstate&#10;  end&#10;end&#10;" version="5">
+<org.eventb.core.refinesMachine name="'" org.eventb.core.target="Mach_PartProc_Trans"/>
+<org.eventb.core.seesContext name="_WP3m4NUOEeOE_q1ibjWlpA" org.eventb.core.target="Ctx_PartProc_with_Events"/>
+<org.eventb.core.variable name="_78mgsc21EeO_w8hSz1RRkQ" org.eventb.core.identifier="processes"/>
+<org.eventb.core.variable name="_78mgss21EeO_w8hSz1RRkQ" org.eventb.core.identifier="processes_of_partition"/>
+<org.eventb.core.variable name="_78mgs821EeO_w8hSz1RRkQ" org.eventb.core.identifier="partition_mode"/>
+<org.eventb.core.variable name="_78mgtM21EeO_w8hSz1RRkQ" org.eventb.core.identifier="process_state"/>
+<org.eventb.core.event name="_78mgtM21EeO_w8hSz1RRkR" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="INITIALISATION">
+<org.eventb.core.action name="_uluXcNUOEeOE_q1ibjWlpA" org.eventb.core.assignment="periodtype_of_process ≔ ∅" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_aEeMcNcoEeOuG80hxTAROw" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="partition_schedule">
+<org.eventb.core.parameter name="_tc-5QNcoEeOuG80hxTAROw" org.eventb.core.identifier="part"/>
+<org.eventb.core.guard name="_tc-5QdcoEeOuG80hxTAROw" org.eventb.core.label="grd01" org.eventb.core.predicate="part∈PARTITIONS"/>
+<org.eventb.core.guard name="_tc-5QtcoEeOuG80hxTAROw" org.eventb.core.label="grd02" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_D9JpwNWYEeOBH5daWkgzeQ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="process_schedule">
+<org.eventb.core.refinesEvent name="_bpK_INeFEeOCX_cGGZTAxg" org.eventb.core.target="process_schedule"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_78mgtM21EeO_w8hSz1RRkT" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_process">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_process"/>
+<org.eventb.core.parameter name="_enLQENUOEeOE_q1ibjWlpA" org.eventb.core.identifier="ptype"/>
+<org.eventb.core.guard name="_enLQEdUOEeOE_q1ibjWlpA" org.eventb.core.label="grd11" org.eventb.core.predicate="ptype∈PROC_PERIOD_TYPE"/>
+<org.eventb.core.action name="_enLQEtUOEeOE_q1ibjWlpA" org.eventb.core.assignment="periodtype_of_process(proc) ≔ ptype" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_RvptQNGbEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_idle">
+<org.eventb.core.refinesEvent name="_RvptQdGbEeOO1v6vzqtXww" org.eventb.core.target="partition_modetransition_to_idle"/>
+<org.eventb.core.action name="_BOpKoNUgEeOE_q1ibjWlpA" org.eventb.core.assignment="periodtype_of_process ≔ procs ⩤ periodtype_of_process" org.eventb.core.label="act31"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_RvptQtGbEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_normal">
+<org.eventb.core.refinesEvent name="_RvqUUNGbEeOO1v6vzqtXww" org.eventb.core.target="partition_modetransition_to_normal"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_78mgtM21EeO_w8hSz1RRkW" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_coldstart">
+<org.eventb.core.refinesEvent name="_GMDmAOE4EeOlhdB8eyQyLQ" org.eventb.core.target="partition_modetransition_to_coldstart"/>
+<org.eventb.core.action name="_BOpKodUgEeOE_q1ibjWlpA" org.eventb.core.assignment="periodtype_of_process ≔ procs ⩤ periodtype_of_process" org.eventb.core.label="act31"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_78mgtM21EeO_w8hSz1RRkX" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_warmstart">
+<org.eventb.core.refinesEvent name="_GMDmAeE4EeOlhdB8eyQyLQ" org.eventb.core.target="partition_modetransition_to_warmstart"/>
+<org.eventb.core.action name="_BOpKotUgEeOE_q1ibjWlpA" org.eventb.core.assignment="periodtype_of_process ≔ procs ⩤ periodtype_of_process" org.eventb.core.label="act31"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_ILDcoNQvEeOZBrbXix_W6g" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="coldstart_partition_fromidle">
+<org.eventb.core.refinesEvent name="_GMDmAuE4EeOlhdB8eyQyLQ" org.eventb.core.target="partition_modetransition_idle_to_coldstart"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_ILDcotQvEeOZBrbXix_W6g" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="warmstart_partition_fromidle">
+<org.eventb.core.refinesEvent name="_GMDmA-E4EeOlhdB8eyQyLQ" org.eventb.core.target="partition_modetransition_idle_to_warmstart"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-Ud0NGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="suspend_self">
+<org.eventb.core.refinesEvent name="_s2EHoNGgEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_pmm_sNQqEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_pmm_sdQqEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_pmm_stQqEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_pmm_s9QqEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_pmm_tNQqEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_pmm_tdQqEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_pmm_ttQqEeOZBrbXix_W6g" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_aiFn4NHKEeOO1v6vzqtXww" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_0U7T0NHKEeOO1v6vzqtXww" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Running"/>
+<org.eventb.core.guard name="_0U764NHKEeOO1v6vzqtXww" org.eventb.core.label="grd33" org.eventb.core.predicate="newstate = PS_Suspend"/>
+<org.eventb.core.guard name="_coiU8NUVEeOE_q1ibjWlpA" org.eventb.core.label="grd34" org.eventb.core.predicate="periodtype_of_process(proc) = APERIOD_PROC"/>
+<org.eventb.core.action name="_gziAgNQqEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-Ud0dGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="suspend">
+<org.eventb.core.refinesEvent name="_N6cAUNHJEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DgL8NQvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DpV4NQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DpV4dQvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DpV4tQvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DpV49QvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DpV5NQvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_2DpV5dQvEeOZBrbXix_W6g" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_bWfBwNeHEeOCX_cGGZTAxg" org.eventb.core.label="grd07" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START"/>
+<org.eventb.core.guard name="_naSiANHNEeOO1v6vzqtXww" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ⇒  (process_state(proc) = PS_Ready ∧ newstate = PS_Suspend)∨  (process_state(proc) = PS_Waiting ∧ newstate = PS_WaitandSuspend)"/>
+<org.eventb.core.guard name="_naTJENHNEeOO1v6vzqtXww" org.eventb.core.label="grd32" org.eventb.core.predicate="(partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_Waiting ∧ newstate = PS_WaitandSuspend)"/>
+<org.eventb.core.guard name="_j1oNwNUVEeOE_q1ibjWlpA" org.eventb.core.label="grd34" org.eventb.core.predicate="periodtype_of_process(proc) = APERIOD_PROC"/>
+<org.eventb.core.action name="_2DpV5tQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-Ud0tGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="resume">
+<org.eventb.core.refinesEvent name="_s2EusNGgEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DpV59QvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DpV6NQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DpV6dQvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DpV6tQvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DpV69QvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DpV7NQvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_2DpV7dQvEeOZBrbXix_W6g" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_qoFo0NHPEeOO1v6vzqtXww" org.eventb.core.label="grd07" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START"/>
+<org.eventb.core.guard name="_9tXDgNWTEeOBH5daWkgzeQ" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ⇒ ((process_state(proc) = PS_Suspend ∧ newstate = PS_Ready) ∨  (process_state(proc) = PS_WaitandSuspend ∧ newstate = PS_Waiting))"/>
+<org.eventb.core.guard name="_j1oNwdUVEeOE_q1ibjWlpA" org.eventb.core.label="grd32" org.eventb.core.predicate="(partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_WaitandSuspend ∧ newstate = PS_Waiting)"/>
+<org.eventb.core.action name="_2DpV7tQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DpV8tQvEeOZBrbXix_W6g" org.eventb.core.label="grd34" org.eventb.core.predicate="periodtype_of_process(proc) = APERIOD_PROC"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-VE4NGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="stop_self">
+<org.eventb.core.refinesEvent name="_s2EusdGgEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DpV79QvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DpV8NQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DpV8dQvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DpV89QvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DpV9NQvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DpV9dQvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_PUJ7gNUaEeOE_q1ibjWlpA" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_PTDU4NHQEeOO1v6vzqtXww" org.eventb.core.label="grd30" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.action name="_2DpV9tQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DpV-tQvEeOZBrbXix_W6g" org.eventb.core.label="grd31" org.eventb.core.predicate="process_state(proc) = PS_Running ∧ newstate = PS_Dormant"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-VE4dGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="stop">
+<org.eventb.core.refinesEvent name="_s2CScNGgEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DpV99QvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DpV-NQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DpV-dQvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DpV-9QvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DpV_NQvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DpV_dQvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_bWfBwteHEeOCX_cGGZTAxg" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_fezKwNHQEeOO1v6vzqtXww" org.eventb.core.label="grd07" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START"/>
+<org.eventb.core.guard name="_fezKwdHQEeOO1v6vzqtXww" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ⇒  ((process_state(proc) = PS_Ready ∨ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_Suspend ∨ process_state(proc) = PS_WaitandSuspend) ∧ newstate = PS_Dormant)"/>
+<org.eventb.core.action name="_2DpV_tQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DpWAtQvEeOZBrbXix_W6g" org.eventb.core.label="grd32" org.eventb.core.predicate="(partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  ((process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend) ∧ newstate = PS_Dormant)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-VE4tGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="start">
+<org.eventb.core.refinesEvent name="_s2C5gNGgEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DpV_9QvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DpWANQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DpWAdQvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DpWA9QvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DpWBNQvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DpWBdQvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_bWoywNeHEeOCX_cGGZTAxg" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="__MNFwNHSEeOO1v6vzqtXww" org.eventb.core.label="grd07" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START"/>
+<org.eventb.core.guard name="__MNs0NHSEeOO1v6vzqtXww" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ⇒  (process_state(proc) = PS_Dormant ∧&#10;             ((periodtype_of_process(proc) = APERIOD_PROC ⇒ newstate = PS_Ready) ∧ (periodtype_of_process(proc) = PERIOD_PROC ⇒ newstate = PS_Waiting)))"/>
+<org.eventb.core.action name="_2DpWBtQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DpWCtQvEeOZBrbXix_W6g" org.eventb.core.label="grd32" org.eventb.core.predicate="(partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_Dormant ∧ newstate = PS_Waiting)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_Wjr0cNHREeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="delayed_start">
+<org.eventb.core.refinesEvent name="_Wjr0cdHREeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DpWB9QvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DpWCNQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DpWCdQvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DpWC9QvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DpWDNQvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DpWDdQvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_bWoywdeHEeOCX_cGGZTAxg" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_Qx3kUNWWEeOBH5daWkgzeQ" org.eventb.core.label="grd07" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ∨ partition_mode(part) = PM_WARM_START ∨ partition_mode(part) = PM_COLD_START"/>
+<org.eventb.core.guard name="_HMDRMdHTEeOO1v6vzqtXww" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL ⇒  (process_state(proc) = PS_Dormant ∧ newstate = PS_Waiting)"/>
+<org.eventb.core.action name="_2DzG4NQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DzG5NQvEeOZBrbXix_W6g" org.eventb.core.label="grd32" org.eventb.core.predicate="(partition_mode(part) = PM_COLD_START ∨  partition_mode(part) = PM_WARM_START)⇒  (process_state(proc) = PS_Dormant ∧ newstate = PS_Waiting)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-Vr8dGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="timed_wait">
+<org.eventb.core.refinesEvent name="_s2DgkNGgEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DzG4dQvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DzG4tQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DzG49QvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DzG5dQvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DzG5tQvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DzG59QvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_qGW38NHTEeOO1v6vzqtXww" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_qGXfANHTEeOO1v6vzqtXww" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.action name="_2DzG6NQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DzG7NQvEeOZBrbXix_W6g" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Running ∧ (newstate = PS_Ready ∨ newstate = PS_Waiting)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_w-Vr8tGdEeOO1v6vzqtXww" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="period_wait">
+<org.eventb.core.refinesEvent name="_s2DgkdGgEeOO1v6vzqtXww" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DzG6dQvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DzG6tQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DzG69QvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DzG7dQvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DzG7tQvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DzG79QvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_D1G4oNHVEeOO1v6vzqtXww" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_D1HfsNHVEeOO1v6vzqtXww" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.action name="_2DzG8NQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DzG9NQvEeOZBrbXix_W6g" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Running ∧ newstate = PS_Waiting"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_hONjwNKdEeOIk6vzYQGQiQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="process_finished">
+<org.eventb.core.refinesEvent name="_hONjwdKdEeOIk6vzYQGQiQ" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DzG8dQvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DzG8tQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DzG89QvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DzG9dQvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DzG9tQvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DzG99QvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_hOOK0NKdEeOIk6vzYQGQiQ" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_hOOK0dKdEeOIk6vzYQGQiQ" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.action name="_2DzG-NQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_2DzG-dQvEeOZBrbXix_W6g" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Running ∧ (newstate = PS_Dormant ∨ newstate = PS_Waiting)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_R3y0kNK3EeOIk6vzYQGQiQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="time_out">
+<org.eventb.core.refinesEvent name="_R3y0kdK3EeOIk6vzYQGQiQ" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_2DzG_dQvEeOZBrbXix_W6g" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_2DzG_tQvEeOZBrbXix_W6g" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_2DzG_9QvEeOZBrbXix_W6g" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_2DzG-tQvEeOZBrbXix_W6g" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_2DzG-9QvEeOZBrbXix_W6g" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_2DzG_NQvEeOZBrbXix_W6g" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_R3y0ktK3EeOIk6vzYQGQiQ" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_R3y0k9K3EeOIk6vzYQGQiQ" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_R3zboNK3EeOIk6vzYQGQiQ" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_Suspend ∨ process_state(proc) = PS_WaitandSuspend"/>
+<org.eventb.core.guard name="_V2fckNeKEeOCX_cGGZTAxg" org.eventb.core.label="grd33" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_Suspend ⇒ newstate = PS_Ready"/>
+<org.eventb.core.action name="_2DzHANQvEeOZBrbXix_W6g" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_GMgR9eE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd34" org.eventb.core.predicate="process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend"/>
+</org.eventb.core.event>
+<org.eventb.core.variable name="_WQUS0NUOEeOE_q1ibjWlpA" org.eventb.core.identifier="periodtype_of_process"/>
+<org.eventb.core.invariant name="_WQUS0dUOEeOE_q1ibjWlpA" org.eventb.core.label="inv_pertype_of_proc" org.eventb.core.predicate="periodtype_of_process ∈ processes → PROC_PERIOD_TYPE"/>
+<org.eventb.core.invariant name="_XhWeoNWXEeOBH5daWkgzeQ" org.eventb.core.comment="card(process_state∼[{PS_Running}]) ≤ 1 // at most one RUNNING proc in a single processor system" org.eventb.core.label="inv_onlyone_runproc" org.eventb.core.predicate="∀p1,p2·(p1∈processes ∧ p2∈processes ∧ process_state(p1)=PS_Running ∧ process_state(p2)=PS_Running ⇒ p1=p2)"/>
+<org.eventb.core.event name="_GMgR8OE4EeOlhdB8eyQyLQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="req_busy_resource">
+<org.eventb.core.refinesEvent name="_GMgR8eE4EeOlhdB8eyQyLQ" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_GMgR8uE4EeOlhdB8eyQyLQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_GMgR8-E4EeOlhdB8eyQyLQ" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_GMgR9OE4EeOlhdB8eyQyLQ" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_GMgR9uE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_GMgR9-E4EeOlhdB8eyQyLQ" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_GMgR-OE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_GMgR-eE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_GMgR-uE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_GMgR--E4EeOlhdB8eyQyLQ" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Running"/>
+<org.eventb.core.action name="_GMgR_OE4EeOlhdB8eyQyLQ" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_GMgSAeE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd34" org.eventb.core.predicate="newstate = PS_Waiting"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_GMgR_eE4EeOlhdB8eyQyLQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="resource_become_available">
+<org.eventb.core.refinesEvent name="_C5iCsOGjEeO_gPwQgWKtUw" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_GMgR_uE4EeOlhdB8eyQyLQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_GMgR_-E4EeOlhdB8eyQyLQ" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_GMgSAOE4EeOlhdB8eyQyLQ" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_GMgSAuE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_GMgSA-E4EeOlhdB8eyQyLQ" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_GMgSBOE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_GMgSBeE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd06" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_GMgSBuE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_GMgSB-E4EeOlhdB8eyQyLQ" org.eventb.core.label="grd32" org.eventb.core.predicate="process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend"/>
+<org.eventb.core.guard name="_GMgSCOE4EeOlhdB8eyQyLQ" org.eventb.core.label="grd33" org.eventb.core.predicate="process_state(proc) = PS_Waiting ⇒ newstate = PS_Ready"/>
+<org.eventb.core.action name="_GMgSCeE4EeOlhdB8eyQyLQ" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_DaIs1OGMEeOirusMDvDXUw" org.eventb.core.label="grd34" org.eventb.core.predicate="process_state(proc) = PS_WaitandSuspend ⇒ newstate = PS_Suspend"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_DaIs0OGMEeOirusMDvDXUw" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="resource_become_available2">
+<org.eventb.core.refinesEvent name="_Hy_aEOGlEeO_gPwQgWKtUw" org.eventb.core.target="process_state_transition2"/>
+<org.eventb.core.parameter name="_DaIs0eGMEeOirusMDvDXUw" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_DaIs0uGMEeOirusMDvDXUw" org.eventb.core.identifier="procs"/>
+<org.eventb.core.parameter name="_DaIs0-GMEeOirusMDvDXUw" org.eventb.core.identifier="newstates"/>
+<org.eventb.core.guard name="_DaJT4OGMEeOirusMDvDXUw" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_DaJT4eGMEeOirusMDvDXUw" org.eventb.core.label="grd02" org.eventb.core.predicate="procs ⊆ processes"/>
+<org.eventb.core.guard name="_DaJT4uGMEeOirusMDvDXUw" org.eventb.core.label="grd03" org.eventb.core.predicate="newstates ∈ procs → PROCESS_STATES"/>
+<org.eventb.core.guard name="_DaJT4-GMEeOirusMDvDXUw" org.eventb.core.label="grd06" org.eventb.core.predicate="procs ⊆ processes_of_partition∼[{part}]"/>
+<org.eventb.core.guard name="_DaJ68OGMEeOirusMDvDXUw" org.eventb.core.label="grd31" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_DaJ68eGMEeOirusMDvDXUw" org.eventb.core.label="grd32" org.eventb.core.predicate="∀proc·(proc∈procs ⇒ process_state(proc) = PS_Waiting ∨ process_state(proc) = PS_WaitandSuspend)"/>
+<org.eventb.core.guard name="_DaJ68uGMEeOirusMDvDXUw" org.eventb.core.label="grd33" org.eventb.core.predicate="∀proc·(proc∈procs ∧ process_state(proc) = PS_Waiting ⇒ newstates(proc) = PS_Ready)"/>
+<org.eventb.core.action name="_DaKiAOGMEeOirusMDvDXUw" org.eventb.core.assignment="process_state ≔ process_state newstates" org.eventb.core.label="act11"/>
+<org.eventb.core.guard name="_ctpAlddIEeOUBrb5qjjxEQ" org.eventb.core.label="grd34" org.eventb.core.predicate="∀proc·(proc∈procs ∧ process_state(proc) = PS_WaitandSuspend ⇒ newstates(proc) = PS_Suspend)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_ctpAkNdIEeOUBrb5qjjxEQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="periodicproc_reach_releasepoint">
+<org.eventb.core.refinesEvent name="_ctpAkddIEeOUBrb5qjjxEQ" org.eventb.core.target="process_state_transition"/>
+<org.eventb.core.parameter name="_ctpAktdIEeOUBrb5qjjxEQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.parameter name="_ctpAk9dIEeOUBrb5qjjxEQ" org.eventb.core.identifier="proc"/>
+<org.eventb.core.parameter name="_ctpAlNdIEeOUBrb5qjjxEQ" org.eventb.core.identifier="newstate"/>
+<org.eventb.core.guard name="_ctpAltdIEeOUBrb5qjjxEQ" org.eventb.core.label="grd01" org.eventb.core.predicate="part ∈ PARTITIONS"/>
+<org.eventb.core.guard name="_ctpAl9dIEeOUBrb5qjjxEQ" org.eventb.core.label="grd02" org.eventb.core.predicate="proc ∈ processes"/>
+<org.eventb.core.guard name="_ctpAmNdIEeOUBrb5qjjxEQ" org.eventb.core.label="grd03" org.eventb.core.predicate="newstate ∈ PROCESS_STATES"/>
+<org.eventb.core.guard name="_ctpAmddIEeOUBrb5qjjxEQ" org.eventb.core.label="grd04" org.eventb.core.predicate="processes_of_partition(proc) = part"/>
+<org.eventb.core.guard name="_ctpAmtdIEeOUBrb5qjjxEQ" org.eventb.core.label="grd05" org.eventb.core.predicate="partition_mode(part) = PM_NORMAL"/>
+<org.eventb.core.guard name="_ctpAm9dIEeOUBrb5qjjxEQ" org.eventb.core.label="grd06" org.eventb.core.predicate="periodtype_of_process(proc) = APERIOD_PROC"/>
+<org.eventb.core.guard name="_ctpAnNdIEeOUBrb5qjjxEQ" org.eventb.core.label="grd07" org.eventb.core.predicate="process_state(proc) = PS_Waiting"/>
+<org.eventb.core.action name="_ctpAnddIEeOUBrb5qjjxEQ" org.eventb.core.assignment="process_state(proc) ≔ newstate" org.eventb.core.label="act01"/>
+<org.eventb.core.guard name="_M2-aQG_5EeW-QJ0vOYKCKQ" org.eventb.core.label="grd08" org.eventb.core.predicate="newstate = PS_Ready"/>
+</org.eventb.core.event>
+</org.eventb.core.machineFile>

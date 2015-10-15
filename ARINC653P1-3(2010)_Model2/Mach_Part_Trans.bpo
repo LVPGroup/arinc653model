@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.poFile org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="CTXHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poIdentifier name="PARTITIONS" org.eventb.core.type="ℙ(PARTITIONS)"/>
+<org.eventb.core.poIdentifier name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.poIdentifier name="PROCESSES" org.eventb.core.type="ℙ(PROCESSES)"/>
+<org.eventb.core.poIdentifier name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.poIdentifier name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspene" org.eventb.core.predicate="finite(PARTITIONS)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazULs21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspenf" org.eventb.core.predicate="finite(PROCESSES)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUL821EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspeng" org.eventb.core.predicate="partition(PARTITION_MODES,{PM_IDLE},{PM_NORMAL},{PM_COLD_START},{PM_WARM_START})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUMc21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspenh" org.eventb.core.predicate="partition(PROCESS_STATES,{PS_Dormant},{PS_Ready},{PS_Waiting},{PS_Suspend},{PS_WaitandSuspend},{PS_Running})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUMs21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspeni" org.eventb.core.predicate="card(PARTITIONS)&gt;0∧card(PARTITIONS)&lt;256" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fa9FIM21EeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="ABSHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#CTXHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poIdentifier name="partition_mode" org.eventb.core.type="ℙ(PARTITIONS×PARTITION_MODES)"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poSequent name="INITIALISATION/inv_part_mode/INV" org.eventb.core.accurate="true" org.eventb.core.poDesc="Invariant  establishment" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="SEQHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTALLHYPCtx_PartProc_Tranu"/>
+<org.eventb.core.poPredicate name="SEQHYQ" org.eventb.core.predicate="PARTITIONS × {PM_COLD_START}∈PARTITIONS → PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.invariant#_yI8UAs4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYR" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#'"/>
+<org.eventb.core.poSource name="SEQHYS" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.invariant#_yI8UAs4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSelHint name="SEQHYT" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#CTXHYP" org.eventb.core.poSelHintSnd="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poSequent#INITIALISATION\/inv_part_mode\/INV|org.eventb.core.poPredicateSet#SEQHYP"/>
+<org.eventb.core.poSelHint name="SEQHYU" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP|org.eventb.core.poPredicate#PRD0"/>
+</org.eventb.core.poSequent>
+<org.eventb.core.poPredicateSet name="EVTIDENTCtx_PartProc_Tranu" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#CTXHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poIdentifier name="partition_mode'" org.eventb.core.type="ℙ(PARTITIONS×PARTITION_MODES)"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="EVTALLHYPCtx_PartProc_Tranu" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTIDENTCtx_PartProc_Tranu" org.eventb.core.poStamp="0"/>
+<org.eventb.core.poSequent name="partition_mode_transition/grd03/WD" org.eventb.core.accurate="true" org.eventb.core.poDesc="Well-definedness of Guard" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="SEQHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv("/>
+<org.eventb.core.poPredicate name="SEQHYQ" org.eventb.core.predicate="part∈dom(partition_mode)∧partition_mode∈PARTITIONS ⇸ PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVoxc4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYR" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVoxc4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSelHint name="SEQHYS" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP" org.eventb.core.poSelHintSnd="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv("/>
+</org.eventb.core.poSequent>
+<org.eventb.core.poSequent name="partition_mode_transition/grd04/WD" org.eventb.core.accurate="true" org.eventb.core.poDesc="Well-definedness of Guard" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="SEQHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv)"/>
+<org.eventb.core.poPredicate name="SEQHYQ" org.eventb.core.predicate="part∈dom(partition_mode)∧partition_mode∈PARTITIONS ⇸ PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVoxs4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYR" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVoxs4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSelHint name="SEQHYS" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP" org.eventb.core.poSelHintSnd="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv)"/>
+</org.eventb.core.poSequent>
+<org.eventb.core.poSequent name="partition_mode_transition/grd05/WD" org.eventb.core.accurate="true" org.eventb.core.poDesc="Well-definedness of Guard" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="SEQHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv*"/>
+<org.eventb.core.poPredicate name="SEQHYQ" org.eventb.core.predicate="part∈dom(partition_mode)∧partition_mode∈PARTITIONS ⇸ PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xfZwM4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYR" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xfZwM4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSelHint name="SEQHYS" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP" org.eventb.core.poSelHintSnd="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv*"/>
+</org.eventb.core.poSequent>
+<org.eventb.core.poSequent name="partition_mode_transition/grd06/WD" org.eventb.core.accurate="true" org.eventb.core.poDesc="Well-definedness of Guard" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="SEQHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv+"/>
+<org.eventb.core.poPredicate name="SEQHYQ" org.eventb.core.predicate="part∈dom(partition_mode)∧partition_mode∈PARTITIONS ⇸ PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xfZwc4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYR" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xfZwc4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSelHint name="SEQHYS" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP" org.eventb.core.poSelHintSnd="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv+"/>
+</org.eventb.core.poSequent>
+<org.eventb.core.poSequent name="partition_mode_transition/inv_part_mode/INV" org.eventb.core.accurate="true" org.eventb.core.poDesc="Invariant  preservation" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="SEQHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTALLHYPCtx_PartProc_Tranv"/>
+<org.eventb.core.poPredicate name="SEQHYQ" org.eventb.core.predicate="partition_mode{part ↦ newm}∈PARTITIONS → PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.invariant#_yI8UAs4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYR" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSource name="SEQHYS" org.eventb.core.poRole="DEFAULT" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.invariant#_yI8UAs4SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poSelHint name="SEQHYT" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP" org.eventb.core.poSelHintSnd="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poSequent#partition_mode_transition\/inv_part_mode\/INV|org.eventb.core.poPredicateSet#SEQHYP"/>
+<org.eventb.core.poSelHint name="SEQHYU" org.eventb.core.poSelHintFst="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP|org.eventb.core.poPredicate#PRD0"/>
+</org.eventb.core.poSequent>
+<org.eventb.core.poPredicateSet name="EVTIDENTCtx_PartProc_Tranv" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ALLHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poIdentifier name="part" org.eventb.core.type="PARTITIONS"/>
+<org.eventb.core.poIdentifier name="partition_mode'" org.eventb.core.type="ℙ(PARTITIONS×PARTITION_MODES)"/>
+<org.eventb.core.poIdentifier name="newm" org.eventb.core.type="PARTITION_MODES"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="EVTHYPCtx_PartProc_Tranv(" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTIDENTCtx_PartProc_Tranv" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD0" org.eventb.core.predicate="part∈PARTITIONS" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVow84SEeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PRD1" org.eventb.core.predicate="newm∈PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVoxM4SEeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="EVTHYPCtx_PartProc_Tranv)" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv(" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD2" org.eventb.core.predicate="partition_mode(part)=PM_COLD_START⇒newm=PM_COLD_START∨newm=PM_IDLE∨newm=PM_NORMAL" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVoxc4SEeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="EVTHYPCtx_PartProc_Tranv*" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv)" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD3" org.eventb.core.predicate="partition_mode(part)=PM_WARM_START⇒newm=PM_WARM_START∨newm=PM_COLD_START∨newm=PM_IDLE∨newm=PM_NORMAL" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xVoxs4SEeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="EVTHYPCtx_PartProc_Tranv+" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv*" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD4" org.eventb.core.predicate="partition_mode(part)=PM_IDLE⇒newm=PM_WARM_START∨newm=PM_COLD_START" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xfZwM4SEeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="EVTALLHYPCtx_PartProc_Tranv" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#EVTHYPCtx_PartProc_Tranv+" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD5" org.eventb.core.predicate="partition_mode(part)=PM_NORMAL⇒newm=PM_WARM_START∨newm=PM_COLD_START∨newm=PM_IDLE" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.event#_5xVowM4SEeO_w8hSz1RRkQ|org.eventb.core.guard#_5xfZwc4SEeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="ALLHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bpo|org.eventb.core.poFile#Mach_Part_Trans|org.eventb.core.poPredicateSet#ABSHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD0" org.eventb.core.predicate="partition_mode∈PARTITIONS → PARTITION_MODES" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Mach_Part_Trans.bum|org.eventb.core.machineFile#Mach_Part_Trans|org.eventb.core.invariant#_yI8UAs4SEeO_w8hSz1RRkQ"/>
+</org.eventb.core.poPredicateSet>
+</org.eventb.core.poFile>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.contextFile org.eventb.core.configuration="org.eventb.core.fwd;de.prob.symbolic.ctxBase;de.prob.units.mchBase;org.eventb.codegen.ui.cgConfig;org.animb.valuation.valBase" org.eventb.texttools.text_lastmodified="1444906933611" org.eventb.texttools.text_representation="context Ctx_IPC&#10;&#10; extends Ctx_PartProc_Manage&#10;&#10;sets PORTS&#10;     PORT_DIRECTIONS&#10;     PORT_MODES&#10;     MESSAGES&#10;     QUEUING_DISCIPLINE&#10;     BLACKBOARD_INDICATORTYPE EVENT_STATE BUFFERS BLACKBOARDS SEMAPHORES EVENTS BufferWaitingTypes&#10;&#10;constants PORT_SOURCE&#10;          PORT_DESTINATION&#10;          PORT_MODE_SAMPLING&#10;          PORT_MODE_QUQUING&#10;          QUEUE_FIFO QUEUE_PRIORITY BB_EMPTY BB_OCCUPIED EVENT_UP EVENT_DOWN SamplingPorts&#10;          QueuingPorts&#10;          Source_SamplingPorts&#10;          Dest_SamplingPorts&#10;          Source_QueuingPorts&#10;          Dest_QueuingPorts&#10;          Sampling_Channels Queuing_Channels&#10;          Ports_of_Partition&#10;         Mode_of_Ports Direction_of_Ports MaxMsgSize_of_Ports&#10;          MaxMsgNum_of_QueuingPorts&#10;          WAITING_R&#10;          WAITING_W&#10;&#10;axioms&#10;  @axm_finite_ports finite(PORTS)&#10;  @axm_finite_msg finite(MESSAGES)&#10;  @axm_ports_partition partition(PORTS,SamplingPorts,QueuingPorts)&#10;  @axm_queueports_partition partition(QueuingPorts,Source_QueuingPorts,Dest_QueuingPorts)&#10;  @axm_sampports_partition partition(SamplingPorts,Source_SamplingPorts, Dest_SamplingPorts)&#10;  @axm_samp_channels Sampling_Channels ∈ Dest_SamplingPorts ↠ Source_SamplingPorts&#10;  @axm_que_channels Queuing_Channels ∈ Source_QueuingPorts ⤖   Dest_QueuingPorts&#10;  @axm_portdirect_partition partition(PORT_DIRECTIONS,{PORT_SOURCE},{PORT_DESTINATION})&#10;  @axm_portmode_partition partition(PORT_MODES,{PORT_MODE_SAMPLING},{PORT_MODE_QUQUING})&#10;  @axm_quediscipline partition(QUEUING_DISCIPLINE,{QUEUE_FIFO},{QUEUE_PRIORITY})&#10;  @axm_bbindicator partition(BLACKBOARD_INDICATORTYPE,{BB_EMPTY},{BB_OCCUPIED})&#10;  @axm_event_state partition(EVENT_STATE,{EVENT_UP},{EVENT_DOWN})&#10;  @axm_portsofpartition Ports_of_Partition∈PORTS→PARTITIONS&#10;  @axm_modeofports Mode_of_Ports∈PORTS→  PORT_MODES&#10;  @axm_directofports Direction_of_Ports∈PORTS→  PORT_DIRECTIONS&#10;  @axm_maxmsgsize_of_ports MaxMsgSize_of_Ports∈PORTS → ℕ1&#10;  @axm_maxmsgnum_of_queports MaxMsgNum_of_QueuingPorts ∈ QueuingPorts → ℕ1&#10;  @axm_srcport_direct ∀p·(p∈(Source_SamplingPorts∪Source_QueuingPorts)⇒ Direction_of_Ports(p)=PORT_SOURCE)&#10;  @axm_destport_direct ∀p·(p∈(Dest_SamplingPorts∪Dest_QueuingPorts)⇒ Direction_of_Ports(p)=PORT_DESTINATION)&#10;  @axm_sampports SamplingPorts = Mode_of_Ports∼[{PORT_MODE_SAMPLING}]&#10;  @axm_queueports QueuingPorts = Mode_of_Ports∼[{PORT_MODE_QUQUING}]&#10;  @axm_src_sampports Source_SamplingPorts = SamplingPorts ∩ Direction_of_Ports∼[{PORT_SOURCE}]&#10;  @axm_dest_sampports Dest_SamplingPorts = SamplingPorts ∩ Direction_of_Ports∼[{PORT_DESTINATION}]&#10;  @axm_src_queueports Source_QueuingPorts = QueuingPorts ∩ Direction_of_Ports∼[{PORT_SOURCE}]&#10;  @axm_dest_queueports Dest_QueuingPorts = QueuingPorts ∩ Direction_of_Ports∼[{PORT_DESTINATION}]&#10;  @axm_finite_buffers finite(BUFFERS) ∧ card(BUFFERS)=1024&#10;  @axm_finite_blackboards finite(BLACKBOARDS) ∧ card(BLACKBOARDS)=1024&#10;  @axm_finite_semaphores finite(SEMAPHORES) ∧ card(SEMAPHORES)=1024&#10;  @axm_finite_events finite(EVENTS) ∧ card(EVENTS)=1024&#10;  @axm_waiting_types partition(BufferWaitingTypes,{WAITING_R},{WAITING_W})&#10;end&#10;" version="3">
+<org.eventb.core.extendsContext name="'" org.eventb.core.target="Ctx_PartProc_Manage"/>
+<org.eventb.core.carrierSet name="_tncogNp4EeOkp8gIz_e_3A" org.eventb.core.identifier="PORTS"/>
+<org.eventb.core.constant name="_O_GwwNp5EeOkp8gIz_e_3A" org.eventb.core.identifier="PORT_SOURCE"/>
+<org.eventb.core.constant name="_O_Gwwdp5EeOkp8gIz_e_3A" org.eventb.core.identifier="PORT_DESTINATION"/>
+<org.eventb.core.constant name="_O_Gwwtp5EeOkp8gIz_e_3A" org.eventb.core.identifier="PORT_MODE_SAMPLING"/>
+<org.eventb.core.constant name="_O_Gww9p5EeOkp8gIz_e_3A" org.eventb.core.identifier="PORT_MODE_QUQUING"/>
+<org.eventb.core.constant name="_Ju1F4NtpEeO9zNSWZY0Sqw" org.eventb.core.identifier="QUEUE_FIFO"/>
+<org.eventb.core.constant name="_Ju1F4dtpEeO9zNSWZY0Sqw" org.eventb.core.identifier="QUEUE_PRIORITY"/>
+<org.eventb.core.constant name="_bUX5YNyfEeOWda2bYj8DcQ" org.eventb.core.identifier="BB_EMPTY"/>
+<org.eventb.core.constant name="_bUX5YdyfEeOWda2bYj8DcQ" org.eventb.core.identifier="BB_OCCUPIED"/>
+<org.eventb.core.constant name="_aJrlAN2pEeOOJcOQCDHIwg" org.eventb.core.identifier="EVENT_UP"/>
+<org.eventb.core.constant name="_aJrlAd2pEeOOJcOQCDHIwg" org.eventb.core.identifier="EVENT_DOWN"/>
+<org.eventb.core.constant name="_58AU8Np5EeOkp8gIz_e_3A" org.eventb.core.identifier="SamplingPorts"/>
+<org.eventb.core.constant name="_58AU8dp5EeOkp8gIz_e_3A" org.eventb.core.identifier="QueuingPorts"/>
+<org.eventb.core.axiom name="_C4j6ENqXEeOJlsJNAJz3Bg" org.eventb.core.label="axm_finite_ports" org.eventb.core.predicate="finite(PORTS)"/>
+<org.eventb.core.axiom name="_9FtfEOCTEeOhSYsQWkKi0A" org.eventb.core.label="axm_finite_msg" org.eventb.core.predicate="finite(MESSAGES)"/>
+<org.eventb.core.axiom name="_58AU8tp5EeOkp8gIz_e_3A" org.eventb.core.label="axm_ports_partition" org.eventb.core.predicate="partition(PORTS,SamplingPorts,QueuingPorts)"/>
+<org.eventb.core.axiom name="_RUN_Qdp_EeOkp8gIz_e_3A" org.eventb.core.label="axm_queueports_partition" org.eventb.core.predicate="partition(QueuingPorts,Source_QueuingPorts,Dest_QueuingPorts)"/>
+<org.eventb.core.axiom name="_RUN_QNp_EeOkp8gIz_e_3A" org.eventb.core.label="axm_sampports_partition" org.eventb.core.predicate="partition(SamplingPorts,Source_SamplingPorts, Dest_SamplingPorts)"/>
+<org.eventb.core.axiom name="_XbutIvJGEeOJxZjYtpnVgA" org.eventb.core.label="axm_samp_channels" org.eventb.core.predicate="Sampling_Channels ∈ Dest_SamplingPorts ↠ Source_SamplingPorts"/>
+<org.eventb.core.axiom name="_qymxUfI9EeOJxZjYtpnVgA" org.eventb.core.label="axm_que_channels" org.eventb.core.predicate="Queuing_Channels ∈ Source_QueuingPorts ⤖   Dest_QueuingPorts"/>
+<org.eventb.core.carrierSet name="_LgVuYNp6EeOkp8gIz_e_3A" org.eventb.core.identifier="PORT_DIRECTIONS"/>
+<org.eventb.core.carrierSet name="_LgVuYdp6EeOkp8gIz_e_3A" org.eventb.core.identifier="PORT_MODES"/>
+<org.eventb.core.axiom name="_LgVuYtp6EeOkp8gIz_e_3A" org.eventb.core.label="axm_portdirect_partition" org.eventb.core.predicate="partition(PORT_DIRECTIONS,{PORT_SOURCE},{PORT_DESTINATION})"/>
+<org.eventb.core.axiom name="_LgVuY9p6EeOkp8gIz_e_3A" org.eventb.core.label="axm_portmode_partition" org.eventb.core.predicate="partition(PORT_MODES,{PORT_MODE_SAMPLING},{PORT_MODE_QUQUING})"/>
+<org.eventb.core.constant name="_IqRG4Np_EeOkp8gIz_e_3A" org.eventb.core.identifier="Source_SamplingPorts"/>
+<org.eventb.core.constant name="_IqRG4dp_EeOkp8gIz_e_3A" org.eventb.core.identifier="Dest_SamplingPorts"/>
+<org.eventb.core.constant name="_IqRG4tp_EeOkp8gIz_e_3A" org.eventb.core.identifier="Source_QueuingPorts"/>
+<org.eventb.core.constant name="_IqRG49p_EeOkp8gIz_e_3A" org.eventb.core.identifier="Dest_QueuingPorts"/>
+<org.eventb.core.constant name="_XbutIPJGEeOJxZjYtpnVgA" org.eventb.core.identifier="Sampling_Channels"/>
+<org.eventb.core.constant name="_XbutIfJGEeOJxZjYtpnVgA" org.eventb.core.identifier="Queuing_Channels"/>
+<org.eventb.core.constant name="_axHw0Np6EeOkp8gIz_e_3A" org.eventb.core.identifier="Ports_of_Partition"/>
+<org.eventb.core.axiom name="_Ju1F4ttpEeO9zNSWZY0Sqw" org.eventb.core.label="axm_quediscipline" org.eventb.core.predicate="partition(QUEUING_DISCIPLINE,{QUEUE_FIFO},{QUEUE_PRIORITY})"/>
+<org.eventb.core.axiom name="_bUX5YtyfEeOWda2bYj8DcQ" org.eventb.core.label="axm_bbindicator" org.eventb.core.predicate="partition(BLACKBOARD_INDICATORTYPE,{BB_EMPTY},{BB_OCCUPIED})"/>
+<org.eventb.core.axiom name="_aJrlAt2pEeOOJcOQCDHIwg" org.eventb.core.label="axm_event_state" org.eventb.core.predicate="partition(EVENT_STATE,{EVENT_UP},{EVENT_DOWN})"/>
+<org.eventb.core.axiom name="_lpV3kNp6EeOkp8gIz_e_3A" org.eventb.core.label="axm_portsofpartition" org.eventb.core.predicate="Ports_of_Partition∈PORTS→PARTITIONS"/>
+<org.eventb.core.axiom name="_4ElY8Np8EeOkp8gIz_e_3A" org.eventb.core.label="axm_modeofports" org.eventb.core.predicate="Mode_of_Ports∈PORTS→  PORT_MODES"/>
+<org.eventb.core.axiom name="_4ElY8dp8EeOkp8gIz_e_3A" org.eventb.core.label="axm_directofports" org.eventb.core.predicate="Direction_of_Ports∈PORTS→  PORT_DIRECTIONS"/>
+<org.eventb.core.axiom name="_3W6mYNqXEeOJlsJNAJz3Bg" org.eventb.core.label="axm_maxmsgsize_of_ports" org.eventb.core.predicate="MaxMsgSize_of_Ports∈PORTS → ℕ1"/>
+<org.eventb.core.axiom name="_3W6mYdqXEeOJlsJNAJz3Bg" org.eventb.core.label="axm_maxmsgnum_of_queports" org.eventb.core.predicate="MaxMsgNum_of_QueuingPorts ∈ QueuingPorts → ℕ1"/>
+<org.eventb.core.axiom name="_D9_P4Np9EeOkp8gIz_e_3A" org.eventb.core.label="axm_srcport_direct" org.eventb.core.predicate="∀p·(p∈(Source_SamplingPorts∪Source_QueuingPorts)⇒ Direction_of_Ports(p)=PORT_SOURCE)"/>
+<org.eventb.core.axiom name="_D9_P4dp9EeOkp8gIz_e_3A" org.eventb.core.label="axm_destport_direct" org.eventb.core.predicate="∀p·(p∈(Dest_SamplingPorts∪Dest_QueuingPorts)⇒ Direction_of_Ports(p)=PORT_DESTINATION)"/>
+<org.eventb.core.constant name="_4ElY8tp8EeOkp8gIz_e_3A" org.eventb.core.identifier="Mode_of_Ports"/>
+<org.eventb.core.constant name="_4ElY89p8EeOkp8gIz_e_3A" org.eventb.core.identifier="Direction_of_Ports"/>
+<org.eventb.core.axiom name="_xt540Np-EeOkp8gIz_e_3A" org.eventb.core.label="axm_sampports" org.eventb.core.predicate="SamplingPorts = Mode_of_Ports∼[{PORT_MODE_SAMPLING}]"/>
+<org.eventb.core.axiom name="_xt540dp-EeOkp8gIz_e_3A" org.eventb.core.label="axm_queueports" org.eventb.core.predicate="QueuingPorts = Mode_of_Ports∼[{PORT_MODE_QUQUING}]"/>
+<org.eventb.core.axiom name="_hj8WMNp_EeOkp8gIz_e_3A" org.eventb.core.label="axm_src_sampports" org.eventb.core.predicate="Source_SamplingPorts = SamplingPorts ∩ Direction_of_Ports∼[{PORT_SOURCE}]"/>
+<org.eventb.core.axiom name="_hj8WMdp_EeOkp8gIz_e_3A" org.eventb.core.label="axm_dest_sampports" org.eventb.core.predicate="Dest_SamplingPorts = SamplingPorts ∩ Direction_of_Ports∼[{PORT_DESTINATION}]"/>
+<org.eventb.core.axiom name="_hj8WMtp_EeOkp8gIz_e_3A" org.eventb.core.label="axm_src_queueports" org.eventb.core.predicate="Source_QueuingPorts = QueuingPorts ∩ Direction_of_Ports∼[{PORT_SOURCE}]"/>
+<org.eventb.core.axiom name="_hj8WM9p_EeOkp8gIz_e_3A" org.eventb.core.label="axm_dest_queueports" org.eventb.core.predicate="Dest_QueuingPorts = QueuingPorts ∩ Direction_of_Ports∼[{PORT_DESTINATION}]"/>
+<org.eventb.core.constant name="_3XEXYNqXEeOJlsJNAJz3Bg" org.eventb.core.identifier="MaxMsgSize_of_Ports"/>
+<org.eventb.core.constant name="_3XEXYdqXEeOJlsJNAJz3Bg" org.eventb.core.identifier="MaxMsgNum_of_QueuingPorts"/>
+<org.eventb.core.carrierSet name="_WWfGYNsbEeO9zNSWZY0Sqw" org.eventb.core.identifier="MESSAGES"/>
+<org.eventb.core.carrierSet name="_Ju1F49tpEeO9zNSWZY0Sqw" org.eventb.core.identifier="QUEUING_DISCIPLINE"/>
+<org.eventb.core.carrierSet name="_bUhqYNyfEeOWda2bYj8DcQ" org.eventb.core.identifier="BLACKBOARD_INDICATORTYPE"/>
+<org.eventb.core.carrierSet name="_aJrlA92pEeOOJcOQCDHIwg" org.eventb.core.identifier="EVENT_STATE"/>
+<org.eventb.core.carrierSet name="_j7oGgNwEEeOJkaz9dS3ZBA" org.eventb.core.identifier="BUFFERS"/>
+<org.eventb.core.carrierSet name="_j7oGgdwEEeOJkaz9dS3ZBA" org.eventb.core.identifier="BLACKBOARDS"/>
+<org.eventb.core.carrierSet name="_j7oGgtwEEeOJkaz9dS3ZBA" org.eventb.core.identifier="SEMAPHORES"/>
+<org.eventb.core.carrierSet name="_j7oGg9wEEeOJkaz9dS3ZBA" org.eventb.core.identifier="EVENTS"/>
+<org.eventb.core.carrierSet name="_AmuHENwHEeOJkaz9dS3ZBA" org.eventb.core.identifier="BufferWaitingTypes"/>
+<org.eventb.core.constant name="_AmuHEdwHEeOJkaz9dS3ZBA" org.eventb.core.identifier="WAITING_R"/>
+<org.eventb.core.constant name="_AmuHEtwHEeOJkaz9dS3ZBA" org.eventb.core.identifier="WAITING_W"/>
+<org.eventb.core.axiom name="_9Rq-8NyXEeOWda2bYj8DcQ" org.eventb.core.label="axm_finite_buffers" org.eventb.core.predicate="finite(BUFFERS) ∧ card(BUFFERS)=1024"/>
+<org.eventb.core.axiom name="_9Rq-8dyXEeOWda2bYj8DcQ" org.eventb.core.label="axm_finite_blackboards" org.eventb.core.predicate="finite(BLACKBOARDS) ∧ card(BLACKBOARDS)=1024"/>
+<org.eventb.core.axiom name="_9Rq-8tyXEeOWda2bYj8DcQ" org.eventb.core.label="axm_finite_semaphores" org.eventb.core.predicate="finite(SEMAPHORES) ∧ card(SEMAPHORES)=1024"/>
+<org.eventb.core.axiom name="_9Rq-89yXEeOWda2bYj8DcQ" org.eventb.core.label="axm_finite_events" org.eventb.core.predicate="finite(EVENTS) ∧ card(EVENTS)=1024"/>
+<org.eventb.core.axiom name="_AmuHE9wHEeOJkaz9dS3ZBA" org.eventb.core.label="axm_waiting_types" org.eventb.core.predicate="partition(BufferWaitingTypes,{WAITING_R},{WAITING_W})"/>
+</org.eventb.core.contextFile>

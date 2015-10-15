@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.machineFile org.eventb.core.configuration="org.eventb.core.fwd;de.prob.units.mchBase;org.eventb.codegen.ui.cgConfig" org.eventb.texttools.text_lastmodified="1444908541886" org.eventb.texttools.text_representation="machine Mach_HM refines Mach_IPC  sees Ctx_HM&#10;&#10;variables processes processes_of_partition partition_mode process_state periodtype_of_process&#10;          process_wait_type&#10;          locklevel_of_partition&#10;          startcondition_of_partition&#10;          basepriority_of_process&#10;          period_of_process&#10;          timecapacity_of_process&#10;          deadline_of_process&#10;          currentpriority_of_process&#10;          deadlinetime_of_process&#10;          releasepoint_of_process&#10;          delaytime_of_process&#10;          current_partition&#10;          current_process&#10;          current_partition_flag&#10;          current_process_flag&#10;          clock_tick&#10;          need_reschedule&#10;          need_procresch&#10;          preempter_of_partition&#10;          timeout_trigger&#10;          errorhandler_of_partition&#10;          process_call_errorhandler&#10;          queuing_ports sampling_ports&#10;          RefreshPeriod_of_SamplingPorts&#10;          msgspace_of_samplingports&#10;          needtrans_of_sourcesamplingport&#10;          queue_of_queueingports quediscipline_of_queueingports&#10;          processes_waitingfor_queuingports&#10;          buffers blackboards semaphores events_ buffers_of_partition blackboards_of_partition semaphores_of_partition events_of_partition MaxMsgNum_of_Buffers queue_of_buffers processes_waitingfor_buffers quediscipline_of_buffers msgspace_of_blackboards emptyindicator_of_blackboards processes_waitingfor_blackboards MaxValue_of_Semaphores value_of_semaphores quediscipline_of_semaphores processes_waitingfor_semaphores state_of_events processes_waitingfor_events&#10;          used_messages&#10;          module_shutdown&#10;&#10;&#10;invariants&#10;  @inv_module_shutdown module_shutdown∈BOOL&#10;&#10;events&#10;  event INITIALISATION extends INITIALISATION&#10;    then&#10;      @act701 module_shutdown ≔ FALSE&#10;  end&#10;&#10;  event create_error_handler extends create_process&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 basepriority=MAX_PRIORITY_VALUE&#10;      @grd702 part∉dom(errorhandler_of_partition)&#10;  end&#10;&#10;  event report_application_message&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_error_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd01 current_partition_flag = TRUE ∧ current_process_flag = TRUE&#10;      @grd02 current_partition∈dom(errorhandler_of_partition) ∧ current_process = errorhandler_of_partition(current_partition)&#10;      @grd03 current_process ∈ dom(process_call_errorhandler)&#10;  end&#10;&#10;  event hm_recoveryaction_shutdown_module&#10;    any errcode part&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS&#10;      @grd702 errcode∈dom(MultiPart_HM_Table(part))&#10;      @grd703 errcode ↦ MLA_SHUTDOWN ∈ MultiPart_HM_Table(part)&#10;    then&#10;      @act701 module_shutdown≔TRUE&#10;  end&#10;&#10;  event hm_recoveryaction_reset_module&#10;    any errcode part&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS&#10;      @grd702 errcode∈dom(MultiPart_HM_Table(part))&#10;      @grd703 errcode ↦ MLA_RESET ∈ MultiPart_HM_Table(part)&#10;  end&#10;&#10;  event hm_recoveryaction_ignore_module&#10;    any errcode part&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS&#10;      @grd702 errcode∈dom(MultiPart_HM_Table(part))&#10;      @grd703 errcode ↦ MLA_IGNORE ∈ MultiPart_HM_Table(part)&#10;  end&#10;&#10;  event hm_recoveryaction_idle_partition extends set_partition_mode_to_idle&#10;    any errcode&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS ∧ part∈PARTITIONS&#10;      @grd703 (errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_IDLE∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))&#10;  end&#10;&#10;  event hm_recoveryaction_coldstart_partition extends set_partition_mode_to_coldstart&#10;    any errcode&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS ∧ part∈PARTITIONS&#10;      @grd703 (errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_COLD_START∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))&#10;  end&#10;&#10;  event hm_recoveryaction_warmstart_partition extends set_partition_mode_to_warmstart&#10;    any errcode&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS&#10;      @grd703 (errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_WARM_START∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))&#10;  end&#10;&#10;  event hm_recoveryaction_ignore_partition&#10;    any errcode part&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS ∧ part∈PARTITIONS&#10;      @grd703 (errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_IGNORE∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))&#10;  end&#10;&#10;  event hm_recoveryaction_errorhandler extends start_aperiodprocess_innormal&#10;    any errcode&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;      @grd701 errcode∈SYSTEM_ERRORS&#10;      @grd702 (errcode∈dom(Partition_HM_Table(part)) ∧ ∃a·(a∈PARTITION_RECOVERY_ACTIONS ∧ ERROR_LEVEL_PROCESS↦a∈dom(Partition_HM_Table(part)(errcode)))  )&#10;      @grd703 DEADLINE_MISSED∈ran(Partition_HM_Table(part)(errcode)) ⇒ (∃pc·(pc∈processes_of_partition∼[{part}] ∧ pc∈dom(deadlinetime_of_process)∧clock_tick∗ONE_TICK_TIME &gt; deadlinetime_of_process(pc)))&#10;      @grd704 part∈dom(errorhandler_of_partition)&#10;      @grd705 current_process ≠ errorhandler_of_partition(part)&#10;      @grd706 proc = errorhandler_of_partition(part)&#10;  end&#10;&#10;  event create_sampling_port extends create_sampling_port&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event write_sampling_message extends write_sampling_message&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event transfer_sampling_msg extends transfer_sampling_msg&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event read_sampling_message extends read_sampling_message&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_sampling_port_id extends get_sampling_port_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_sampling_port_status extends get_sampling_port_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event create_queuing_port extends create_queuing_port&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event send_queuing_message extends send_queuing_message&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event send_queuing_message_needwait&#10;  extends send_queuing_message_needwait&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event transfer_queuing_msg extends transfer_queuing_msg&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event wakeup_waitproc_on_srcqueports&#10;  extends wakeup_waitproc_on_srcqueports&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event wakeup_waitproc_on_destqueports&#10;  extends wakeup_waitproc_on_destqueports&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event receive_queuing_message extends receive_queuing_message&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event receive_queuing_message_needwait&#10;  extends receive_queuing_message_needwait&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_queuing_port_id extends get_queuing_port_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_queuing_port_status extends get_queuing_port_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event clear_queuing_port extends clear_queuing_port&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event create_buffer extends create_buffer&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event send_buffer extends send_buffer&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event send_buffer_needwakeuprecvproc&#10;  extends send_buffer_needwakeuprecvproc&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event send_buffer_withfull&#10;  extends send_buffer_withfull&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event receive_buffer extends receive_buffer&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event receive_buffer_needwakeupsendproc&#10;  extends receive_buffer_needwakeupsendproc&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event receive_buffer_whenempty&#10;  extends receive_buffer_whenempty&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_buffer_id extends get_buffer_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_buffer_status extends get_buffer_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event create_blackboard extends create_blackboard&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event display_blackboard extends display_blackboard&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event display_blackboard_needwakeuprdprocs&#10;  extends display_blackboard_needwakeuprdprocs&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event read_blackboard extends read_blackboard&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event read_blackboard_whenempty&#10;  extends read_blackboard_whenempty&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event clear_blackboard extends clear_blackboard&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_blackboard_id extends get_blackboard_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_blackboard_status extends get_blackboard_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event create_semaphore extends create_semaphore&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event wait_semaphore extends wait_semaphore&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event wait_semahpore_whenzero&#10;  extends wait_semahpore_whenzero&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event signal_semaphore extends signal_semaphore&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event signal_semaphore_needwakeupproc&#10;  extends signal_semaphore_needwakeupproc&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_semaphore_id extends get_semaphore_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_semaphore_status extends get_semaphore_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event create_event extends create_event&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event set_event extends set_event&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event set_event_needwakeupprocs&#10;  extends set_event_needwakeupprocs&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event reset_event extends reset_event&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event wait_event extends wait_event&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event wait_event_whendown&#10;  extends wait_event_whendown&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_event_id extends get_event_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_event_status extends get_event_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event ticktock&#10;  extends ticktock&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event partition_schedule extends partition_schedule&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event process_schedule&#10;  extends process_schedule&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event run_errorhandler_preempter&#10;  extends run_errorhandler_preempter&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_partition_status extends get_partition_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event set_partition_mode_to_idle&#10;  extends set_partition_mode_to_idle&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event set_partition_mode_to_normal extends set_partition_mode_to_normal&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event set_partition_mode_to_coldstart extends set_partition_mode_to_coldstart&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event set_partition_mode_to_warmstart extends set_partition_mode_to_warmstart&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_process_id extends get_process_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_process_status extends get_process_status&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event create_process extends create_process&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event set_priority extends set_priority&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event suspend_self&#10;  extends suspend_self&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event suspend&#10;  extends suspend&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event resume&#10;  extends resume&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event stop_self extends stop_self&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event stop extends stop&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event stop_wf_qport extends stop_wf_qport&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event stop_wf_buf extends stop_wf_buf&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event stop_wf_sem extends stop_wf_sem&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event stop_wf_bb extends stop_wf_bb&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event stop_wf_evt extends stop_wf_evt&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event start_aperiodprocess_instart&#10;  extends start_aperiodprocess_instart&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event start_aperiodprocess_innormal&#10;  extends start_aperiodprocess_innormal&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event start_periodprocess_instart&#10;  extends start_periodprocess_instart&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event start_periodprocess_innormal&#10;  extends start_periodprocess_innormal&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event delaystart_aperiodprocess_instart&#10;  extends delaystart_aperiodprocess_instart&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event delaystart_aperiodprocess_innormal&#10;  extends delaystart_aperiodprocess_innormal&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event delaystart_periodprocess_instart&#10;  extends delaystart_periodprocess_instart&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event delaystart_periodprocess_innormal&#10;  extends delaystart_periodprocess_innormal&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event lock_preemption extends lock_preemption&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event unlock_preemption extends unlock_preemption&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_my_id extends get_my_id&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event timed_wait extends timed_wait&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event period_wait extends period_wait&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event get_time extends get_time&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event replenish extends replenish&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event aperiodicprocess_finished extends aperiodicprocess_finished&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event periodicprocess_finished extends periodicprocess_finished&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event time_out&#10;  extends time_out&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;&#10;  event time_out_wf_qport extends time_out_wf_qport&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event time_out_wf_buf extends time_out_wf_buf&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event time_out_wf_sem extends time_out_wf_sem&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event time_out_wf_bb extends time_out_wf_bb&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event time_out_wf_evt extends time_out_wf_evt&#10;  where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event periodicproc_reach_releasepoint extends periodicproc_reach_releasepoint&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event coldstart_partition_fromidle extends coldstart_partition_fromidle&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;&#10;  event warmstart_partition_fromidle extends warmstart_partition_fromidle&#10;    where&#10;      @grd700 module_shutdown = FALSE&#10;  end&#10;end&#10;" version="5">
+<org.eventb.core.refinesMachine name="'" org.eventb.core.target="Mach_IPC"/>
+<org.eventb.core.seesContext name="_RXK5AP3TEeOo5_6MhQdZkA" org.eventb.core.target="Ctx_HM"/>
+<org.eventb.core.variable name="_kB9LEPaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes"/>
+<org.eventb.core.variable name="_kB9LEfaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_of_partition"/>
+<org.eventb.core.variable name="_kB9LEvaqEeO0lIhp9r31mg" org.eventb.core.identifier="partition_mode"/>
+<org.eventb.core.variable name="_kB9LE_aqEeO0lIhp9r31mg" org.eventb.core.identifier="process_state"/>
+<org.eventb.core.variable name="_kB9LFPaqEeO0lIhp9r31mg" org.eventb.core.identifier="periodtype_of_process"/>
+<org.eventb.core.variable name="_kB9LFfaqEeO0lIhp9r31mg" org.eventb.core.identifier="process_wait_type"/>
+<org.eventb.core.variable name="_kB9LFvaqEeO0lIhp9r31mg" org.eventb.core.identifier="locklevel_of_partition"/>
+<org.eventb.core.variable name="_kB9LF_aqEeO0lIhp9r31mg" org.eventb.core.identifier="startcondition_of_partition"/>
+<org.eventb.core.variable name="_kB9LGPaqEeO0lIhp9r31mg" org.eventb.core.identifier="basepriority_of_process"/>
+<org.eventb.core.variable name="_kB9LGfaqEeO0lIhp9r31mg" org.eventb.core.identifier="period_of_process"/>
+<org.eventb.core.variable name="_kB9LGvaqEeO0lIhp9r31mg" org.eventb.core.identifier="timecapacity_of_process"/>
+<org.eventb.core.variable name="_kB9LG_aqEeO0lIhp9r31mg" org.eventb.core.identifier="deadline_of_process"/>
+<org.eventb.core.variable name="_kB9LHPaqEeO0lIhp9r31mg" org.eventb.core.identifier="currentpriority_of_process"/>
+<org.eventb.core.variable name="_kB9LHfaqEeO0lIhp9r31mg" org.eventb.core.identifier="deadlinetime_of_process"/>
+<org.eventb.core.variable name="_kB9LHvaqEeO0lIhp9r31mg" org.eventb.core.identifier="releasepoint_of_process"/>
+<org.eventb.core.variable name="_kB9LH_aqEeO0lIhp9r31mg" org.eventb.core.identifier="delaytime_of_process"/>
+<org.eventb.core.variable name="_kB9LIPaqEeO0lIhp9r31mg" org.eventb.core.identifier="current_partition"/>
+<org.eventb.core.variable name="_kB9LIfaqEeO0lIhp9r31mg" org.eventb.core.identifier="current_process"/>
+<org.eventb.core.variable name="_kB9LIvaqEeO0lIhp9r31mg" org.eventb.core.identifier="current_partition_flag"/>
+<org.eventb.core.variable name="_kB9LI_aqEeO0lIhp9r31mg" org.eventb.core.identifier="current_process_flag"/>
+<org.eventb.core.variable name="_kB9LJPaqEeO0lIhp9r31mg" org.eventb.core.identifier="clock_tick"/>
+<org.eventb.core.variable name="_kB9LJfaqEeO0lIhp9r31mg" org.eventb.core.identifier="need_reschedule"/>
+<org.eventb.core.variable name="_EvrdADVKEeSxw-wt7-_VGQ" org.eventb.core.identifier="need_procresch"/>
+<org.eventb.core.variable name="_kB9LJvaqEeO0lIhp9r31mg" org.eventb.core.identifier="preempter_of_partition"/>
+<org.eventb.core.variable name="_kB9LJ_aqEeO0lIhp9r31mg" org.eventb.core.identifier="timeout_trigger"/>
+<org.eventb.core.variable name="_kB9LKPaqEeO0lIhp9r31mg" org.eventb.core.identifier="errorhandler_of_partition"/>
+<org.eventb.core.variable name="_kB9LKfaqEeO0lIhp9r31mg" org.eventb.core.identifier="process_call_errorhandler"/>
+<org.eventb.core.variable name="_kB9LKvaqEeO0lIhp9r31mg" org.eventb.core.identifier="queuing_ports"/>
+<org.eventb.core.variable name="_mW8Q8PdkEeOkQpPDjalEqQ" org.eventb.core.identifier="sampling_ports"/>
+<org.eventb.core.variable name="_kB9LLPaqEeO0lIhp9r31mg" org.eventb.core.identifier="RefreshPeriod_of_SamplingPorts"/>
+<org.eventb.core.variable name="_mW8Q8fdkEeOkQpPDjalEqQ" org.eventb.core.identifier="msgspace_of_samplingports"/>
+<org.eventb.core.variable name="_kB9LLvaqEeO0lIhp9r31mg" org.eventb.core.identifier="needtrans_of_sourcesamplingport"/>
+<org.eventb.core.variable name="_mW8Q8vdkEeOkQpPDjalEqQ" org.eventb.core.identifier="queue_of_queueingports"/>
+<org.eventb.core.variable name="_kB9LMPaqEeO0lIhp9r31mg" org.eventb.core.identifier="quediscipline_of_queueingports"/>
+<org.eventb.core.variable name="_kB9LMfaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_waitingfor_queuingports"/>
+<org.eventb.core.variable name="_kB9LMvaqEeO0lIhp9r31mg" org.eventb.core.identifier="buffers"/>
+<org.eventb.core.variable name="_kCDRsPaqEeO0lIhp9r31mg" org.eventb.core.identifier="blackboards"/>
+<org.eventb.core.variable name="_kCDRsfaqEeO0lIhp9r31mg" org.eventb.core.identifier="semaphores"/>
+<org.eventb.core.variable name="_mW8Q8_dkEeOkQpPDjalEqQ" org.eventb.core.identifier="events_"/>
+<org.eventb.core.variable name="_mW8Q9PdkEeOkQpPDjalEqQ" org.eventb.core.identifier="buffers_of_partition"/>
+<org.eventb.core.variable name="_mW8Q9fdkEeOkQpPDjalEqQ" org.eventb.core.identifier="blackboards_of_partition"/>
+<org.eventb.core.variable name="_mW8Q9vdkEeOkQpPDjalEqQ" org.eventb.core.identifier="semaphores_of_partition"/>
+<org.eventb.core.variable name="__thJkPdiEeOkQpPDjalEqQ" org.eventb.core.identifier="events_of_partition"/>
+<org.eventb.core.variable name="_kCDRt_aqEeO0lIhp9r31mg" org.eventb.core.identifier="MaxMsgNum_of_Buffers"/>
+<org.eventb.core.variable name="_kCDRuPaqEeO0lIhp9r31mg" org.eventb.core.identifier="queue_of_buffers"/>
+<org.eventb.core.variable name="_mW8Q9_dkEeOkQpPDjalEqQ" org.eventb.core.identifier="processes_waitingfor_buffers"/>
+<org.eventb.core.variable name="_kCDRuvaqEeO0lIhp9r31mg" org.eventb.core.identifier="quediscipline_of_buffers"/>
+<org.eventb.core.variable name="_kCDRu_aqEeO0lIhp9r31mg" org.eventb.core.identifier="msgspace_of_blackboards"/>
+<org.eventb.core.variable name="_kCDRvPaqEeO0lIhp9r31mg" org.eventb.core.identifier="emptyindicator_of_blackboards"/>
+<org.eventb.core.variable name="__thJkfdiEeOkQpPDjalEqQ" org.eventb.core.identifier="processes_waitingfor_blackboards"/>
+<org.eventb.core.variable name="_kCDRvvaqEeO0lIhp9r31mg" org.eventb.core.identifier="MaxValue_of_Semaphores"/>
+<org.eventb.core.variable name="_mW8Q-PdkEeOkQpPDjalEqQ" org.eventb.core.identifier="value_of_semaphores"/>
+<org.eventb.core.variable name="_kCDRwPaqEeO0lIhp9r31mg" org.eventb.core.identifier="quediscipline_of_semaphores"/>
+<org.eventb.core.variable name="_kCDRwfaqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_waitingfor_semaphores"/>
+<org.eventb.core.variable name="_kCDRwvaqEeO0lIhp9r31mg" org.eventb.core.identifier="state_of_events"/>
+<org.eventb.core.variable name="_kCDRw_aqEeO0lIhp9r31mg" org.eventb.core.identifier="processes_waitingfor_events"/>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqR" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="INITIALISATION">
+<org.eventb.core.action name="_LNt_QR7UEeScPtO58H0E3g" org.eventb.core.assignment="module_shutdown ≔ FALSE" org.eventb.core.label="act701"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_V5-uwP_1EeOGibWoyCWxNQ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_error_handler">
+<org.eventb.core.refinesEvent name="_V5-uwf_1EeOGibWoyCWxNQ" org.eventb.core.target="create_process"/>
+<org.eventb.core.guard name="_8YBg4B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_V5-uwv_1EeOGibWoyCWxNQ" org.eventb.core.label="grd701" org.eventb.core.predicate="basepriority=MAX_PRIORITY_VALUE"/>
+<org.eventb.core.guard name="_V5-uw__1EeOGibWoyCWxNQ" org.eventb.core.label="grd702" org.eventb.core.predicate="part∉dom(errorhandler_of_partition)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_jyLNoP_1EeOGibWoyCWxNQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="report_application_message">
+<org.eventb.core.guard name="_8YBg4R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_jyLNof_1EeOGibWoyCWxNQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="get_error_status">
+<org.eventb.core.guard name="_8YBg4h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_jyLNov_1EeOGibWoyCWxNQ" org.eventb.core.label="grd01" org.eventb.core.predicate="current_partition_flag = TRUE ∧ current_process_flag = TRUE"/>
+<org.eventb.core.guard name="_jyLNo__1EeOGibWoyCWxNQ" org.eventb.core.label="grd02" org.eventb.core.predicate="current_partition∈dom(errorhandler_of_partition) ∧ current_process = errorhandler_of_partition(current_partition)"/>
+<org.eventb.core.guard name="_jyLNpP_1EeOGibWoyCWxNQ" org.eventb.core.label="grd03" org.eventb.core.predicate="current_process ∈ dom(process_call_errorhandler)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_VwrnsB7UEeScPtO58H0E3g" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="hm_recoveryaction_shutdown_module">
+<org.eventb.core.parameter name="_OmX08R8HEeSl4PykE4BuzQ" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.parameter name="_Omg-4B8HEeSl4PykE4BuzQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.guard name="_8YnWwh7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_Omg-4R8HEeSl4PykE4BuzQ" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS"/>
+<org.eventb.core.guard name="_Omg-4h8HEeSl4PykE4BuzQ" org.eventb.core.label="grd702" org.eventb.core.predicate="errcode∈dom(MultiPart_HM_Table(part))"/>
+<org.eventb.core.guard name="_Omg-4x8HEeSl4PykE4BuzQ" org.eventb.core.label="grd703" org.eventb.core.predicate="errcode ↦ MLA_SHUTDOWN ∈ MultiPart_HM_Table(part)"/>
+<org.eventb.core.action name="_8YnWwx7UEeScPtO58H0E3g" org.eventb.core.assignment="module_shutdown≔TRUE" org.eventb.core.label="act701"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_VwrnsR7UEeScPtO58H0E3g" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="hm_recoveryaction_reset_module">
+<org.eventb.core.parameter name="_Omg-5B8HEeSl4PykE4BuzQ" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.parameter name="_Omg-5R8HEeSl4PykE4BuzQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.guard name="_8YnWxB7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_Omg-5h8HEeSl4PykE4BuzQ" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS"/>
+<org.eventb.core.guard name="_Omg-5x8HEeSl4PykE4BuzQ" org.eventb.core.label="grd702" org.eventb.core.predicate="errcode∈dom(MultiPart_HM_Table(part))"/>
+<org.eventb.core.guard name="_Omg-6B8HEeSl4PykE4BuzQ" org.eventb.core.label="grd703" org.eventb.core.predicate="errcode ↦ MLA_RESET ∈ MultiPart_HM_Table(part)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_Vwrnsh7UEeScPtO58H0E3g" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="hm_recoveryaction_ignore_module">
+<org.eventb.core.parameter name="_Omg-6R8HEeSl4PykE4BuzQ" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.parameter name="_Omg-6h8HEeSl4PykE4BuzQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.guard name="_8YBg4x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_Omg-6x8HEeSl4PykE4BuzQ" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS"/>
+<org.eventb.core.guard name="_Omg-7B8HEeSl4PykE4BuzQ" org.eventb.core.label="grd702" org.eventb.core.predicate="errcode∈dom(MultiPart_HM_Table(part))"/>
+<org.eventb.core.guard name="_Omg-7R8HEeSl4PykE4BuzQ" org.eventb.core.label="grd703" org.eventb.core.predicate="errcode ↦ MLA_IGNORE ∈ MultiPart_HM_Table(part)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_gdX3QP9AEeOMm9piiWZLqw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="hm_recoveryaction_idle_partition">
+<org.eventb.core.refinesEvent name="_gdX3Qf9AEeOMm9piiWZLqw" org.eventb.core.target="set_partition_mode_to_idle"/>
+<org.eventb.core.parameter name="_gdX3Qv9AEeOMm9piiWZLqw" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.guard name="_8YBg5B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_gdX3Q_9AEeOMm9piiWZLqw" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS ∧ part∈PARTITIONS"/>
+<org.eventb.core.guard name="_-fT4QP_tEeOGibWoyCWxNQ" org.eventb.core.label="grd703" org.eventb.core.predicate="(errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_IDLE∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cYX9QP_vEeOGibWoyCWxNQ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="hm_recoveryaction_coldstart_partition">
+<org.eventb.core.refinesEvent name="_7zpUgP_zEeOGibWoyCWxNQ" org.eventb.core.target="set_partition_mode_to_coldstart"/>
+<org.eventb.core.parameter name="_cYX9Qv_vEeOGibWoyCWxNQ" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.guard name="_8YBg5R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_cYX9Q__vEeOGibWoyCWxNQ" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS ∧ part∈PARTITIONS"/>
+<org.eventb.core.guard name="_cYX9Rf_vEeOGibWoyCWxNQ" org.eventb.core.label="grd703" org.eventb.core.predicate="(errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_COLD_START∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_46HbQP_2EeOGibWoyCWxNQ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="hm_recoveryaction_warmstart_partition">
+<org.eventb.core.refinesEvent name="_46HbQf_2EeOGibWoyCWxNQ" org.eventb.core.target="set_partition_mode_to_warmstart"/>
+<org.eventb.core.parameter name="_46HbQv_2EeOGibWoyCWxNQ" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.guard name="_8YBg5h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_46HbQ__2EeOGibWoyCWxNQ" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS"/>
+<org.eventb.core.guard name="_46HbRP_2EeOGibWoyCWxNQ" org.eventb.core.label="grd703" org.eventb.core.predicate="(errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_WARM_START∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_cYX9TP_vEeOGibWoyCWxNQ" org.eventb.core.convergence="0" org.eventb.core.extended="false" org.eventb.core.label="hm_recoveryaction_ignore_partition">
+<org.eventb.core.parameter name="_cYhHMP_vEeOGibWoyCWxNQ" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.parameter name="__Vcf8P_2EeOGibWoyCWxNQ" org.eventb.core.identifier="part"/>
+<org.eventb.core.guard name="_8YBg5x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_cYhHMf_vEeOGibWoyCWxNQ" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS ∧ part∈PARTITIONS"/>
+<org.eventb.core.guard name="_cYhHM__vEeOGibWoyCWxNQ" org.eventb.core.label="grd703" org.eventb.core.predicate="(errcode∈dom(Partition_HM_Table(part)) ∧ ERROR_LEVEL_PARTITION2↦PLA_IGNORE∈dom(Partition_HM_Table(part)(errcode)))&#10;              ∨ (part∉dom(errorhandler_of_partition)) ∨ (current_process = errorhandler_of_partition(part))"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_NWY54P_xEeOGibWoyCWxNQ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="hm_recoveryaction_errorhandler">
+<org.eventb.core.refinesEvent name="_s613wP_0EeOGibWoyCWxNQ" org.eventb.core.target="start_aperiodprocess_innormal"/>
+<org.eventb.core.parameter name="_NWY54f_xEeOGibWoyCWxNQ" org.eventb.core.identifier="errcode"/>
+<org.eventb.core.guard name="_8YBg6B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+<org.eventb.core.guard name="_NWY54__xEeOGibWoyCWxNQ" org.eventb.core.label="grd701" org.eventb.core.predicate="errcode∈SYSTEM_ERRORS"/>
+<org.eventb.core.guard name="_BcG-sVZgEeSDPdjKBmjRbA" org.eventb.core.label="grd702" org.eventb.core.predicate="(errcode∈dom(Partition_HM_Table(part)) ∧ ∃a·(a∈PARTITION_RECOVERY_ACTIONS ∧ ERROR_LEVEL_PROCESS↦a∈dom(Partition_HM_Table(part)(errcode)))  )"/>
+<org.eventb.core.guard name="_NWY55f_xEeOGibWoyCWxNQ" org.eventb.core.label="grd703" org.eventb.core.predicate="DEADLINE_MISSED∈ran(Partition_HM_Table(part)(errcode)) ⇒ (∃pc·(pc∈processes_of_partition∼[{part}] ∧ pc∈dom(deadlinetime_of_process)∧clock_tick∗ONE_TICK_TIME &gt; deadlinetime_of_process(pc)))"/>
+<org.eventb.core.guard name="_NWY55v_xEeOGibWoyCWxNQ" org.eventb.core.label="grd704" org.eventb.core.predicate="part∈dom(errorhandler_of_partition)"/>
+<org.eventb.core.guard name="_NWY55__xEeOGibWoyCWxNQ" org.eventb.core.label="grd705" org.eventb.core.predicate="current_process ≠ errorhandler_of_partition(part)"/>
+<org.eventb.core.guard name="_s613wf_0EeOGibWoyCWxNQ" org.eventb.core.label="grd706" org.eventb.core.predicate="proc = errorhandler_of_partition(part)"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqS" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_sampling_port">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_sampling_port"/>
+<org.eventb.core.guard name="_8YBg6R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqT" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="write_sampling_message">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="write_sampling_message"/>
+<org.eventb.core.guard name="_8YKq0B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqU" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="transfer_sampling_msg">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="transfer_sampling_msg"/>
+<org.eventb.core.guard name="_8YKq0R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqV" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="read_sampling_message">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="read_sampling_message"/>
+<org.eventb.core.guard name="_8YKq0h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqW" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_sampling_port_id">
+<org.eventb.core.refinesEvent name="_VwFKwB7UEeScPtO58H0E3g" org.eventb.core.target="get_sampling_port_id"/>
+<org.eventb.core.guard name="_8YKq0x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqX" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_sampling_port_status">
+<org.eventb.core.refinesEvent name="_VwO7wB7UEeScPtO58H0E3g" org.eventb.core.target="get_sampling_port_status"/>
+<org.eventb.core.guard name="_8YKq1B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqY" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_queuing_port">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_queuing_port"/>
+<org.eventb.core.guard name="_8YKq1R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqZ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="send_queuing_message">
+<org.eventb.core.refinesEvent name="_BcQvsFZgEeSDPdjKBmjRbA" org.eventb.core.target="send_queuing_message"/>
+<org.eventb.core.guard name="_8YKq1h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq[" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="send_queuing_message_needwait">
+<org.eventb.core.refinesEvent name="_BcQvsVZgEeSDPdjKBmjRbA" org.eventb.core.target="send_queuing_message_needwait"/>
+<org.eventb.core.guard name="_8YKq1x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq\" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="transfer_queuing_msg">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="transfer_queuing_msg"/>
+<org.eventb.core.guard name="_8YKq2B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq]" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="wakeup_waitproc_on_srcqueports">
+<org.eventb.core.refinesEvent name="_BcQvslZgEeSDPdjKBmjRbA" org.eventb.core.target="wakeup_waitproc_on_srcqueports"/>
+<org.eventb.core.guard name="_8YKq2R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq^" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="wakeup_waitproc_on_destqueports">
+<org.eventb.core.refinesEvent name="_BcQvs1ZgEeSDPdjKBmjRbA" org.eventb.core.target="wakeup_waitproc_on_destqueports"/>
+<org.eventb.core.guard name="_8YKq2h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq_" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="receive_queuing_message">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="receive_queuing_message"/>
+<org.eventb.core.guard name="_8YKq2x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq`" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="receive_queuing_message_needwait">
+<org.eventb.core.refinesEvent name="_BcQvtFZgEeSDPdjKBmjRbA" org.eventb.core.target="receive_queuing_message_needwait"/>
+<org.eventb.core.guard name="_8YKq3B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqa" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_queuing_port_id">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_queuing_port_id"/>
+<org.eventb.core.guard name="_8YKq3R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqb" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_queuing_port_status">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_queuing_port_status"/>
+<org.eventb.core.guard name="_8YKq3h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqc" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="clear_queuing_port">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="clear_queuing_port"/>
+<org.eventb.core.guard name="_8YKq3x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqd" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_buffer">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_buffer"/>
+<org.eventb.core.guard name="_8YKq4B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqe" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="send_buffer">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="send_buffer"/>
+<org.eventb.core.guard name="_8YKq4R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqf" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="send_buffer_needwakeuprecvproc">
+<org.eventb.core.refinesEvent name="_BcQvtVZgEeSDPdjKBmjRbA" org.eventb.core.target="send_buffer_needwakeuprecvproc"/>
+<org.eventb.core.guard name="_8YKq4h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqg" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="send_buffer_withfull">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="send_buffer_withfull"/>
+<org.eventb.core.guard name="_8YKq4x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqh" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="receive_buffer">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="receive_buffer"/>
+<org.eventb.core.guard name="_8YKq5B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqi" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="receive_buffer_needwakeupsendproc">
+<org.eventb.core.refinesEvent name="_BcQvtlZgEeSDPdjKBmjRbA" org.eventb.core.target="receive_buffer_needwakeupsendproc"/>
+<org.eventb.core.guard name="_8YKq5R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqj" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="receive_buffer_whenempty">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="receive_buffer_whenempty"/>
+<org.eventb.core.guard name="_8YUb0B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqk" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_buffer_id">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_buffer_id"/>
+<org.eventb.core.guard name="_8YUb0R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEql" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_buffer_status">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_buffer_status"/>
+<org.eventb.core.guard name="_8YUb0h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqm" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_blackboard">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_blackboard"/>
+<org.eventb.core.guard name="_8YUb0x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqn" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="display_blackboard">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="display_blackboard"/>
+<org.eventb.core.guard name="_8YUb1B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqo" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="display_blackboard_needwakeuprdprocs">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="display_blackboard_needwakeuprdprocs"/>
+<org.eventb.core.guard name="_8YUb1R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqp" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="read_blackboard">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="read_blackboard"/>
+<org.eventb.core.guard name="_8YUb1h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqq" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="read_blackboard_whenempty">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="read_blackboard_whenempty"/>
+<org.eventb.core.guard name="_8YUb1x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqr" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="clear_blackboard">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="clear_blackboard"/>
+<org.eventb.core.guard name="_8YUb2B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqs" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_blackboard_id">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_blackboard_id"/>
+<org.eventb.core.guard name="_8YUb2R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqt" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_blackboard_status">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_blackboard_status"/>
+<org.eventb.core.guard name="_8YUb2h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqu" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_semaphore">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_semaphore"/>
+<org.eventb.core.guard name="_8YUb2x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqv" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="wait_semaphore">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="wait_semaphore"/>
+<org.eventb.core.guard name="_8YUb3B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="wait_semahpore_whenzero">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="wait_semahpore_whenzero"/>
+<org.eventb.core.guard name="_8YUb3R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqx" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="signal_semaphore">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="signal_semaphore"/>
+<org.eventb.core.guard name="_8YUb3h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqy" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="signal_semaphore_needwakeupproc">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="signal_semaphore_needwakeupproc"/>
+<org.eventb.core.guard name="_8YUb3x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEqz" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_semaphore_id">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_semaphore_id"/>
+<org.eventb.core.guard name="_8YUb4B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq{" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_semaphore_status">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_semaphore_status"/>
+<org.eventb.core.guard name="_8YUb4R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq|" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_event">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_event"/>
+<org.eventb.core.guard name="_8YUb4h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq}" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_event">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="set_event"/>
+<org.eventb.core.guard name="_8YUb4x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEq~" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_event_needwakeupprocs">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="set_event_needwakeupprocs"/>
+<org.eventb.core.guard name="_8YUb5B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr'" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="reset_event">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="reset_event"/>
+<org.eventb.core.guard name="_8YeM0B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr(" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="wait_event">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="wait_event"/>
+<org.eventb.core.guard name="_8YeM0R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr)" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="wait_event_whendown">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="wait_event_whendown"/>
+<org.eventb.core.guard name="_8YeM0h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr*" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_event_id">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_event_id"/>
+<org.eventb.core.guard name="_8YeM0x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr+" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_event_status">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_event_status"/>
+<org.eventb.core.guard name="_8YeM1B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr," org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="ticktock">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="ticktock"/>
+<org.eventb.core.guard name="_8YeM1R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr-" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="partition_schedule">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="partition_schedule"/>
+<org.eventb.core.guard name="_8YeM1h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr." org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="process_schedule">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="process_schedule"/>
+<org.eventb.core.guard name="_8YeM1x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr/" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="run_errorhandler_preempter">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="run_errorhandler_preempter"/>
+<org.eventb.core.guard name="_8YeM2B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr0" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_partition_status">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_partition_status"/>
+<org.eventb.core.guard name="_8YeM2R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr1" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_idle">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="set_partition_mode_to_idle"/>
+<org.eventb.core.guard name="_8YeM2h7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr2" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_normal">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="set_partition_mode_to_normal"/>
+<org.eventb.core.guard name="_8YeM2x7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr3" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_coldstart">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="set_partition_mode_to_coldstart"/>
+<org.eventb.core.guard name="_8YeM3B7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr4" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_partition_mode_to_warmstart">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="set_partition_mode_to_warmstart"/>
+<org.eventb.core.guard name="_8YeM3R7UEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr5" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_process_id">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_process_id"/>
+<org.eventb.core.guard name="_LF3OUB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr6" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_process_status">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="get_process_status"/>
+<org.eventb.core.guard name="_LF3OUR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr7" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="create_process">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="create_process"/>
+<org.eventb.core.guard name="_LF3OUh7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr8" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="set_priority">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="set_priority"/>
+<org.eventb.core.guard name="_LF3OUx7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr9" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="suspend_self">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="suspend_self"/>
+<org.eventb.core.guard name="_LF3OVB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr:" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="suspend">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="suspend"/>
+<org.eventb.core.guard name="_LF3OVR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr;" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="resume">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="resume"/>
+<org.eventb.core.guard name="_LGAYQB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr=" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_self">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="stop_self"/>
+<org.eventb.core.guard name="_LGAYQR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr&gt;" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop">
+<org.eventb.core.refinesEvent name="'" org.eventb.core.target="stop"/>
+<org.eventb.core.guard name="_LGAYQh7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr?" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_qport">
+<org.eventb.core.refinesEvent name="_2gUPIHMKEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_qport"/>
+<org.eventb.core.guard name="_LGAYQx7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalEr@" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_buf">
+<org.eventb.core.refinesEvent name="_2gUPIXMKEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_buf"/>
+<org.eventb.core.guard name="_LGAYRB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErA" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_sem">
+<org.eventb.core.refinesEvent name="_2gUPInMKEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_sem"/>
+<org.eventb.core.guard name="_LGAYRR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErB" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_bb">
+<org.eventb.core.refinesEvent name="_2gUPI3MKEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_bb"/>
+<org.eventb.core.guard name="_LGAYRh7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErC" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="stop_wf_evt">
+<org.eventb.core.refinesEvent name="_2gUPJHMKEeWvprsQA3-vtw" org.eventb.core.target="stop_wf_evt"/>
+<org.eventb.core.guard name="_LGAYRx7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErD" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_aperiodprocess_instart">
+<org.eventb.core.refinesEvent name="_2gUPJXMKEeWvprsQA3-vtw" org.eventb.core.target="start_aperiodprocess_instart"/>
+<org.eventb.core.guard name="_LGAYSB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErE" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_aperiodprocess_innormal">
+<org.eventb.core.refinesEvent name="_2gUPJnMKEeWvprsQA3-vtw" org.eventb.core.target="start_aperiodprocess_innormal"/>
+<org.eventb.core.guard name="_LGAYSR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErF" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_periodprocess_instart">
+<org.eventb.core.refinesEvent name="_2gUPJ3MKEeWvprsQA3-vtw" org.eventb.core.target="start_periodprocess_instart"/>
+<org.eventb.core.guard name="_LGAYSh7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErG" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="start_periodprocess_innormal">
+<org.eventb.core.refinesEvent name="_2gUPKHMKEeWvprsQA3-vtw" org.eventb.core.target="start_periodprocess_innormal"/>
+<org.eventb.core.guard name="_LGAYSx7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErH" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_aperiodprocess_instart">
+<org.eventb.core.refinesEvent name="_2gUPKXMKEeWvprsQA3-vtw" org.eventb.core.target="delaystart_aperiodprocess_instart"/>
+<org.eventb.core.guard name="_LGAYTB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErI" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_aperiodprocess_innormal">
+<org.eventb.core.refinesEvent name="_2gUPKnMKEeWvprsQA3-vtw" org.eventb.core.target="delaystart_aperiodprocess_innormal"/>
+<org.eventb.core.guard name="_LGAYTR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErJ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_periodprocess_instart">
+<org.eventb.core.refinesEvent name="_2gUPK3MKEeWvprsQA3-vtw" org.eventb.core.target="delaystart_periodprocess_instart"/>
+<org.eventb.core.guard name="_LGAYTh7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErK" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="delaystart_periodprocess_innormal">
+<org.eventb.core.refinesEvent name="_2gUPLHMKEeWvprsQA3-vtw" org.eventb.core.target="delaystart_periodprocess_innormal"/>
+<org.eventb.core.guard name="_LGAYTx7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErL" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="lock_preemption">
+<org.eventb.core.refinesEvent name="_2geAIHMKEeWvprsQA3-vtw" org.eventb.core.target="lock_preemption"/>
+<org.eventb.core.guard name="_LGAYUB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErM" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="unlock_preemption">
+<org.eventb.core.refinesEvent name="_2geAIXMKEeWvprsQA3-vtw" org.eventb.core.target="unlock_preemption"/>
+<org.eventb.core.guard name="_LGAYUR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErN" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_my_id">
+<org.eventb.core.refinesEvent name="_2geAInMKEeWvprsQA3-vtw" org.eventb.core.target="get_my_id"/>
+<org.eventb.core.guard name="_LGAYUh7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErO" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="timed_wait">
+<org.eventb.core.refinesEvent name="_2geAI3MKEeWvprsQA3-vtw" org.eventb.core.target="timed_wait"/>
+<org.eventb.core.guard name="_LGAYUx7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErP" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="period_wait">
+<org.eventb.core.refinesEvent name="_2geAJHMKEeWvprsQA3-vtw" org.eventb.core.target="period_wait"/>
+<org.eventb.core.guard name="_LGKJQB7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErQ" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="get_time">
+<org.eventb.core.refinesEvent name="_2geAJXMKEeWvprsQA3-vtw" org.eventb.core.target="get_time"/>
+<org.eventb.core.guard name="_LGKJQR7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErR" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="replenish">
+<org.eventb.core.refinesEvent name="_2geAJnMKEeWvprsQA3-vtw" org.eventb.core.target="replenish"/>
+<org.eventb.core.guard name="_LGKJQh7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_mW8Q9vdkEeOkQpPDjalErS" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="aperiodicprocess_finished">
+<org.eventb.core.refinesEvent name="_2geAJ3MKEeWvprsQA3-vtw" org.eventb.core.target="aperiodicprocess_finished"/>
+<org.eventb.core.guard name="_LGKJQx7VEeScPtO58H0E3g" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.variable name="_LOdmIB7UEeScPtO58H0E3g" org.eventb.core.identifier="used_messages"/>
+<org.eventb.core.invariant name="_LOdmIR7UEeScPtO58H0E3g" org.eventb.core.label="inv_module_shutdown" org.eventb.core.predicate="module_shutdown∈BOOL"/>
+<org.eventb.core.variable name="_bVRaIHMKEeWvprsQA3-vtw" org.eventb.core.identifier="module_shutdown"/>
+<org.eventb.core.event name="_2geAKHMKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="periodicprocess_finished">
+<org.eventb.core.refinesEvent name="_2geAKXMKEeWvprsQA3-vtw" org.eventb.core.target="periodicprocess_finished"/>
+<org.eventb.core.guard name="_2geAKnMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geAK3MKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out">
+<org.eventb.core.refinesEvent name="_2geALHMKEeWvprsQA3-vtw" org.eventb.core.target="time_out"/>
+<org.eventb.core.guard name="_2geALXMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geALnMKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_qport">
+<org.eventb.core.refinesEvent name="_2geAL3MKEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_qport"/>
+<org.eventb.core.guard name="_2geAMHMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geAMXMKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_buf">
+<org.eventb.core.refinesEvent name="_2geAMnMKEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_buf"/>
+<org.eventb.core.guard name="_2geAM3MKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geANHMKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_sem">
+<org.eventb.core.refinesEvent name="_2geANXMKEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_sem"/>
+<org.eventb.core.guard name="_2geANnMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geAN3MKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_bb">
+<org.eventb.core.refinesEvent name="_2geAOHMKEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_bb"/>
+<org.eventb.core.guard name="_2geAOXMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geAOnMKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="time_out_wf_evt">
+<org.eventb.core.refinesEvent name="_2geAO3MKEeWvprsQA3-vtw" org.eventb.core.target="time_out_wf_evt"/>
+<org.eventb.core.guard name="_2geAPHMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geAPXMKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="periodicproc_reach_releasepoint">
+<org.eventb.core.refinesEvent name="_2geAPnMKEeWvprsQA3-vtw" org.eventb.core.target="periodicproc_reach_releasepoint"/>
+<org.eventb.core.guard name="_2geAP3MKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geAQHMKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="coldstart_partition_fromidle">
+<org.eventb.core.refinesEvent name="_2geAQXMKEeWvprsQA3-vtw" org.eventb.core.target="coldstart_partition_fromidle"/>
+<org.eventb.core.guard name="_2geAQnMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+<org.eventb.core.event name="_2geAQ3MKEeWvprsQA3-vtw" org.eventb.core.convergence="0" org.eventb.core.extended="true" org.eventb.core.label="warmstart_partition_fromidle">
+<org.eventb.core.refinesEvent name="_2geARHMKEeWvprsQA3-vtw" org.eventb.core.target="warmstart_partition_fromidle"/>
+<org.eventb.core.guard name="_2geARXMKEeWvprsQA3-vtw" org.eventb.core.label="grd700" org.eventb.core.predicate="module_shutdown = FALSE"/>
+</org.eventb.core.event>
+</org.eventb.core.machineFile>

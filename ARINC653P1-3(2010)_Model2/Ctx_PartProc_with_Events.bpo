@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eventb.core.poFile org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicateSet name="ABSHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poIdentifier name="PARTITIONS" org.eventb.core.type="ℙ(PARTITIONS)"/>
+<org.eventb.core.poIdentifier name="PARTITION_MODES" org.eventb.core.type="ℙ(PARTITION_MODES)"/>
+<org.eventb.core.poIdentifier name="PROCESSES" org.eventb.core.type="ℙ(PROCESSES)"/>
+<org.eventb.core.poIdentifier name="PROCESS_STATES" org.eventb.core.type="ℙ(PROCESS_STATES)"/>
+<org.eventb.core.poIdentifier name="PM_COLD_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_IDLE" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_NORMAL" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PM_WARM_START" org.eventb.core.type="PARTITION_MODES"/>
+<org.eventb.core.poIdentifier name="PS_Dormant" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Ready" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Running" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Suspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_WaitandSuspend" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poIdentifier name="PS_Waiting" org.eventb.core.type="PROCESS_STATES"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspene" org.eventb.core.predicate="finite(PARTITIONS)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazULs21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspenf" org.eventb.core.predicate="finite(PROCESSES)" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUL821EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspeng" org.eventb.core.predicate="partition(PARTITION_MODES,{PM_IDLE},{PM_NORMAL},{PM_COLD_START},{PM_WARM_START})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUMc21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspenh" org.eventb.core.predicate="partition(PROCESS_STATES,{PS_Dormant},{PS_Ready},{PS_Waiting},{PS_Suspend},{PS_WaitandSuspend},{PS_Running})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fazUMs21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poPredicate name="PS_WaitandSuspeni" org.eventb.core.predicate="card(PARTITIONS)&gt;0∧card(PARTITIONS)&lt;256" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_Trans.buc|org.eventb.core.contextFile#Ctx_PartProc_Trans|org.eventb.core.axiom#_fa9FIM21EeO_w8hSz1RRkQ"/>
+<org.eventb.core.poIdentifier name="PROC_PERIOD_TYPE" org.eventb.core.type="ℙ(PROC_PERIOD_TYPE)"/>
+<org.eventb.core.poIdentifier name="APERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+<org.eventb.core.poIdentifier name="PERIOD_PROC" org.eventb.core.type="PROC_PERIOD_TYPE"/>
+</org.eventb.core.poPredicateSet>
+<org.eventb.core.poPredicateSet name="ALLHYP" org.eventb.core.parentSet="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_with_Events.bpo|org.eventb.core.poFile#Ctx_PartProc_with_Events|org.eventb.core.poPredicateSet#ABSHYP" org.eventb.core.poStamp="0">
+<org.eventb.core.poPredicate name="PRD0" org.eventb.core.predicate="partition(PROC_PERIOD_TYPE,{PERIOD_PROC},{APERIOD_PROC})" org.eventb.core.source="/ARINC653P1-3(2010)_Model2/Ctx_PartProc_with_Events.buc|org.eventb.core.contextFile#Ctx_PartProc_with_Events|org.eventb.core.axiom#_IKNTw9UOEeOE_q1ibjWlpA"/>
+</org.eventb.core.poPredicateSet>
+</org.eventb.core.poFile>
